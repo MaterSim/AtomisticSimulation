@@ -5,7 +5,7 @@ This is a 3-credit course requires three hours of classroom or direct faculty in
 
 ## Instructor: Qiang Zhu (Battcave 114, qzhu8@uncc.edu)
 
-## Text book, title, author, and year: 
+## Textbooks
 - *Understanding molecular simulation from algorithms to applications*, By Daan Frankel and Berend Smit, 3rd Edition
 - *Electronic structure*, By Richard. Martin, 2nd Edition
 
@@ -60,24 +60,172 @@ The expected outcomes include:
 * Go beyond the experimental capability
 * Gain some physical insights
 
-Homework: Read the [Rahman](https://en.wikipedia.org/wiki/Aneesur_Rahman)'s 1964 paper. We will try to reproduce some results from this work in this week. 
+## Homework (W1M1): 
+1. Read the Alder & Wainwright's [1956 paper]([Phase transition of hard spheres](https://gibbs.ccny.cuny.edu/teaching/s2021/labs/HardDiskSimulation/Alders&Wainwright1957.pdf) and understand [hard sphere potential](https://en.wikipedia.org/wiki/Hard_spheres)
+2. Read the [Rahman](https://en.wikipedia.org/wiki/Aneesur_Rahman)'s [1964 paper](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405). We will try to reproduce some results from this work in this week. 
 
 ## A first MD simulation of liquid argon under NVE ensemble.
 
-### MD workflow
+### A Simple MD workflow
 
+```pseudo
+I. Initialization
+    * Set simulation parameters (e.g., number of particles, temperature, time step)
+    1. particle positions (R) randomly or on a lattice
+    2 particle velocities (V) Maxwell-Boltzmann distribution
+
+II. Computation of Energy and Forces
+    * Compute potential energy using the chosen potential
+    * Compute forces on each particle by differentiating the potential energy
+
+III. Integration (Time Evolution)
+    * For each time step:
+        1. Update particle positions using the integration algorithm (e.g., Verlet)
+        2. Update particle velocities based on the computed forces
+        3. Apply periodic boundary conditions (if necessary)
+        4. Recompute forces on all particles
+        5. Update potential energy
+
+IV. Termination
+    * Check if the simulation time has reached the desired number of steps
+```
 ### Interatomic potential
-Lennard Jones Potential is a popular choice for modelling weakly interacted systems.
 
-* Energy
-* Force
+[Lennard Jones Potential](https://en.wikipedia.org/wiki/Lennard-Jones_potential) express the assumes that all particles interact with each other via pairwise interactions (i.e., the interaction energy only depends on the distance).
+
+$$
+V(r) = 4\epsilon \left[ \left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^{6} \right]
+$$
+
+It consist of two components:
+* $1/r^{12}$ term to account for short range repulsion
+* $-1/r^6$ term to account for the long range attraction (also called [London dispersion force](https://en.wikipedia.org/wiki/London_dispersion_force))
+* ε and σ control the equilibrum distance and shape of the energy well. 
+
+This form has been widely used to model the essential features of interactions between simple atoms and molecules.
+
+* Questions:
+1. Why were the 12 and 6-powered terms were choosen? Any other choices?
+2. How does the LJ potential decay with respect to r?
+3. The limitations of LJ potential?
+4. Can we use them to model metal, ceramics or others?
+
+### The computation of energy and forces
+
+After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system.
+Assuming the system consists of N atoms, and the positions (R) are recorded by an array of [N, 3], we can use the following psuedo Python code for the given task.
+```python
+import numpy as np
+
+E = 0                    # Total Energy
+F = np.zeros([N, 3])     # Atomic forces
+
+for atom i in range(N-1):
+    for atom j in range(i+1, N):
+        Compute the distance: R = Ri - Rj
+        Compute the energy: V = V(R_ij)
+        E += V
+        Compute the derivative w.r.t R: dE/dR_i and dE/dR_j
+        F(i) -= dE/dR_i
+        F(j) -= dE/dR_j
+```
+
+### Notes: derivation of Forces
+The force  $\mathbf{F}(r)$ between two particles is the negative gradient of the potential:
+
+$$
+\mathbf{F}(r) = -\frac{dV(r)}{dr}
+$$
+
+Taking the derivative of the potential with respect to  r :
+
+$$
+\begin{align*}
+\frac{dV(r)}{dr} &= 4\epsilon \left[ -12\left(\frac{\sigma}{r}\right)^{12} \frac{1}{r} + 6\left(\frac{\sigma}{r}\right)^{6} \frac{1}{r} \right]\\
+                 &= \epsilon \left[ \frac{48\sigma^{12}}{r^{13}} - \frac{24\sigma^{6}}{r^{7}} \right]
+\end{align*}
+$$
+
+In practice, the $r$ is a 3-vector $(x, y, z)$, to compute the force component on like $F_x(r)$, there is an addition work.
+The distance $r$ between two particles can be written as:
+
+$$
+r = \sqrt{x^2 + y^2 + z^2}
+$$
+
+$$
+\begin{align*}
+F_x(r) &= -\frac{dV(x, y, z)}{dx} = -\frac{dV(x, y, z)}{dr}\frac{dr}{dx} \\
+       &= - \frac{dV(x, y, z)}{dr} \frac{x}{r} \\
+       &= x \epsilon \left[ \frac{48\sigma^{12}}{r^{14}} - \frac{24\sigma^{6}}{r^{8}} \right]
+\end{align*}
+$$
 
 
 ### Initialization
+* Atoimic positions
+If we study a system that mimics solid, we can just create the position on a lattice compatible with the structure that we aim to simulate. You must avoid the case of geometry consisting of two atoms with very short distances.
+
+* Velocities
+Ideally, we should generate the initial velocities to follow the [Maxwell-Boltzmann distribution](https://en.wikipedia.org/wiki/Maxwell–Boltzmann_distribution).
+
+$$
+f(v) = 4\pi \left( \frac{m}{2\pi k_B T} \right)^{3/2} v^2 \exp\left(-\frac{mv^2}{2k_B T}\right)
+$$
+
+To acheive this, idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
+
+```python
+import numpy as np
+
+def generate_velocities(num_particles, temperature, mass):
+    # Boltzmann constant in appropriate units (e.g., J/K or eV/K)
+    k_B = 1.380649e-23  # J/K
+
+    # Standard deviation of the velocity distribution
+    sigma_v = np.sqrt(k_B * temperature / mass)
+
+    # Generate velocities from a normal distribution
+    velocities = np.random.normal(0, sigma_v, (num_particles, 3))
+
+    return velocities
+
+# Example usage
+num_particles = 1000       # Number of particles
+temperature = 300          # Temperature in Kelvin
+mass = 1.67e-27            # Mass of a particle in kg (e.g., proton)
+
+velocities = generate_velocities(num_particles, temperature, mass)
+
+# Subtract the mean velocity to ensure zero net momentum
+mean_velocity = np.mean(velocities, axis=0)
+velocities -= mean_velocity
+
+print("Velocities adjusted for zero total momentum (m/s):")
+print(velocities[:5])
+```
+However, for the current task of NVE simulation, we would compute velocity from $\mathbf{r}(t)$ trajectory. Therefore, this setup would only impact the first step of integration. If the simulation converges, it won't have impacts on the simulation.
 
 ### Integrator (updating rule)
-* Leapfrog
-* Verlet
+After knowing the forces, we can proceed to update the velocities (V) and positions (R) for the next time step:
+
+$$
+\begin{align*}
+r(t+dt) &= r(t) + v(t)dt\\
+v(t+dt) &= v(t) + f(t)/m \cdot dt
+\end{align*}
+$$
+
+However, this update will suffer from a rapid propagation of error. To reduce the error propogation, we use the so called [Verlet algorithm](https://en.wikipedia.org/wiki/Verlet_integration). 
+
+$$
+\begin{align*}
+\mathbf{r}(t + dt) &= 2\mathbf{r}(t) - \mathbf{r}(t - dt)  \\
+\mathbf{v}(t + dt) &= \frac{\mathbf{r}(t+dt) - \mathbf{v}(t - dt)}{2dt}
+\end{align*}
+$$
+
+According to Taylor expansion, this algorithm is accurate to $O(dt^2)$ in position. 
 
 ### Full code
 
