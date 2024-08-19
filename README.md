@@ -43,7 +43,8 @@ The expected outcomes include:
 
 # Week 1: Gas Simulation under the NVE ensemble
 
-## Prehistory of Computer Simulation:
+## 1.1 Overview
+### 1.1.1 Prehistory of Computer Simulation:
 * The Los Alamos MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer) became operational in 1952. This event marks a significant milestone in the history of computing. Nicholas Metropolis, as the most notable early user, developed the Monte Carlo method, a statistical technique that utilizes random sampling to solve complex mathematical problems. 
 
 * The launch of computer also openned the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people have to to do it either analytically (e.g., thermodynamics and stastical mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagentic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lacks the atomic detail. An alterative approach is directly model the system (straightforward but very time consuming and tedious). Notable examples include. 
@@ -56,17 +57,17 @@ The expected outcomes include:
 2. Real material, 1959, Gibson, Goland, Milgram, Vineyard (Brookhaven), [Dynamics of radiation damage](https://journals.aps.org/pr/abstract/10.1103/PhysRev.120.1229)
 3. Liquid, 1964, Rahman, [Correlations in Liquid Argon](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405)
 
-## Why do we need such kind of direct simulation method like MD
+### 1.1.2 Why do we need such kind of direct simulation method like MD
 * Go beyond the experimental capability
 * Gain some physical insights
 
-## Homework (W1M1): 
+### 1.1.3 Homework (W1M1): 
 1. Read the Alder & Wainwright's [1956 paper]([Phase transition of hard spheres](https://gibbs.ccny.cuny.edu/teaching/s2021/labs/HardDiskSimulation/Alders&Wainwright1957.pdf) and understand [hard sphere potential](https://en.wikipedia.org/wiki/Hard_spheres)
 2. Read the [Rahman](https://en.wikipedia.org/wiki/Aneesur_Rahman)'s [1964 paper](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405). We will try to reproduce some results from this work in this week. 
 
-## A first MD simulation of liquid argon under NVE ensemble.
+## 1.2 A first MD simulation of liquid argon under NVE ensemble.
 
-### A Simple MD workflow
+### 1.2.1 A Simple MD workflow
 
 ```pseudo
 I. Initialization
@@ -89,7 +90,7 @@ III. Integration (Time Evolution)
 IV. Termination
     * Check if the simulation time has reached the desired number of steps
 ```
-### Interatomic potential
+### 1.2.2 Interatomic potential
 
 [Lennard Jones Potential](https://en.wikipedia.org/wiki/Lennard-Jones_potential) express the assumes that all particles interact with each other via pairwise interactions (i.e., the interaction energy only depends on the distance).
 
@@ -110,7 +111,7 @@ This form has been widely used to model the essential features of interactions b
 3. The limitations of LJ potential?
 4. Can we use them to model metal, ceramics or others?
 
-### The computation of energy and forces
+### 1.2.3 The computation of energy and forces
 
 After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system.
 Assuming the system consists of N atoms, and the positions (R) are recorded by an array of [N, 3], we can use the following psuedo Python code for the given task.
@@ -130,7 +131,7 @@ for atom i in range(N-1):
         F(j) -= dE/dR_j
 ```
 
-### Notes: derivation of Forces
+### 1.2.4 Notes: derivation of Forces
 The force  $\mathbf{F}(r)$ between two particles is the negative gradient of the potential:
 
 $$
@@ -162,7 +163,7 @@ F_x(r) &= -\frac{dV(x, y, z)}{dx} = -\frac{dV(x, y, z)}{dr}\frac{dr}{dx} \\
 $$
 
 
-### Initialization
+### 1.2.5 Initialization
 * Atoimic positions
 If we study a system that mimics solid, we can just create the position on a lattice compatible with the structure that we aim to simulate. You must avoid the case of geometry consisting of two atoms with very short distances.
 
@@ -170,10 +171,15 @@ If we study a system that mimics solid, we can just create the position on a lat
 Ideally, we should generate the initial velocities to follow the [Maxwell-Boltzmann distribution](https://en.wikipedia.org/wiki/Maxwell–Boltzmann_distribution).
 
 $$
-f(v) = 4\pi \left( \frac{m}{2\pi k_B T} \right)^{3/2} v^2 \exp\left(-\frac{mv^2}{2k_B T}\right)
+p(v) = 4\pi \left( \frac{m}{2\pi k_B T} \right)^{3/2} v^2 \exp\left(-\frac{mv^2}{2k_B T}\right)
 $$
 
-To acheive this, idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
+The mean value of v should be
+$$
+
+$$
+
+To acheive this, the idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
 
 ```python
 import numpy as np
@@ -204,9 +210,11 @@ velocities -= mean_velocity
 print("Velocities adjusted for zero total momentum (m/s):")
 print(velocities[:5])
 ```
-However, for the current task of NVE simulation, we would compute velocity from $\mathbf{r}(t)$ trajectory. Therefore, this setup would only impact the first step of integration. If the simulation converges, it won't have impacts on the simulation.
+In addition the above script, one can also use [scipy.stats.maxwell](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.maxwell.html#scipy.stats.maxwell) to generate random samples.
 
-### Integrator (updating rule)
+Note, for the current task of NVE simulation, we would compute velocity from $\mathbf{r}(t)$ trajectory. Therefore, this setup would only impact the first step of integration. If the simulation converges, it won't have impacts on the simulation.
+
+### 1.2.6 Integrator (updating rule)
 After knowing the forces, we can proceed to update the velocities (V) and positions (R) for the next time step:
 
 $$
@@ -227,12 +235,29 @@ $$
 
 According to Taylor expansion, this algorithm is accurate to $O(dt^2)$ in position. 
 
-### Full code
+## 1.3 Full code
+Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
 
-Hopefully, you are able to write a basic code for MD simulation. 
+### 1.3.1 Summary of Code Implementation
+1. Make sure you have go over all equations and finish the pseudo code before writing the real code
+2. Split the entire workflow into several subtasks.
+3. For each subtask, make sure you have some mechanisms to validate and debug your code.
+4. Validate the final results with some physical guidance (in NVE simulation, ensure you check if the total energy is conserved).
 
-Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of LAMMPS, one of the most popular code for materials modelling. A short example is provided as follows.
-   
+Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
+
+### 1.3.2 Crossvalidation with other MD codes.
+Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of LAMMPS, one of the most popular code for materials modelling.
+
+For students who already have LAMMPS experience, there is a bonus credit opportunity. 
+Please rerun the simulation in lammps with the same parameter setup. Post your lammps script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1)
+
+
+# Week 2: Liquid-gas phase transition under the NVT ensemble
+
+## 2.1 Moltivation
+
+
 
 
 
