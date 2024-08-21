@@ -23,7 +23,7 @@ The expected outcomes include:
 ## Tenative schedules
 
 ### I: Molecular dynamics simulation
-- Week 1: Motivating example 1: Numerical simulation of argon under the NVE ensemble
+- Week 1: Motivating example 1: Argon under the NVE ensemble
 - Week 2: Motivating example 2: Liquid-gas phase transition under the NVT ensemble
 - Week 3: Motivating example 3: Simulation of solids under the NPT ensemble 
 - Week 4: Introduction to the LAMMPS package
@@ -41,7 +41,7 @@ The expected outcomes include:
 - Week 14: Selected presentations from students 
 
 
-# Week 1: Gas Simulation under the NVE ensemble
+# Week 1: Simulation under the NVE ensemble
 
 ## 1.1 Overview
 ### 1.1.1 Prehistory of Computer Simulation:
@@ -243,10 +243,10 @@ Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2
 Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
 
 ### 1.3.2 Crossvalidation with other MD codes.
-Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of LAMMPS, one of the most popular code for materials modelling.
+Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular code for materials modelling.
 
 For students who already have LAMMPS experience, there is a bonus credit opportunity. 
-Please rerun the simulation in lammps with the same parameter setup. Post your lammps script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1)
+Please rerun the simulation in LAMMPS with the same parameter setup. Post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1)
 
 
 # Week 2: Liquid-gas phase transition under the NVT ensemble
@@ -264,6 +264,7 @@ To maintain the system at a desired temperature by coupling it to an external *h
 ## 2.2 Different types of thermostats
 
 To introduce the thermostat to a MD system, the trick is to modify the integrator. Currently, there exist several flavors of thermostat techniques.
+Perhaps the easiest way to rescale the velecities to force the total kinet energy to be equal to $\frac{3NkT}{2}$ at every few steps. However, this kind of rescaling can definitely perturb the MD trajectory strongly and thus not recommended. Below I will show you a few better strategies. 
 
 ### 2.2.1 The Anderson thermostat
 
