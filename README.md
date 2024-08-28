@@ -206,9 +206,10 @@ velocities -= mean_velocity
 print("Velocities adjusted for zero total momentum (m/s):")
 print(velocities[:5])
 ```
-In addition the above script, one can also use [scipy.stats.maxwell](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.maxwell.html#scipy.stats.maxwell) to generate random samples.
+<!---In addition the above script, one can also use [scipy.stats.maxwell](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.maxwell.html#scipy.stats.maxwell) to generate random samples.
 
 Note, for the current task of NVE simulation, we would compute velocity from $\mathbf{r}(t)$ trajectory. Therefore, this setup would only impact the first step of integration. If the simulation converges, it won't have impacts on the simulation.
+--->
 
 ### 1.2.6 Integrator (updating rule)
 After knowing the forces, we can proceed to update the velocities (V) and positions (R) for the next time step:
@@ -412,6 +413,9 @@ for step in range(num_steps):
     kE= 0.5 * np.sum(mass * V**2)
     xi += dt * (2 * kE / (3 * N * k_B * T) - 1) / Q
 ```
+
+### 2.2.4 Extended Discussions in Ensembles and Nosé-Hoover thermostat
+Complete the reading in [Appendix-W2](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Appendix/W2_NoseHoover.pdf).
 
 ## 2.3 Full code to run NVT simulation
 Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
