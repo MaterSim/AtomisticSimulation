@@ -15,16 +15,16 @@ The lecture notes were made based on these two excellent books. However, the har
 This course aims to use the atomistic computer simulation to model and understand the properties of real materials and their accompanying process and phenomena. It will primarily focus on two approaches: molecular dynamics and electronic structure calculation based on density functional theory. Some typical examples, codes, analytical tools will be also covered in this course. 
 
 The expected outcomes include: 
-- Understand the fundmental of Molecular dynamics simulation and its connection with statistical physics
+- Understand the fundamental of Molecular dynamics simulation and its connection with statistical physics
 - Apply the molecular dynamics simulation technique to model the physical process in real materials
 - Understand the concept of electronic structure simulation based on density functional theory 
-- Use the available softwares LAMMPS and VASP to compute material’s properties
+- Use the available software LAMMPS and VASP to compute material’s properties
 
 ## Tenative schedules
 
 ### I: Molecular dynamics simulation
 - Week 1: Motivating example 1: Argon under the NVE ensemble
-- Week 2: Motivating example 2: Liquid-gas phase transition under the NVT ensemble
+- Week 2: Motivating example 2: Thermostat NVT ensemble
 - Week 3: Motivating example 3: Simulation of solids under the NPT ensemble 
 - Week 4: Introduction to the LAMMPS package
 - Week 5: MD Analysis I: structural characterization (RDF), degree of order
@@ -47,7 +47,7 @@ The expected outcomes include:
 ### 1.1.1 Prehistory of Computer Simulation:
 * The Los Alamos MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer) became operational in 1952. This event marks a significant milestone in the history of computing. Nicholas Metropolis, as the most notable early user, developed the Monte Carlo method, a statistical technique that utilizes random sampling to solve complex mathematical problems. 
 
-* The launch of computer also openned the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people have to to do it either analytically (e.g., thermodynamics and stastical mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagentic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lacks the atomic detail. An alterative approach is directly model the system (straightforward but very time consuming and tedious). Notable examples include. 
+* The launch of computer also opened the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people have to to do it either analytically (e.g., thermodynamics and statiscal mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagentic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lacks the atomic detail. An alterative approach is directly model the system (straightforward but very time consuming and tedious). Notable examples include. 
 1. [Buffon's needle experiment to compute $\pi$](https://en.wikipedia.org/wiki/Buffon%27s_needle_problem), 
 2. [Bernal's ball-bearing model](https://iopscience.iop.org/article/10.1088/0953-8984/26/46/463102), 
 3. [Kitaigorodskii’s structure seeker](https://pubs.acs.org/doi/10.1021/acs.cgd.8b00972).
@@ -105,8 +105,8 @@ It consist of two components:
 
 This form has been widely used to model the essential features of interactions between simple atoms and molecules.
 
-* Questions:
-1. Why were the 12 and 6-powered terms were choosen? Any other choices?
+#### Questions:
+1. Why were the 12 and 6-powered terms were chosen? Any other choices?
 2. How does the LJ potential decay with respect to r?
 3. The limitations of LJ potential?
 4. Can we use them to model metal, ceramics or others?
@@ -114,7 +114,7 @@ This form has been widely used to model the essential features of interactions b
 ### 1.2.3 The computation of energy and forces
 
 After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system.
-Assuming the system consists of N atoms, and the positions (R) are recorded by an array of [N, 3], we can use the following psuedo Python code for the given task.
+Assuming the system consists of N atoms, and the positions (R) are recorded by an array of [N, 3], we can use the following pseudo Python code for the given task.
 ```python
 import numpy as np
 
@@ -175,7 +175,7 @@ p(v) = 4\pi \left( \frac{m}{2\pi k_B T} \right)^{3/2} v^2 \exp\left(-\frac{mv^2}
 $$
 
 
-To acheive this, the idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
+To achieve this, the idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
 
 ```python
 import numpy as np
@@ -243,18 +243,18 @@ Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2
 
 Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
 
-### 1.3.2 Crossvalidation with other MD codes.
+### 1.3.2 Cross-validation with other MD codes.
 Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular code for materials modelling.
 
 For students who already have LAMMPS experience, there is a bonus credit opportunity. 
 Please rerun the simulation in LAMMPS with the same parameter setup. Post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1)
 
 
-# Week 2: Liquid-gas phase transition under the NVT ensemble
+# Week 2: Thermostat under the NVT ensemble
 
 ## 2.1 Moltivation
 ### 2.1.1 The limitation of NVE ensembel
-So far we have learned how to run a NVE MD simulation for a periodic system from both programing and application points of view. In such simulations, the total energy E should be a constant with the propagation of time. This is called *microcanonical ensemble* in statistical physics. 
+So far, we have learned how to run a NVE MD simulation for a periodic system from both programing and application points of view. In such simulations, the total energy E should be a constant with the propagation of time. This is called *microcanonical ensemble* in statistical physics. 
 However, this set up is not really the truth for many practical simulations. It is more likely that the system would interact with the surrounding environment and exchange heat over the boundaries. 
 
 ### 2.1.2 Extension to NVE by allowing the heat exchange.
@@ -264,8 +264,7 @@ To maintain the system at a desired temperature by coupling it to an external *h
 
 ## 2.2 Different types of thermostats
 
-To introduce the thermostat to a MD system, the trick is to modify the integrator. Currently, there exist several flavors of thermostat techniques.
-Perhaps the easiest way to rescale the velecities to force the total kinet energy to be equal to $\frac{3NkT}{2}$ at every few steps. However, this kind of rescaling can definitely perturb the MD trajectory strongly and thus not recommended. Below I will show you a few better strategies. 
+To introduce the thermostat to a MD system, the trick is to modify the integrator. Currently, there exist several flavors of thermostat techniques. Perhaps the easiest way to rescale velocities to force the total kinetic energy  energy to be equal to $\frac{3NkT}{2}$ at every few steps. However, this kind of rescaling can definitely perturb the MD trajectory strongly and thus not recommended. Below I will show you a few better strategies. 
 
 ### 2.2.1 The Anderson thermostat
 
@@ -278,7 +277,7 @@ Thus we could periodically pick some particles and randomizes the velocities of 
 
 In this technique, collision Frequency $$\nu$$ determines how often the particle velocities are randomized (following a [Poisson Distribution](https://en.wikipedia.org/wiki/Poisson_distribution)). A higher $\nu$ means more frequent collisions (interaction) with the heat bath, leading to stronger coupling to the temperature bath. We should choose a $$\nu$$ so that velocity reassignment happens at an appropriate rate to maintain the desired temperature without overly disrupting the natural dynamics of the system.
 
-The Anderson thermostat is relatively simple to implement, requiring only the addition of random velocity reassignment at each time step. However, it may not reflect the real dynamics. Since velocities are randomly reassigned, the resulting particle trajectories may not correspond to those in a real physical system where energy exchange occurs through physical interactions. This is particularly true for a peridoic system without the clear definition of boundary. In addition, one needs to play with the $\nu$ values.
+The Anderson thermostat is relatively simple to implement, requiring only the addition of random velocity reassignment at each time step. However, it may not reflect the real dynamics. Since velocities are randomly reassigned, the resulting particle trajectories may not correspond to those in a real physical system where energy exchange occurs through physical interactions. This is particularly true for a periodic  system without the clear definition of boundary. In addition, one needs to play with the $\nu$ values.
 
 
 The algorithm can be described as follows.
@@ -337,11 +336,11 @@ import numpy as np
 def langevin_thermostat(V, F, gamma, sigma, dt):
     # Update velocities with deterministic part
     V += 0.5 * F * dt / mass
-    
+
     # Apply friction and random force (stochastic part)
-    V += friction_term = -gamma * V * dt
+    V += -gamma * V * dt
     V += np.random.normal(0, sigma, V.shape) * np.sqrt(dt)
-        
+
     return V
 
 # Initialization
@@ -357,7 +356,7 @@ for step in range(num_steps):
 
     # Apply Langevin thermostat to update velocities
     V = langevin_thermostat(V, F, gamma, sigma, dt)
-	
+
 	# Update F and velocity using Verlet
     F_new = calculate_forces(positions)
     V += 0.5 * (F + F_new) * dt / mass
@@ -366,7 +365,7 @@ for step in range(num_steps):
 
 
 ### 2.2.3 The Nosé-Hoover thermostat
-If we want to avoid the use of brute-force velocity reassignment, a more gentle approach is to control the temperature by coupling the system to an additional degree of freedom, which acts as a “thermal reservoir” that exchanges energy with the system.
+If we want to avoid the use of brute-force velocity reassignment, a gentler approach is to control the temperature by coupling the system to an additional degree of freedom, which acts as a “thermal reservoir” that exchanges energy with the system.
 Nosé introduced a method where the system’s Hamiltonian is extended by adding an artificial variable that represents the thermal reservoir. This approach ensures that the system’s temperature fluctuates around a desired value, allowing it to correctly sample the canonical ensemble. Then, Hoover reformulated the equations of motion to include a friction term ($\xi$) that dynamically adjusts the particle velocities to maintain the target temperature, simplified Nosé’s method, making it more efficient for MD simulations. See an extended discussion in the Appendix.
 
 In the Nosé-Hoover thermostat, the velocity is updated via the following term
@@ -418,7 +417,7 @@ for step in range(num_steps):
 Complete the reading in [Appendix-W2](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Appendix/W2_NoseHoover.pdf).
 
 ## 2.3 Full code to run NVT simulation
-Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
+Complete the codes in [Colab](https://colab.research.google.com/drive/1x8FFEDrvmThUQGhfVCJd9LZka0aO1zhe?usp=sharing)
 
 ### 2.3.1 Summary of Code Implementation
 1. Make sure you have go over all equations and finish the pseudo code before writing the real code
