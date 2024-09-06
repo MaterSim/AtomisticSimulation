@@ -151,6 +151,7 @@ def langevin_thermostat(R, V, F, L, gamma):
     """
     Langevin thermostat
     """
+    # Update R
     R += V * TIMESTEP + 0.5 * F/MASS * TIMESTEP ** 2
     R = R % L
 
@@ -190,13 +191,21 @@ def Nose_Hoover_thermostat(R, V, F, xi, L, Q):
     """
     Nose-Hoover thermostat
     """
+    # Update R
     R += V * TIMESTEP + 0.5 * F/MASS * TIMESTEP ** 2
     R = R % L
+
+    # Update forces
     PE, F_new = LJ_energy_forces(R, L)
     V += 0.5 * (F + F_new) / MASS * TIMESTEP
     V *= (1 - 0.5 * xi * TIMESTEP) / (1 + 0.5 * xi * TIMESTEP)
+
+    # Update xi
     KE = 0.5 * np.sum(V**2) * MASS
     xi += TIMESTEP * (2 * KE / (3 * len(R) * KB * TEMPERATURE) - 1) / (Q*MASS)
+
+    # Update forces
+    F = F_new
     return R, V, F, xi
 
 
@@ -246,6 +255,8 @@ def MD(thermostat=None, nu=0.1, gamma=1e-13, Q=1.0, num_steps=500):
 if __name__ == "__main__":
     results = []
     for thermostat in ["Langevin"]:
+    #for thermostat in ["Nose-Hoover"]:
+    #for thermostat in [None, "Anderson", "Langevin", "Nose-Hoover"]:
         print(f"Simulation with {thermostat} thermostat")
         KEs, PEs, TEs = MD(thermostat=thermostat)
         results.append((thermostat, KEs, PEs, TEs))
