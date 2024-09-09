@@ -114,7 +114,7 @@ This form has been widely used to model the essential features of interactions b
 ### 1.2.3 The computation of energy and forces
 
 After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system.
-Assuming the system consists of N atoms, and the positions (R) are recorded by an array of [N, 3], we can use the following pseudo Python code for the given task.
+Assuming the system consists of $N$ atoms, and the positions ($R$) are recorded by an array of [N, 3], we can use the following pseudo Python code for the given task.
 ```python
 import numpy as np
 
@@ -253,7 +253,7 @@ Please rerun the simulation in LAMMPS with the same parameter setup. Post your L
 # Week 2: Thermostat under the NVT ensemble
 
 ## 2.1 Moltivation
-### 2.1.1 The limitation of NVE ensembel
+### 2.1.1 The limitation of NVE ensemble
 So far, we have learned how to run a NVE MD simulation for a periodic system from both programing and application points of view. In such simulations, the total energy E should be a constant with the propagation of time. This is called *microcanonical ensemble* in statistical physics. 
 However, this set up is not really the truth for many practical simulations. It is more likely that the system would interact with the surrounding environment and exchange heat over the boundaries. 
 
@@ -439,17 +439,17 @@ This is a simple barostat that rescales the simulation box gradually toward the 
 1. The instantaneous pressure $P$ in an MD simulation is calculated using the virial equation. It includes contributions from the kinetic energy and the virial of the system (related to particle interactions):
 
 $$
-P = \frac{N k_B T}{V} + \frac{1}{3V} \sum_{i=1}^{N} \mathbf{r}_i \cdot \mathbf{F}_i
+P = \frac{N k_B T}{V} + \frac{1}{3V} \sum_{i < j} r_{ij} \cdot \mathbf{F}_{ij}
 $$
 
 Where:
 
-- $N$  is the number of particles.
-- $k_B$  is the Boltzmann constant.
-- $T$  is the temperature.
-- $V$  is the volume of the simulation box.
-- $\mathbf{r}_i$  is the position of particle  i .
-- $\mathbf{F}_i$  is the force on particle  i .
+- $N$ is the number of particles.
+- $k_B$ is the Boltzmann constant.
+- $T$ is the temperature.
+- $V$ is the volume of the simulation box.
+- $\mathbf{r}_{ij}$ is the position vector between particles $i$ and $j$.
+- $\mathbf{F}_{ij}$ is the force acting on particle $i$ due to particle $j$.
 
 2. Compute pressure difference. At each time step, calculate the difference between the current and target pressures.
 
@@ -464,13 +464,13 @@ Where:
 - $dt$  is the time step.
 - $V_{old}$ is the current volume.
 
-4. Rescale the positions. The positions of all particles are scaled accordingly to maintain their relative distances within the simulation box. For isotropic scaling, each position  $\mathbf{r}_i$  is rescaled by a factor  $\lambda$ :
+4. Rescale the positions. The positions of all particles are scaled accordingly to maintain their relative distances within the simulation box. For isotropic scaling, each position  $\mathbf{r}$ is rescaled:
 
 $$
-\mathbf{r}_i^{new} = \mathbf{r}_i^{old} \cdot \left( \frac{V_{new}}{V_{old}} \right)^{1/3}
+r_{new} = r_{old} \cdot \left( \frac{V_{new}}{V_{old}} \right)^{1/3}
 $$
 
-The pseduo code should look like the following
+The pseudo code should look like the following
 ```python
 import numpy as np
 
@@ -487,18 +487,46 @@ velocities = np.random.randn(N, 3)  # Random initial velocities of particles
 forces = np.zeros_like(positions)  # Placeholder for forces
 
 # Define function to calculate pressure
-def calculate_pressure(positions, velocities, V, T):
-    """Calculate the instantaneous pressure."""
-    kinetic_energy = 0.5 * np.sum(velocities ** 2)
-    virial = np.sum(positions * forces)  # Simplified for demonstration purposes
-    pressure = (N * kb * T / V) + (virial / (3 * V))
-    return pressure
+def compute_virial_pressure(positions, forces, T, V):
+    """
+    Compute the virial pressure for an isotropic system.
+
+    Parameters:
+    positions (np.array): N x 3 array of particle positions.
+    forces (np.array): N x 3 array of forces acting on particles.
+    N (int): Number of particles.
+    T (float): Temperature of the system.
+    V (float): Volume of the system.
+    
+    Returns:
+    float: Virial pressure of the system.
+    """
+    N = len(positions)
+
+    # Step 1: Calculate the ideal gas contribution
+    P_kinetic = (N * kB * T) / V
+
+    # Step 2: Calculate the virial contribution
+    P_virial = 0.0
+    for i in range(N):
+        for j in range(i + 1, N):
+            r_ij = positions[i] - positions[j]  # Displacement vector between particles i and j
+            F_ij = forces[i]  # Force on particle i due to particle j (assumed already calculated)
+            P_virial += np.dot(r_ij, F_ij)  # Dot product r_ij · F_ij
+    
+    P_virial /= (3 * volume)  # Virial term divided by 3V
+    
+    # Total pressure is the sum of kinetic and virial contributions
+    total_pressure = P_kinetic + P_virial
+    
+    return total_pressure
+
 
 # Barostat function (Berendsen type)
-def apply_barostat(positions, velocities, V, P_target, tau_P, dt):
+def apply_barostat(positions, velocities, forces, V, P_target, tau_P, dt):
     """Adjust volume and rescale positions to maintain constant pressure."""
     # Calculate current pressure
-    P = calculate_pressure(positions, velocities, V, T)
+    P = compute_virial_pressure(positions, velocities, V, T)
     
     # Calculate volume scaling factor
     dP = P - P_target
@@ -517,11 +545,11 @@ def apply_barostat(positions, velocities, V, P_target, tau_P, dt):
     return positions, velocities, V_new
 ```
 
-This is a relatively simple method, where the system’s volume is gradually rescaled to match the target pressure. It does not rigorously conserve the ensemble, but it is computationally efficient and often used for equilibration runs.
+This is a relatively simple method, where the system’s volume is gradually rescaled to match the target pressure. It does not rigorously conserve the ensemble, but it is computationally efficient and often used for equilibration runs for the simulation of isotropic systems like liquid.
 
 
 ### 3.2.2 Parrinello-Rahman Barostat 
-The Parrinello-Rahman barostat is a more advanced method for controlling pressure in molecular dynamics simulations, particularly useful when the system undergoes anisotropic volume changes. Unlike Berendsen barostat that scales the simulation box isotropically, the Parrinello-Rahman barostat allows both the shape and size of the simulation box to change. This is especially important in simulations of materials under strain, phase transitions, or when dealing with anisotropic systems like crystals.
+The Parrinello-Rahman barostat is a more advanced method for controlling pressure in MD simulations, particularly useful when the system undergoes anisotropic volume changes. Unlike Berendsen barostat that scales the simulation box isotropically, the Parrinello-Rahman barostat allows both the shape and size of the simulation box to change. This is especially important in simulations of materials under strain, phase transitions, or when dealing with anisotropic systems like crystals.
 
 1. To enable this barostate, we first represent simulation box by a matrix $\mathbf{h}$ that defines the three lattice vectors of the simulation box. This matrix allows for changes in both the box size and shape.
 
