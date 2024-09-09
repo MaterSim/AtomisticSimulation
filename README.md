@@ -474,39 +474,48 @@ The pseudo code should look like the following
 ```python
 import numpy as np
 
-# Constants
-dt = 0.001  # Time step
-N = 100  # Number of particles
-T = 300.0  # Temperature in Kelvin
 P_target = 1.0  # Target pressure (arbitrary units)
 tau_P = 0.5  # Pressure coupling constant (barostat relaxation time)
 kb = 1.38e-23  # Boltzmann constant in J/K
-V = 1.0  # Initial volume of the simulation box
-positions = np.random.randn(N, 3)  # Random initial positions of particles
-velocities = np.random.randn(N, 3)  # Random initial velocities of particles
-forces = np.zeros_like(positions)  # Placeholder for forces
 
-# Define function to calculate pressure
-def compute_virial_pressure(positions, forces, T, V):
+def compute_temperature(velocities, masses):
     """
-    Compute the virial pressure for an isotropic system.
+    Compute the temperature of the system from particle velocities.
+
+    Parameters:
+    velocities (np.array): N x 3 array of particle velocities.
+    masses (np.array): Array of particle masses.
+
+    Returns:
+    float: Temperature of the system.
+    """
+    KE = 0.5 * np.sum(masses[:, None] * velocities**2)  # Sum of kinetic energies
+    temperature = (2 * KE) / (3 * len(velocities))  # Ideal gas temperature relation
+    return temperature
+
+def compute_virial_pressure(positions, velocities, forces, V):
+    """
+    Compute the pressure using the virial equation in the Berendsen barostat.
 
     Parameters:
     positions (np.array): N x 3 array of particle positions.
-    forces (np.array): N x 3 array of forces acting on particles.
-    N (int): Number of particles.
-    T (float): Temperature of the system.
-    V (float): Volume of the system.
+    velocities (np.array): N x 3 array of particle velocities.
+    forces (np.array): N x 3 array of interatomic forces.
+    V (float): Volume of the simulation box.
     
     Returns:
-    float: Virial pressure of the system.
+    float: Computed pressure of the system.
     """
-    N = len(positions)
-
-    # Step 1: Calculate the ideal gas contribution
-    P_kinetic = (N * kB * T) / V
-
-    # Step 2: Calculate the virial contribution
+    
+    N = len(positions)  # Number of particles
+    
+    # Step 1: Compute the temperature from velocities
+    T = compute_temperature(velocities, masses)
+    
+    # Step 2: Compute the kinetic contribution to the pressure
+    P_KE = (N * kB * T) / V
+    
+    # Step 3: Compute the virial contribution to the pressure
     P_virial = 0.0
     for i in range(N):
         for j in range(i + 1, N):
@@ -514,13 +523,12 @@ def compute_virial_pressure(positions, forces, T, V):
             F_ij = forces[i]  # Force on particle i due to particle j (assumed already calculated)
             P_virial += np.dot(r_ij, F_ij)  # Dot product r_ij · F_ij
     
-    P_virial /= (3 * volume)  # Virial term divided by 3V
+    P_virial /= (3 * V)  # Virial term divided by 3V
     
     # Total pressure is the sum of kinetic and virial contributions
-    total_pressure = P_kinetic + P_virial
+    P = P_kinetic + P_virial
     
-    return total_pressure
-
+    return P
 
 # Barostat function (Berendsen type)
 def apply_barostat(positions, velocities, forces, V, P_target, tau_P, dt):
@@ -626,13 +634,42 @@ velocities = np.random.randn(N, 3)
 forces = np.zeros_like(positions)  # Placeholder for forces
 h = np.eye(3) * V ** (1/3)  # Initial box matrix (cubic box)
 
-# Define function to calculate pressure tensor
-def calculate_pressure_tensor(positions, velocities, forces, V):
-    """Calculate the instantaneous pressure tensor."""
-    kinetic_part = np.sum([np.outer(v, v) for v in velocities], axis=0)
-    virial_part = np.sum([np.outer(r, f) for r, f in zip(positions, forces)], axis=0)
-    P = (1 / V) * (kinetic_part + virial_part)
-    return P
+def compute_pressure_tensor(positions, velocities, forces, V, kB):
+    """
+    Compute the internal pressure tensor using the virial equation.
+    
+    Parameters:
+    positions (np.array): N x 3 array of particle positions.
+    velocities (np.array): N x 3 array of particle velocities.
+    forces (np.array): N x 3 array of interatomic forces.
+    V (float): Volume of the simulation box.
+    
+    Returns:
+    np.array: 3 x 3 pressure tensor.
+    """
+    
+    # Number of particles
+    N = len(positions)
+    
+    # Compute the kinetic energy contribution to the pressure
+    KE = np.sum(0.5 * masses[:, None] * velocities**2)
+    T = (2 * kinetic_energy) / (3 * N * kB)
+    P_kE = N * kB * T / V
+    
+    # Compute the virial contribution to the pressure tensor
+    P_virial = np.zeros((3, 3))
+    for i in range(N):
+        for j in range(i + 1, N):
+            r_ij = positions[i] - positions[j]  # Displacement vector
+            F_ij = forces[i]  # Force on particle i
+            P_virial += np.outer(r_ij, F_ij)
+    
+    # Average pressure tensor by dividing by the volume
+    P_virial /= volume
+    
+    # Total pressure tensor is the sum of kinetic and virial contributions
+    P_total = P_KE* np.eye(3) + P_virial
+    return P_total
 
 # Parrinello-Rahman barostat step
 def parrinello_rahman_barostat(h, positions, velocities, forces, P_target, Q, dt):
@@ -653,7 +690,6 @@ def parrinello_rahman_barostat(h, positions, velocities, forces, P_target, Q, dt
 
     return h_new, positions.T
 ```
-
 
 
 A more complete discussion can be found [here](https://computecanada.github.io/molmodsim-md-theory-lesson-novice/08-barostats/index.html).
