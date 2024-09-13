@@ -10,7 +10,7 @@ In 1964, Pierre Hohenberg and Walter Kohn established Density Functional Theory 
 The time-independent Schrödinger equation for a system of $N$ interacting electrons is:
 
 $$
-\hat{H} \Psi(\mathbf{r}_1, \mathbf{r}_2, …, \mathbf{r}_N) = E \Psi(\mathbf{r}_1, \mathbf{r}_2, …, \mathbf{r}_N)
+\hat{H} \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N) = E \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N)
 $$
 
 - $\hat{H}$ is the Hamiltonian operator, including kinetic and potential energies.
@@ -20,10 +20,12 @@ $$
 The Hamiltonian for such a system is:
 
 $$
-\hat{H} = \sum_{i=1}^{N} \left( -\frac{\hbar^2}{2m} \nabla_i^2 + V_{\text{ext}}(\mathbf{r}i) \right) + \sum{i \lt j} \frac{e^2}{4\pi\epsilon_0 |\mathbf{r}_i - \mathbf{r}_j|}
+\hat{H} = \sum_{i=1}^{N} \left( -\frac{\hbar^2}{2m} \nabla_i^2 + V_{\text{ext}}(\mathbf{r}_i) \right) + \sum^{i \lt j} \frac{e^2}{4\pi\epsilon_0 |\mathbf{r}_i - \mathbf{r}_j|}
 $$
+
 where 
-- The first term represents the kinetic energy of each electron and V_{\text{ext}} (due to external potential).
+
+- The first term represents the kinetic energy of each electron and $V_{\text{ext}}$ (due to external potential).
 - The second summation accounts for electron-electron Coulomb interactions.
 
 It is not easy to solve this equation due to the following issues,
@@ -40,7 +42,7 @@ Kohn and Hohenberg proofed two Theorems
 2. There exists a universal functional $E[\rho]$ such that the ground-state energy $E_0$ can be obtained variationally:
 
 $$
-E_0 = \min_{\rho} \left\{ E[\rho] = F[\rho] + \int V_{\text{ext}}(\mathbf{r}) \rho(\mathbf{r}) d\mathbf{r} \right\}
+E_0 = \min_{\rho} \left[ E[\rho] = F[\rho] + \int V_{\text{ext}}(\mathbf{r}) \rho(\mathbf{r}) d\mathbf{r} \right]
 $$
 
 where $F[\rho]$ is a universal functional comprising the kinetic energy and electron-electron interactions.
@@ -59,46 +61,46 @@ $$
 E[\rho] = T_s[\rho] + E_{\text{ext}}[\rho] + E_H[\rho] + E_{\text{XC}}[\rho]
 $$
 
-- T_s[\rho] : Kinetic energy of non-interacting electrons.
-- E_{\text{ext}}[\rho] : Interaction with external potential.
-- E_H[\rho] : Hartree energy (classical electron-electron repulsion).
-- E_{\text{XC}}[\rho] : Exchange-correlation energy, encompassing all many-body effects.
+- $T_s[\rho]$: Kinetic energy of non-interacting electrons.
+- $E_{\text{ext}}[\rho]$: Interaction with external potential.
+- $E_H[\rho]$: Hartree energy (classical electron-electron repulsion).
+- $E_{\text{XC}}[\rho]$: Exchange-correlation energy, encompassing all many-body effects.
 
-Thus, the Schrödinger equation (now called Kohn-Sham Equations) becomes:
+Thus, the Schrödinger equation (now called **Kohn-Sham Equations**) becomes:
 
 $$
 \left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
 $$
 
-- \phi_i(\mathbf{r}) : Kohn-Sham orbitals.
-- \epsilon_i : Orbital energies.
-- V_{\text{eff}}(\mathbf{r}) : Effective potential.
+- $\phi_i(\mathbf{r})$: Kohn-Sham orbitals.
+- $\epsilon_i$: Orbital energies.
+- $V_{\text{eff}}(\mathbf{r})$: Effective potential.
 
-Effective Potential is
+**Effective Potential** is
 
 $$
 V_{\text{eff}}(\mathbf{r}) = V_{\text{ext}}(\mathbf{r}) + V_H(\mathbf{r}) + V_{\text{XC}}(\mathbf{r})
 $$
 
-- V_H(\mathbf{r}) : Hartree potential.
-- V_{\text{XC}}(\mathbf{r}) = \frac{\delta E_{\text{XC}}[\rho]}{\delta \rho(\mathbf{r})} .
+- $V_H(\mathbf{r})$ : Hartree potential.
+- $V_{\text{XC}}(\mathbf{r}) = \frac{\delta E_{\text{XC}}[\rho]}{\delta \rho(\mathbf{r})}$ .
 
-The Electron Density derived from the solution of KS equation:
+The **Electron Density** derived from the solution of KS equation:
 
 $$
 \rho(\mathbf{r}) = \sum_{i}^{\text{occ}} |\phi_i(\mathbf{r})|^2
 $$
 
-To solve the KS equation, Exchange-Correlation Functional is a tricky term that represents the difference between the true kinetic and electron-electron interaction energies and those of the non-interacting reference system. The exact form is unknown. Hence approximations are necessary. Some commond choices are
+To solve the KS equation, **Exchange-Correlation Functional** is a tricky term that represents the difference between the true kinetic and electron-electron interaction energies and those of the non-interacting reference system. The exact form is unknown. Hence approximations are necessary. Some commond choices are
 
-- Local Density Approximation (LDA) assumes the exchange-correlation energy at a point depends only on the local density.
+- ``Local Density Approximation (LDA)`` assumes the exchange-correlation energy at a point depends only on the local density.
 
 $$
 E_{\text{XC}}^{\text{LDA}}[\rho] = \int \rho(\mathbf{r}) \varepsilon_{\text{XC}}(\rho(\mathbf{r})) d\mathbf{r}
 $$
 
 
-- Generalized Gradient Approximation (GGA) is a more advanced version by including density gradients to account for inhomogeneities. This can provide better accuracy for molecular and surface systems.
+- ``Generalized Gradient Approximation (GGA)`` is a more advanced version by including density gradients to account for inhomogeneities. This can provide better accuracy for molecular and surface systems.
 
 $$
 E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) d\mathbf{r}
@@ -111,8 +113,8 @@ Since the electron density becomes the only concern of interest, one can start w
 Now, we proceed to apply DFT to solve an One-Dimensional Harmonic Oscillator. Here we start by define the grid.
 We aim to find the wavefunction of an One-Dimensional Harmonic Oscillator. 
 
-1. Define a grid to describe the wavefunction spanning between at $x_{\text{min}}$ and $x_{\text{max}}$.
-```
+1. **Define a grid** to describe the wavefunction spanning between at $x_{\text{min}}$ and $x_{\text{max}}$.
+```python
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -123,19 +125,19 @@ x = np.linspace(x_min, x_max, N)
 dx = x[1] - x[0]
 ```
 
-2. Express the kinetic energy ($T$) and External Potential $V_{\text{ext}}(x)$ is simply a Harmonic potential:
+2. **Express the Kinetic energy** ($T$) and **External Potential** $V_{\text{ext}}(x)$ is simply a Harmonic potential:
 ```python
 T = (-2 * np.eye(N) + np.eye(N, k=1) + np.eye(N, k=-1)) / dx**2
 V_ext = 0.5 * x**2
 ```
 
-3. An initial guess of Electron Density as a function of $r$,
+3. **An initial guess** of Electron Density as a function of $r$,
 
 ```python
 rho = np.ones(N) * 1e-3  # Small initial density
 ```
 
-4. Iterative Solution
+4. **Iterative Solution**
 ```python
 tolerance = 1e-6
 max_iterations = 100
@@ -172,7 +174,7 @@ else:
 ```
 
 5. Post-analysis
-```
+```python
 plt.plot(x, rho)
 plt.title('Electron Density')
 plt.xlabel('Position x')
@@ -196,24 +198,24 @@ $$
 To solve this equation numerically, we approximate the second derivative using the finite difference method. Consider a function $f(x)$ on a discrete grid of points $x_1, x_2, …, x_N$ with spacing $dx$. The second derivative of the function $f$  at point $x_i$ can be approximated by the finite difference formula:
 
 $$
-\frac{d^2 f}{dx^2} \bigg|{x_i} \approx \frac{f(x{i+1}) - 2f(x_i) + f(x_{i-1})}{dx^2}
+\frac{d^2 f}{dx^2} \bigg|{x_i} \approx \frac{f(x_{i+1}) - 2f(x_i) + f(x_{i-1})}{dx^2}
 $$
 
 The expression tells us how to approximate the curvature of the function at each point using values of the function at neighboring points.
 
-To apply this approximation to a system with $N$ discrete points, we can represent it using a matrix that operates on the values of the function at all grid points. The matrix will essentially encode the coefficients  (-2, +1, +1)  that multiply the values $f(x_i), f(x_{i-1}), f(x_{i+1})$.
+To apply this approximation to a system with $N$ discrete points, we can represent it using a matrix that operates on the values of the function at all grid points. The matrix will essentially encode the coefficients ``(-2, +1, +1)`` that multiply the values $f(x_i), f(x_{i-1}), f(x_{i+1})$.
 
-- ``np.eye(N)``: This creates an identity matrix of size $N \times N$. The identity matrix has ones along the diagonal and zeros everywhere else.
-- ``np.eye(N, k=1)}``: This creates a matrix of size $N \times N$ with ones on the first upper diagonal (i.e., the diagonal just above the main diagonal), and zeros elsewhere.
-- ``np.eye(N, k=-1)`` : This creates a matrix of size  $N \times N$  with ones on the first lower diagonal (i.e., the diagonal just below the main diagonal), and zeros elsewhere.
+- ``np.eye(N)``: an identity matrix of $N \times N$.
+- ``np.eye(N, k=1)}``: a matrix of $N \times N$ with ones on the first upper diagonal.
+- ``np.eye(N, k=-1)`` : a matrix of $N \times N$  with ones on the first lower diagonal.
 
-- ``-2*{np.eye(N)}``: This term corresponds to the coefficient -2 multiplying the function value $f(x_i)$ at each grid point.
-- ``np.eye(N, k=1)``: This adds  +1  to the points immediately to the right of the main diagonal (i.e., $f(x_{i+1})$).
-- ``np.eye(N, k=-1)}``: This adds  +1  to the points immediately to the left of the main diagonal (i.e., $f(x_{i-1})$).
+- ``-2*{np.eye(N)}``: the coefficient ``-2`` multiplying the function value $f(x_i)$ at each grid point.
+- ``np.eye(N, k=1)``: adds ``+1`` to the points immediately to the right of the main diagonal (i.e., $f(x_{i+1})$ ).
+- ``np.eye(N, k=-1)}``: adds ``+1`` to the points immediately to the left of the main diagonal (i.e., $f(x_{i-1})$ ).
 
-Thus, the combination of these matrices gives us a matrix representation of the finite difference approximation of the second derivative operator across the entire grid. The division by  dx^2  normalizes the matrix to account for the grid spacing.
+Thus, the combination of these matrices gives us a matrix representation of the finite difference approximation of the second derivative operator across the entire grid. The division by $dx^2$ normalizes the matrix to account for the grid spacing.
 
-For a 5-point grid (N = 5), the matrix $T$ would look something like this:
+For a 5-point grid, the matrix $T$ would look something like this:
 
 $$
 T = \frac{1}{dx^2}
@@ -226,7 +228,7 @@ T = \frac{1}{dx^2}
 \end{bmatrix}
 $$
 
-This matrix will act on a vector representing the function $f$ at discrete grid points to approximate the second derivative for the entire grid. It physically represents the kinetic energy operator in one dimension (ignoring constants like  \hbar^2 / 2m ). When this matrix acts on the wavefunction, it computes the kinetic energy for the system in a discretized space.
+This matrix will act on a vector representing the function $f$ at discrete grid points to approximate the second derivative for the entire grid. It physically represents the kinetic energy operator in one dimension (ignoring constants like $\hbar^2/2m$ ). When this matrix acts on the wavefunction, it computes the kinetic energy for the system in a discretized space.
 Extensions
 
 
