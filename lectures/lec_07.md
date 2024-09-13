@@ -209,10 +209,6 @@ To apply this approximation to a system with $N$ discrete points, we can represe
 - ``np.eye(N, k=1)}``: a matrix of $N \times N$ with ones on the first upper diagonal.
 - ``np.eye(N, k=-1)`` : a matrix of $N \times N$  with ones on the first lower diagonal.
 
-- ``-2*{np.eye(N)}``: the coefficient ``-2`` multiplying the function value $f(x_i)$ at each grid point.
-- ``np.eye(N, k=1)``: adds ``+1`` to the points immediately to the right of the main diagonal (i.e., $f(x_{i+1})$ ).
-- ``np.eye(N, k=-1)}``: adds ``+1`` to the points immediately to the left of the main diagonal (i.e., $f(x_{i-1})$ ).
-
 Thus, the combination of these matrices gives us a matrix representation of the finite difference approximation of the second derivative operator across the entire grid. The division by $dx^2$ normalizes the matrix to account for the grid spacing.
 
 For a 5-point grid, the matrix $T$ would look something like this:
