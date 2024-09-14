@@ -8,3 +8,8 @@
 - [Week 5: MD Analysis I: Structural Characterization](lectures/lec_05.md)
 - [Week 6: MD Analysis II: Transport Processes](lectures/lec_06.md)
 - [Week 7: Introduction to Density Functional Theory](lectures/lec_07.md)
+- [Week 8: DFT Simulation of a Hydrogen Molecule](lectures/lec_08.md)
+- [Week 9: DFT Simulation of the Periodic System](lectures/lec_09.md)
+- [Week 10: Electronic Band Structure Analysis](lectures/lec_10.md)
+- [Week 11: Introduction to VASP](lectures/lec_11.md)
+- [Week 12: Phonon calculation from both classical force field and DFT](lectures/lec_12.md)
