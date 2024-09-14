@@ -1,177 +1,98 @@
 # Week 11. Introduction to VASP
 
-The electronic band structure describes the energy levels that electrons can occupy in a solid. Unlike in isolated atoms, where electrons occupy discrete energy levels, in a crystal the periodic potential causes these levels to broaden into bands.
+For practical application, it is not recommended to run DFT calculation with your own code. In the past, researchers have developped many excellent choice of DFT-based codes. Among them,  the Vienna Ab initio Simulation Package (VASP) is one of the most widely used computational tools for performing first-principles calculations based on Density Functional Theory (DFT), Hartree-Fock (HF), and hybrid functionals. 
+It employs plane-wave basis sets and pseudopotentials or PAW (Projector Augmented-Wave) potentials to represent the wavefunctions and the core-electron interaction, respectively.
+VASP is highly efficient in calculating the electronic structure, total energies, and properties of materials.
 
-- Valence Band: The highest energy band that is completely filled with electrons at 0 K.
-- Conduction Band: The lowest energy band that is partially filled or completely empty at 0 K.
-- Band Gap: The energy difference between the top of the valence band and the bottom of the conduction band.
+## 11.1 Key Concepts in VASP
 
-A conductor has overlapping bands (or a partially filled conduction band), while a semiconductor or insulator has a band gap separating the valence and conduction bands.
+1. **Plane-Wave Basis Sets**. In VASP, the electronic wavefunctions are expanded in terms of plane waves. The accuracy of this expansion is controlled by the energy cutoff  E_{\text{cutoff}} , which limits the maximum kinetic energy of the plane waves included in the calculation.
 
-To explain, 
+2. **Pseudopotentials and PAW**. To speed up calculation, Pseudopotentials are used to replace the core electrons with a smoother potential, allowing only the valence electrons to be explicitly treated. In VASP, the so called PAW Potentials were used to reconstruct the all-electron wavefunction from the pseudopotential wavefunction.
+
+3. **Exchange-Correlation Functionals**. VASP support a variety of exchange-correlation functionals to account for the interactions between electrons, including LDA, GGA or more advanced hybrid functionals.
+
+4. **K-Point Sampling**. The Brillouin zone of a crystal is sampled using k-points. VASP uses a Monkhorst-Pack grid or Gamma-centered grid to sample the k-points. Denser k-point grids yield more accurate results, especially for band structure calculations.
+
+5. **Self-Consistent Field (SCF) Iteration**. In VASP, the SCF process iteratively solves the Kohn-Sham equations to obtain the electronic ground state. This iterative procedure continues until convergence is achieved based on the total energy or electronic density.
 
 
-The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the p_z orbitals.
+## 11.2 Workflow for a VASP Calculation
 
-In this lecture, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
+A typical VASP calculation consists of several input files and a few critical steps:
 
-Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the p_z orbitals of the carbon atoms.
+### 11.2.1 Input Files
 
-Graphene Lattice and Hamiltonian Setup
+- POSCAR: Defines the crystal structure (atomic positions, lattice vectors, and unit cell).
+- INCAR: Contains the calculation parameters (energy cutoff, type of calculation, convergence criteria).
+- POTCAR: Contains the pseudopotentials for the elements in the system.
+- KPOINTS: Defines the k-point mesh used to sample the Brillouin zone.
 
-- Lattice vectors: Graphene’s lattice is hexagonal with two basis atoms (A and B) per unit cell.
-- Nearest-neighbor hopping: Electrons can hop between neighboring A and B atoms with a hopping parameter $t$.
+### 11.2.2 Output Files
 
-The tight-binding Hamiltonian for graphene can be written as:
+- OUTCAR: Provides detailed information about the entire calculation, including the total energy and convergence status.
+- CONTCAR: Contains the relaxed atomic positions if ionic relaxation was performed.
+- EIGENVAL: Contains the eigenvalues, which are used for band structure and DOS calculations.
+- DOSCAR: Contains the density of states data.
+Many other files 
 
-$$
-H = -t \sum_{\langle i,j \rangle} \left( a_i^\dagger b_j + b_j^\dagger a_i \right)
-$$
+## 11.3 Example: Band Structure Calculation for Silicon
 
-where $t$ is the hopping energy between neighboring sites (typically around 2.7 eV for graphene), and $a_i^\dagger$ and $b_j^\dagger$ are the creation operators for sublattice A and B, respectively.
+Let’s walk through an example to compute the band structure of silicon (Si) using VASP.
 
-1. Define the Graphene Lattice in Python
+## 11.3.1 Preparing the Input Files
 
-We begin by defining the graphene lattice, with lattice vectors  \mathbf{a}_1  and  \mathbf{a}_2 , and the three nearest-neighbor vectors  \delta_1 ,  \delta_2 , and  \delta_3 .
-
-```python
-import numpy as np
-import matplotlib.pyplot as plt
-
-# Define lattice vectors for graphene
-a = 1.42  # Carbon-carbon bond length in Angstroms
-
-# Lattice vectors
-a1 = np.array([np.sqrt(3) * a, 0])
-a2 = np.array([np.sqrt(3) / 2 * a, 3 * a / 2])
-
-# Nearest-neighbor vectors (bond vectors)
-delta1 = np.array([0, a])
-delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
-delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
-
-# All nearest-neighbor vectors
-deltas = [delta1, delta2, delta3]
-
-# Plot the lattice
-plt.figure(figsize=(6, 6))
-for i in range(-2, 3):
-    for j in range(-2, 3):
-        R = i * a1 + j * a2
-        plt.plot(R[0], R[1], 'ko')  # Carbon atoms
-        for delta in deltas:
-            plt.plot([R[0], R[0] + delta[0]], [R[1], R[1] + delta[1]], 'k-')
-plt.title('Graphene lattice')
-plt.gca().set_aspect('equal')
-plt.show()
+POSCAR: Silicon Crystal Structure
+```
+Si
+1.0
+   0.000000  2.715000  2.715000
+   2.715000  0.000000  2.715000
+   2.715000  2.715000  0.000000
+Si
+2
+Direct
+  0.000000  0.000000  0.000000
+  0.250000  0.250000  0.250000
 ```
 
-This code defines the graphene lattice and plots it. Each carbon atom is connected to three neighboring carbon atoms, forming the characteristic honeycomb structure.
-
-
-2. Tight-Binding Hamiltonian
-
-We now construct the tight-binding Hamiltonian for graphene, taking into account the nearest-neighbor hopping between sublattices A and B.
-
-The Hamiltonian in k-space is written as:
-
-$$
-H(\mathbf{k}) =
-\begin{pmatrix}
-0 & f(\mathbf{k}) \\
-f^*(\mathbf{k}) & 0
-\end{pmatrix}
-$$
-
-where $f(\mathbf{k}) = -t \left( e^{i \mathbf{k} \cdot \delta_1} + e^{i \mathbf{k} \cdot \delta_2} + e^{i \mathbf{k} \cdot \delta_3} \right)$.
-
-The eigenvalues of this matrix give us the band energies for the π-bands.
-
-3. Define the Hamiltonian in k-Space
-
-Let’s define the function  f(\mathbf{k})  that represents the hopping terms in the Hamiltonian.
-
-```python
-def f_k(kx, ky, a, t):
-    """Function f(k) representing hopping terms in k-space."""
-    delta1 = np.array([0, a])
-    delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
-    delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
-    return -t * (np.exp(1j * (kx * delta1[0] + ky * delta1[1])) +
-                 np.exp(1j * (kx * delta2[0] + ky * delta2[1])) +
-                 np.exp(1j * (kx * delta3[0] + ky * delta3[1])))
-
-# Define the band structure computation
-def graphene_band_structure(kx, ky, a, t):
-    """Compute the band structure of graphene using the tight-binding model."""
-    f = f_k(kx, ky, a, t)
-    H_k = np.array([[0, f], [np.conj(f), 0]])  # Tight-binding Hamiltonian in k-space
-    eigenvalues = np.linalg.eigvalsh(H_k)
-    return eigenvalues
+INCAR: General Input Parameters
+```
+SYSTEM = Silicon
+PREC = Accurate
+ENCUT = 400
+ISMEAR = 0
+SIGMA = 0.05
+IBRION = -1
+ISIF = 2
+NSW = 0
+LWAVE = .FALSE.
+LCHARG = .FALSE.
+EDIFF = 1E-6
 ```
 
-4. Compute and Plot the Band Structure Along High-Symmetry Directions
-
-Now we compute the band structure along high-symmetry points in the Brillouin zone. The typical path is $\Gamma \rightarrow K \rightarrow M \rightarrow \Gamma$.
-
-```python
-# High-symmetry points in k-space
-K_point = [4*np.pi/(3*np.sqrt(3)*a), 0]
-M_point = [np.pi/(np.sqrt(3)*a), np.pi/a]
-Gamma_point = [0, 0]
-
-# Interpolation between high-symmetry points
-def interpolate_points(p1, p2, n):
-    return np.linspace(p1, p2, n)
-
-# Parameters for graphene
-t = 2.7  # Hopping energy in eV
-
-# Compute the band structure along high-symmetry directions
-n_points = 100
-kx_values = []
-ky_values = []
-kx_values += interpolate_points(Gamma_point[0], K_point[0], n_points).tolist()
-ky_values += interpolate_points(Gamma_point[1], K_point[1], n_points).tolist()
-kx_values += interpolate_points(K_point[0], M_point[0], n_points).tolist()
-ky_values += interpolate_points(K_point[1], M_point[1], n_points).tolist()
-kx_values += interpolate_points(M_point[0], Gamma_point[0], n_points).tolist()
-ky_values += interpolate_points(M_point[1], Gamma_point[1], n_points).tolist()
-
-# Calculate the energy bands
-bands = []
-for kx, ky in zip(kx_values, ky_values):
-    bands.append(graphene_band_structure(kx, ky, a, t))
-
-bands = np.array(bands)
-
-# Plot the band structure
-plt.figure(figsize=(8, 6))
-plt.plot(bands[:, 0], label='Lower band')
-plt.plot(bands[:, 1], label='Upper band')
-plt.xticks(ticks=[0, n_points, 2*n_points, 3*n_points],
-           labels=['Gamma', 'K', 'M', 'Gamma'])
-plt.ylabel('Energy (eV)')
-plt.title('Band Structure of Graphene')
-plt.legend()
-plt.grid(True)
-plt.show()
+POTCAR: Pseudopotential File (from each VASP distribution)
+```
+Si_PBE
+```
+KPOINTS: K-Point Mesh for SCF Calculation
+```
+Automatic mesh
+0
+Monkhorst-Pack
+8 8 8
+0 0 0
 ```
 
-Interpretation of the Band Structure
 
-In the plotted band structure of graphene:
+Run the SCF Calculation
 
-- The Dirac points at the  K -point are where the valence and conduction bands meet, and the energy gap is zero.
-- Near the Dirac points, the bands show a linear dispersion, which indicates the massless Dirac fermions that are responsible for graphene’s unique electronic properties.
-- The bands are symmetric about the zero energy level, representing the bonding and anti-bonding states from the tight-binding model.
+Run VASP using the prepared input files to get the ground-state electronic density. This is required before computing the band structure.
 
-Linear Dispersion: The tight-binding model shows a linear energy dispersion near the Dirac points (located at the  K  and  K{\prime}  points in the Brillouin zone). This linear relationship between energy and momentum is characteristic of massless Dirac fermions, which are responsible for the high mobility of charge carriers in graphene.
-	2.	Zero Band Gap: At the Dirac points, the valence and conduction bands touch, resulting in zero band gap. This makes graphene a semimetal (or more precisely, a zero-gap semiconductor), where the conduction and valence bands meet at the Fermi level.
-	3.	Bonding and Anti-Bonding States: The two bands that arise from the tight-binding Hamiltonian correspond to the bonding (lower) and anti-bonding (upper) states. These bands arise due to the interaction between the p_z orbitals on neighboring carbon atoms in the honeycomb lattice.
+After the SCF run, you’ll get files like OUTCAR, EIGENVAL, and CHGCAR.
 
-1. High Electron Mobility: The linear dispersion near the Dirac points leads to high electron mobility in graphene. The electrons behave like massless Dirac fermions, which is why graphene exhibits exceptional electrical conductivity.
-2.	Ambipolar Behavior: Since the conduction and valence bands touch at the Dirac points, graphene can conduct both electrons (n-type) and holes (p-type) depending on the external doping or electric field applied to it.
-3.	Optical Properties: The unique band structure of graphene also influences its optical properties. The zero band gap allows graphene to absorb light across a wide range of frequencies, making it useful for optoelectronic applications.
 
-This lecture could form a foundation for further studies on more complex materials and advanced band structure concepts using tight binding and other methods like DFT.
+Plotting the Band Structure
+
+To complete
+
