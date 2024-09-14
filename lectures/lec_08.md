@@ -1,14 +1,12 @@
 # Week 8. DFT Simulation of a Hydrogen Molecule
 
-Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H$_2$ molecule.
-H$_2$ is the simplest molecule, consisting of two protons and two electrons.
-This small size is ideal for demonstrating the DFT method in a manageable way.
-By solving for the ground state energy and electron density of H$_2$, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H$_2$ and the
+Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
+By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H$_2$ and the
 electron distribution.
 
 ## 8.1 Basic Setup
 
-In a H$_2$ molecule, we need to consider the following variables in the KS equation.
+In a H<sub>2</sub>  molecule, we need to consider the following variables in the KS equation.
 
 - Nuclei: Two protons, located at positions $R_1$ and $R_2$ .
 - Electrons: Two electrons interacting with the protons and each other.
@@ -16,7 +14,7 @@ In a H$_2$ molecule, we need to consider the following variables in the KS equat
 We first write down its Hamiltonian,
 
 $$
-\text{Hamiltonian:} \quad \hat{H} = \hat{T}e + \hat{V}{\text{ext}} + \hat{V}{\text{ee}} + \hat{V}{\text{nn}}
+\text{Hamiltonian} \quad \hat{H} = \hat{T}_e + \hat{V} _{\text{ext}} + \hat{V} _{\text{ee}} + \hat{V} _{\text{nn}}
 $$
 
 Where
@@ -25,13 +23,14 @@ Where
 - $\hat{V}_{\text{ee}}$ : Electron-electron interaction.
 - $\hat{V}_{\text{nn}}$ : Nucleus-nucleus interaction.
 
-Hence, Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H$_2$, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as  \rho(x) = 2 |\phi_0(x)|^2. Howeever, in a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.
+Hence, Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H<sub>2</sub>, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as $\rho(x) = 2 |\phi_0(x)|^2$. **If you want to solve a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.**
 
 $$
 \left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
 $$
 
 1. The total energy is
+   
 $$
 E[\rho] = T_s[\rho] + E_{\text{ext}}[\rho] + E_H[\rho] + E_{\text{XC}}[\rho]
 $$
@@ -155,12 +154,13 @@ plt.ylabel('Electron Density')
 plt.show()
 ```
 ## 8.3 GGA implementation 
-In the previous example, we used Local Density Approximation (LDA) for the exchange-correlation energy $E_{\text{XC}}$. 
+In the previous example, we used Local Density Approximation (LDA) for the exchange-correlation energy $E_{\text{XC}}$.
+
 $$
 E_{\text{XC}}^{\text{LDA}}[\rho] = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) \, d\mathbf{r}
 $$
 
-The Generalized Gradient Approximation (GGA) improves upon the LDA by including not only the electron density  $\rho(\mathbf{r})$  but also the gradient of the electron density $\nabla \rho(\mathbf{r})$. This allows for a more accurate representation of the exchange-correlation effects, especially in systems where the electron density varies significantly, such as in molecular systems like H$_2$.
+The Generalized Gradient Approximation (GGA) improves upon the LDA by including not only the electron density  $\rho(\mathbf{r})$  but also the gradient of the electron density $\nabla \rho(\mathbf{r})$. This allows for a more accurate representation of the exchange-correlation effects, especially in systems where the electron density varies significantly, such as in molecular systems like H<sub>2</sub>.
 
 $$
 E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) \, d\mathbf{r}
@@ -168,7 +168,7 @@ $$
 
 where $f(\rho, \nabla \rho)$ is a function that depends on both the local density $\rho$ and its gradient $\nabla \rho$.
 
-To implement GGA, we need to modify the exchange-correlation potential $V_{\text{XC}}$  and the corresponding exchange-correlation energy  $E_{\text{XC}}$. For simplicity, we will use the PBE (Perdew-Burke-Ernzerhof) form of GGA, which is widely used in DFT calculations. In this case, both the exchange-correlation energy and potential are functions of  $\rho(\mathbf{r})$  and  $|\nabla \rho(\mathbf{r})|$.
+To implement GGA, we need to modify the exchange-correlation potential $V_{\text{XC}}$  and the corresponding exchange-correlation energy  $E_{\text{XC}}$. For simplicity, we will use the PBE (Perdew-Burke-Ernzerhof) form of GGA, which is widely used in DFT calculations. In this case, both the exchange-correlation energy and potential are functions of $\rho(\mathbf{r})$ and $|\nabla \rho(\mathbf{r})|$.
 
 ```python
 def compute_density_gradient(rho, dx):
@@ -214,7 +214,7 @@ def compute_total_energy_gga(rho, V_ext, T, orbitals, dx):
 ## 8.4 Further discussions
 
 - Interpret the Ground State Energy
-- Compare the computed total energy of the H$_2$ molecule with known reference values.
+- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
 - Discuss how the electron density represents the covalent bonding between the two protons.
 - Compare the results obtained from LDA and GGA
 - Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
