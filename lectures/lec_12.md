@@ -125,7 +125,7 @@ $$
 
 ### 12.2.3 Physical Insights
 - Dispersion relation. we find the vibrational frequency depends on the wavevector. 
-- Long Wavelength Limit: For small $q$, $\sin(q a / 2) \approx q a / 2$, so the frequency becomes approximately linear in $q$, i.e.,  \omega(q) \propto q , which is typical for acoustic phonons.
+- Long Wavelength Limit: For small $q$, $\sin(q a / 2) \approx q a / 2$, so the frequency becomes approximately linear in $q$, i.e.,  $\omega(q) \propto q$, which is typical for acoustic phonons.
 - At the edge of the Brillouin zone, where $q = \frac{\pi}{a}$, the frequency reaches its maximum value:
 
 ```python
@@ -217,8 +217,7 @@ m_A \omega^2 & 0 \\
 A \\
 B
 \end{pmatrix}
-= 
-k
+=k
 \begin{pmatrix}
 2 - 2 \cos(qa) & -2 \cos(qa) \\
 -2 \cos(qa) & 2 - 2 \cos(qa)
@@ -259,7 +258,7 @@ Where  $c_s$  is the speed of sound in the material.
 - For the optical mode, the atoms move out of phase, and the frequency  $\omega(q)$  is larger. The optical phonon mode has a higher frequency because the atoms are oscillating against each other.
 
 
-```
+```python
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -327,7 +326,7 @@ $$
 Where:
 
 - $i$, $j$  index the atoms in the unit cell.
-- $\alpha$, $\beta$  represent the Cartesian components (x, y, z).
+- $\alpha$, $\beta$  represent the Cartesian components $(x, y, z)$.
 - $m_i$, $m_j$  are the masses of atoms $i$ and $j$.
 - $\Phi_{\alpha\beta}^{ij}(\mathbf{R})$  are the force constants between atoms $i$ and $j$ in unit cells separated by the vector $\mathbf{R}$.
 - $\mathbf{q}$ is the wavevector.
@@ -343,9 +342,9 @@ Below are the steps to Compute Phonon in a 3D Crystal.
 
 3. Construct the Dynamical Matrix.  For each wavevector $\mathbf{q}$ in the Brillouin zone, construct the dynamical matrix  $D(\mathbf{q})$  using the force constants. The dynamical matrix will be a $3N \times 3N$  matrix, where $N$ is the number of atoms in the unit cell.
 
-4. Diagonalize the Dynamical Matrix. For each wavevector  \mathbf{q} , diagonalize the dynamical matrix  D(\mathbf{q}) . The eigenvalues of the matrix give the squared frequencies $\omega^2(\mathbf{q})$, and the eigenvectors describe the polarization vectors (atomic displacements) for the phonon modes.
+4. Diagonalize the Dynamical Matrix. For each wavevector $\mathbf{q}$, diagonalize the dynamical matrix $D(\mathbf{q})$. The eigenvalues of the matrix give the squared frequencies $\omega^2(\mathbf{q})$, and the eigenvectors describe the polarization vectors (atomic displacements) for the phonon modes.
 
-5. Compute the Phonon Dispersion Relation and density of states. Once the phonon frequencies  $\omega(\mathbf{q})$  are computed, plot them as a function of $\mathbf{q}$  along high-symmetry directions in the Brillouin zone.
+5. Compute the Phonon Dispersion Relation and density of states. Once the phonon frequencies  $\omega(\mathbf{q})$  are computed, plot them as a function of $\mathbf{q}$ along high-symmetry directions in the Brillouin zone.
 
 6. Optionally, compute the phonon density of states. To compute the phonon DOS, you must sample the Brillouin zone using a k-point grid or a q-point grid. The finer the grid, the more accurate your calculation will be. The total number of wavevectors sampled is denoted as $N_q$.
 
