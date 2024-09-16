@@ -191,16 +191,25 @@ According to Taylor expansion, this algorithm is accurate to $O(dt^3)$ in positi
 
 ## 1.3 Code Implementation and Testing
 
-1. Run [lec_01_maxwell](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_maxwell.py) to understand the generation of random velocities
-2. Run [lec_02_LJ](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_LJ.py) to understand how to implement LJ potential to compute energy and forces. 
-3. Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
-4. Validate the final results with some physical guidance (in NVE simulation, ensure you check if the total energy is conserved).
+1. Run [lec_01_maxwell.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_maxwell.py) to understand the generation of random velocities,
+2. Run [lec_02_LJ.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_LJ.py) to understand how to implement LJ potential to compute energy and forces,
+3. Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp),
+4. Debug [lec_01_nve_debug.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_nve_debug.py). You should get a constant `E_total` outputs as shown below if the code works.
+   
+```
+Step      0, PE: -9.74960e-18 KE: 1.60642e-18 E_total: -8.14319e-18 CPU_time: 7.93e-02
+Step     10, PE: -9.52152e-18 KE: 1.37792e-18 E_total: -8.14359e-18 CPU_time: 8.52e-01
+Step     20, PE: -8.88977e-18 KE: 7.47063e-19 E_total: -8.14271e-18 CPU_time: 1.62e+00
+Step     30, PE: -8.86056e-18 KE: 7.17322e-19 E_total: -8.14323e-18 CPU_time: 2.39e+00
+Step     40, PE: -8.98529e-18 KE: 8.41977e-19 E_total: -8.14331e-18 CPU_time: 3.16e+00
+Step     50, PE: -8.98938e-18 KE: 8.46170e-19 E_total: -8.14321e-18 CPU_time: 3.93e+00
+```
 
 Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
 
 Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular code for materials modelling.
 
 For students who already have LAMMPS experience, there is a bonus credit opportunity. 
-Please rerun the simulation in LAMMPS with the same parameter setup. Post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1)
+Please rerun the simulation in LAMMPS with the same parameter setup. Post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1).
 
 
