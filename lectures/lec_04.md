@@ -1,7 +1,7 @@
 # Week 4: Realistic MD simulation with LAMMPS
 
 ## 4.1 Introduction to LAMMPS
-LAMMPS (Large-scale Atomic/Molecular Massively Parallel Simulator) is an open-source software tool designed for performing classical molecular dynamics (MD) simulations. It can be used to model an array of particle interactions, ranging from simple atomic systems to complex materials and biomolecular systems. As one of the most population materials simulation package, LAMMPS is specifically optimized for large-scale simulations, which involve millions to billions of particles, making it suitable for high-performance computing (HPC) environments. Its versatility allows for simulations of a variety of systems such as metals, polymers, proteins and membranes. Some typical applications include
+[LAMMPS](https://www.lammps.org) (Large-scale Atomic/Molecular Massively Parallel Simulator) is an open-source software tool designed for performing classical molecular dynamics (MD) simulations. It can be used to model an array of particle interactions, ranging from simple atomic systems to complex materials and biomolecular systems. As one of the most population materials simulation package, LAMMPS is specifically optimized for large-scale simulations, which involve millions to billions of particles, making it suitable for high-performance computing (HPC) environments. Its versatility allows for simulations of a variety of systems such as metals, polymers, proteins and membranes. Some typical applications include
 
 - Crystal Defects and Deformation: (e.g., dislocation motion, grain boundary evolution, and fracture in materials).
 - Phase Transitions: Simulating phase changes in metals and alloys, such as melting, solidification, or the formation of microstructures.
@@ -103,7 +103,7 @@ run 50000                              # Run simulation for 50,000 timesteps
 
 ## 4.5 Post-Processing
 
-After a simulation, the results need to be visualized and analyzed. LAMMPS produces several types of output files, which contain thermodynamic data, atom positions, velocities, and forces. VMD (Visual Molecular Dynamics) and OVITO (Open Visualization Tool) are popular tools for visualizing molecular dynamics simulations.
+After a simulation, the results need to be visualized and analyzed. LAMMPS produces several types of output files, which contain thermodynamic data, atom positions, velocities, and forces. [VMD](https://www.ks.uiuc.edu/Research/vmd/) (Visual Molecular Dynamics) and [OVITO](https://www.ovito.org) (Open Visualization Tool) are popular tools for visualizing molecular dynamics simulations.
 
 To add a few ovito figures and explain ovito.
 
@@ -129,3 +129,8 @@ mpirun -np 128 lmp_mpi -in input_file.in    # Run LAMMPS in parallel across 128 
 - `lmp_mpi` is the parallel version of LAMMPS used for multi-node execution.
 
 
+## 4.7 Further discussions
+
+- Check the implementation of distance calculation in the LAMMPS code.
+- Check the thermostats/barostats codes in LAMMPS and compare it with our previous Python implementations.
+- What kind of MD simulations would you like to explore with LAMMPS?
