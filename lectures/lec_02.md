@@ -20,10 +20,10 @@ The main idea of Anderson thermostat is inspired by the observation of physical 
 
 Thus we could periodically pick some particles and randomizes the velocities of some particles in the system. These randomizations mimic the effect of an external environment interacting with the particles, ensuring that the system’s temperature remains constant. Hence, we allow two types of MD integration rules in the actual code.
 
-1. With a certain probability  $\nu$  (collision frequency), the velocity of each particle is reassigned by sampling from a Maxwell-Boltzmann distribution corresponding to the desired temperature T.
-1. If the particle’s velocity is not reassigned, it evolves according to the usual equations of motion (e.g., using the Verlet integration method).
+1. **Random particle selection and velocity assignment**. With a certain probability $\nu$, the velocity of each particle is reassigned by sampling from a Maxwell-Boltzmann distribution corresponding to the desired temperature $T$.
+2. **Ordinary update**. If the particle’s velocity is not reassigned, it evolves according to the usual equations of motion (e.g., using the Verlet integration method).
 
-In this technique, collision Frequency $$\nu$$ determines how often the particle velocities are randomized (following a [Poisson Distribution](https://en.wikipedia.org/wiki/Poisson_distribution)). A higher $\nu$ means more frequent collisions (interaction) with the heat bath, leading to stronger coupling to the temperature bath. We should choose a $$\nu$$ so that velocity reassignment happens at an appropriate rate to maintain the desired temperature without overly disrupting the natural dynamics of the system.
+In this technique, **collision Frequency** $$\nu$$ determines how often the particle velocities are randomized (following a [Poisson Distribution](https://en.wikipedia.org/wiki/Poisson_distribution)). A higher $\nu$ means more frequent collisions (interaction) with the heat bath, leading to stronger coupling to the temperature bath. We should choose a $$\nu$$ so that velocity reassignment happens at an appropriate rate to maintain the desired temperature without overly disrupting the natural dynamics of the system.
 
 The Anderson thermostat is relatively simple to implement, requiring only the addition of random velocity reassignment at each time step. However, it may not reflect the real dynamics. Since velocities are randomly reassigned, the resulting particle trajectories may not correspond to those in a real physical system where energy exchange occurs through physical interactions. This is particularly true for a periodic  system without the clear definition of boundary. In addition, one needs to play with the $\nu$ values.
 
@@ -31,15 +31,17 @@ The Anderson thermostat is relatively simple to implement, requiring only the ad
 The algorithm can be described as follows.
 
 ```python
+import numpy as np
 
-def anderson_thermostat(V, T, mass, nu, dt):
-    sigma_v = np.sqrt(k_B * temperature / mass)
+def anderson_thermostat(V, T, nu):
+    sigma_v = np.sqrt(k_B * T / MASS)
     for i in range(num_particles):
-        if np.random.rand() < collision_frequency * time_step:
+        if np.random.rand() < nu * TIMESTEP:
             V[i] = np.random.normal(0, sigma_v, 3)
     return V
 
 # Initialization
+T = 300 # in K
 R = Initialize_positions()
 V = Initialize_velocities()
 F = calculate_forces(R)
@@ -48,13 +50,13 @@ F = calculate_forces(R)
 for step in range(num_steps):
 
     # Update R, V, F using Verlet integration
-    R += V * dt + 0.5 * F * dt**2 / mass
-    F_new = calculate_forces(positions)
-    V += 0.5 * (F + F_new) * dt / mass
+    R += V * TIMESTEP + 0.5 * F * TIMESTEP**2 / MASS
+    F_new = calculate_forces(R)
+    V += 0.5 * (F + F_new) * TIMESTEP / MASS
     F = F_new
 
     # Apply Anderson thermostat to randomly reassign V
-    V = anderson_thermostat(V, T, mass, nu, dt)
+    V = anderson_thermostat(V, T, nu)
 ```
 
 ### 2.2.2 The Langevin thermostat 
@@ -64,11 +66,11 @@ $$
 m_i \frac{d\mathbf{v}_i}{dt} = \mathbf{F}_i - \gamma m_i \mathbf{v}_i + \mathbf{R}_i(t)
 $$
 
-* Frictional Force  $\gamma m_i \mathbf{v}_i$  : represents the damping effect of the environment, which tends to slow down the particles.
+* Frictional Force $\gamma m_i \mathbf{v}_i$: the damping effect of the environment, which tends to slow down the particles.
 
-* Random Force  $\mathbf{R}_i(t)$ : represents the random collisions with particles from the heat bath, which cause the particles to move randomly, maintaining the system’s temperature. These kicks help maintain the temperature of the system by continuously injecting energy into the system.
+* Random Force $\mathbf{R}_i(t)$ : the random collisions with particles from the heat bath, which cause the particles to move randomly, maintaining the system’s temperature. These kicks help maintain the temperature of the system by continuously injecting energy into the system.
 
-A typical value of $\gamma$ used in many MD simulations is around $\gamma = 0.1 \, \text{ps}^{-1}$. This value provides a good balance between maintaining temperature control and preserving realistic dynamics. The system is weakly coupled to the heat bath, ensuring that it can sample the canonical ensemble without heavily damping the natural motion of the particles.
+A typical value of $\gamma$ used in many MD simulations is around $\gamma = 0.1 \text{ps}^{-1}$. This value provides a good balance between maintaining temperature control and preserving realistic dynamics. The system is weakly coupled to the heat bath, ensuring that it can sample the canonical ensemble without heavily damping the natural motion of the particles.
 
 In MD simulations, the Langevin equation is integrated with the Velocity Verlet algorithm, modified to include the Langevin terms. A simple update rule for the velocity might look like this:
 
@@ -77,38 +79,35 @@ $$
 $$
 
 ```python
-
 import numpy as np
 
+def langevin_thermostat(V, F, gamma):
+	# Update R, V, F using Verlet integration
+    R += V * TIMESTEP + 0.5 * F * TIMESTEP **2 / MASS
 
-def langevin_thermostat(V, F, gamma, sigma, dt):
-    # Update velocities with deterministic part
-    V += 0.5 * F * dt / mass
+	# Update velocities with deterministic part
+    V += 0.5 * F * TIMESTEP / MASS
 
     # Apply friction and random force (stochastic part)
-    V += -gamma * V * dt
+    V += -gamma * V * TIMESTEP
+	sigma = np.sqrt(2 * gamma * kB * T / MASS)
     V += np.random.normal(0, sigma, V.shape) * np.sqrt(dt)
 
-    return V
+	# Update forces and velocities
+	F_new = calculate_forces(positions)
+	V += 0.5 * (F + F_new) / MASS * TIMESTEP
+	F = F_new
+    return R, V, F
 
 # Initialization
+T = 300 # in K
 R = Initialize_positions()
 V = Initialize_velocities()
 F = calculate_forces(R)
 
 # Main MD loop
 for step in range(num_steps):
-
-    # Update R, V, F using Verlet integration
-    R += V * dt + 0.5 * F * dt**2 / mass
-
-    # Apply Langevin thermostat to update velocities
-    V = langevin_thermostat(V, F, gamma, sigma, dt)
-
-	# Update F and velocity using Verlet
-    F_new = calculate_forces(positions)
-    V += 0.5 * (F + F_new) * dt / mass
-    F = F_new
+	R, V, F = langevin_thermostat(R, V, F, L, gamma)
 ```
 
 
@@ -149,12 +148,12 @@ F = calculate_forces(R)
 for step in range(num_steps):
 
     # Verlet-like integration
-    R += velocities * time_step + 0.5 * forces * time_step**2 / mass
+    R += V * TIMESTEP + 0.5 * F * TIMESTEP**2 / MASS
     F_new = calculate_forces(R)
 
     # Update velocities
-    V += 0.5 * (F + F_new) * dt / mass
-    V *= (1 - 0.5 * xi * dt) / (1 + 0.5 * xi * dt)
+    V += 0.5 * (F + F_new) * TIMESTEP / MASS
+    V *= (1 - 0.5 * xi * TIMESTEP) / (1 + 0.5 * xi * TIMESTEP)
 
     # Update the Nosé-Hoover thermostat variable
     kE= 0.5 * np.sum(mass * V**2)
@@ -165,10 +164,7 @@ for step in range(num_steps):
 Complete the reading in [Appendix-W2](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Appendix/W2_NoseHoover.pdf).
 
 ## 2.3 Full code to run NVT simulation
-Complete the codes in [Colab](https://colab.research.google.com/drive/1x8FFEDrvmThUQGhfVCJd9LZka0aO1zhe?usp=sharing)
-
-### 2.3.1 Summary of Code Implementation
-1. Make sure you have go over all equations and finish the pseudo code before writing the real code
-2. Split the entire workflow into several subtasks.
-3. Validate the final results with some physical guidance (in NVT simulation, ensure you check if the final kinetic energy fluctuate around the desired value).
+1. Complete the codes in [Colab](https://colab.research.google.com/drive/1x8FFEDrvmThUQGhfVCJd9LZka0aO1zhe?usp=sharing)
+2. Modify your code with different $nu$, $gamma$ and $Q$ parameters for different thermostats and monitor the progress of kinetic energies.
+3. Debug the code [lec_02_langevin_debug.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_02_langevin_debug.py)
 
