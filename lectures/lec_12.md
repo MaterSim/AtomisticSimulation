@@ -38,6 +38,11 @@ $$
 ## 12.2 An 1D Infinite Chain of Identical Atoms
 Now let's consider a relatively more complex system with a infinite number of identical spring. This model helps in understanding phonons, the quantized vibrations in a lattice, which are critical in thermal and electrical properties of solids.
 
+$$
+A_1 \sim\sim\sim A_2 \sim\sim\sim  A_3 \cdots\cdots\cdots A_{n-1} \sim\sim\sim A_{n} \sim\sim\sim A_{n+1} \cdots\cdots\cdots 
+$$
+
+
 We’ll consider a chain of identical atoms, each with mass $m$, connected by springs with force constant $k$. In this model, the atoms are spaced a distance $a$ apart. Each atom oscillates around its equilibrium position.
 
 ## 12.2.1 Problem setup
@@ -163,6 +168,9 @@ plt.show()
 ## 12.3 An 1D diatomic chain model
 In the 1D diatomic chain model, we consider two different types of atoms (A and B) with masses $m_A$ and $m_B$, alternating along the chain. The atoms are connected by springs with a spring constant $k$.
 
+$$
+\textcolor{red}{A_1} \sim\sim\sim \textcolor{blue}{B_1} \sim\sim\sim  \textcolor{red}{A_2} \sim\sim\sim \textcolor{blue}{B_2}  \cdots\cdots\cdots \textcolor{red}{A_n} \sim\sim\sim \textcolor{blue}{B_n}  \sim\sim\sim \textcolor{red}{A_{n+1}}\sim\sim\sim \textcolor{blue}{B_{n+1}}  \cdots\cdots\cdots 
+$$
 
 ## 12.3.1 Equation of Motions
 The displacement of atom A in the $n$-th unit cell is denoted by $u_n^A(t)$, and the displacement of atom B is  $u_n^B(t)$. And the forces on each atom come from the interactions with neighboring atoms. Using Hooke’s law and Newton’s second law, the equations of motion for atoms A and B are:
