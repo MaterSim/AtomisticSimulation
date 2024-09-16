@@ -165,7 +165,7 @@ Complete the reading in [Appendix-W2](https://github.com/qzhu2017/AtomisticSimul
 
 ## 2.3 Full code to run NVT simulation
 1. Complete the codes in [Colab](https://colab.research.google.com/drive/1x8FFEDrvmThUQGhfVCJd9LZka0aO1zhe?usp=sharing)
-2. Modify your code with different $nu$, $gamma$ and $Q$ parameters for different thermostats and monitor the progress of kinetic energies.
+2. Modify your code with different $\nu$ (Anderson), $\gamma$ (Langevin) and $Q$ (Nose-Hoover) parameters for different thermostats and monitor the progress of kinetic energies.
 3. Debug the code [lec_02_langevin_debug.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_02_langevin_debug.py)
 4. Understand the behaviors of different thermostat techniques as shown in the following figure (obtained from your colab exercise).
 
