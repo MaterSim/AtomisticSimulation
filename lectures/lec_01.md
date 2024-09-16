@@ -189,18 +189,15 @@ $$
 
 According to Taylor expansion, this algorithm is accurate to $O(dt^3)$ in position and $O(dt^2)$ in velocity. 
 
-## 1.3 Full code
-Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
+## 1.3 Code Implementation and Testing
 
-### 1.3.1 Summary of Code Implementation
-1. Make sure you have go over all equations and finish the pseudo code before writing the real code
-2. Split the entire workflow into several subtasks.
-3. For each subtask, make sure you have some mechanisms to validate and debug your code.
+1. Run [lec_01_maxwell](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_maxwell.py) to understand the generation of random velocities
+2. Run [lec_02_LJ](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_LJ.py) to understand how to implement LJ potential to compute energy and forces. 
+3. Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp)
 4. Validate the final results with some physical guidance (in NVE simulation, ensure you check if the total energy is conserved).
 
 Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
 
-### 1.3.2 Cross-validation with other MD codes.
 Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular code for materials modelling.
 
 For students who already have LAMMPS experience, there is a bonus credit opportunity. 
