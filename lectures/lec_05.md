@@ -46,7 +46,7 @@ plt.title('Evolution of Temperature')
 Visualization allows researchers to visually inspect the dynamics of the system, spot abnormalities, and better understand atomic movements. Tools like VMD and OVITO are commonly used. Please refer to OVITO pape to find more functions.
 
 ## 5.3 Radial Distribution Function (RDF)
-The RDF $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
+The [RDF](https://en.wikipedia.org/wiki/Radial_distribution_function) $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
 
 $$
 g(r) = \frac{V}{N^2} \left\langle \sum_{i=1}^{N} \sum_{j \neq i} \delta(r - r_{ij}) \right\rangle \cdot \frac{1}{4 \pi r^2 \Delta r}
@@ -60,12 +60,17 @@ Where:
 - $\delta(r - r_{ij})$ is the Dirac delta function ensuring that only pairs with separation $r_{ij}$ equal to $r$ contribute.
 - $4\pi r^2 \Delta r$ is the volume of a spherical shell at distance $r$ with thickness $\Delta r$.
 
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Rdf_schematic.svg/1280px-Rdf_schematic.svg.png" alt="Alt text" width="200"/>
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Lennard-Jones_Radial_Distribution_Function.svg/1920px-Lennard-Jones_Radial_Distribution_Function.svg.png" alt="rdf" width="300"/>
+</p>
+
 It is commonly used to characterize the short-range order in liquids and gases. In a RDF, we are interested the location of Peaks and their spreads, as they indicate common interatomic distances (e.g., nearest-neighbor distance).
 
 To compute $g(r)$, one should
-1. Compute the distance $r_{ij}$ between every pair of particles $i$ and $j$ .
-2. Group the distances into bins of width $\Delta r$ to accumulate how many pairs of particles have a separation within each bin.
-3. Normalize the number of pairs in each bin by:
+1. **Compute the distance pair** $r_{ij}$ between every pair of particles $i$ and $j$ .
+2. **Group the distances** into bins of width $\Delta r$ to accumulate how many pairs of particles have a separation within each bin.
+3. **Normalize the number of pairs** in each bin by:
 - The number of particle pairs $N(N-1)/2$.
 - The volume of the spherical shell at distance $r$, given by $4\pi r^2 \Delta r$.
 - The average particle density $N/V$.
@@ -100,7 +105,7 @@ plt.show()
 ```
 
 ## 5.4 Vibration Spectrum
-In addition to RDF, another commond characterization is to understand how particles in a system vibrate. In experiment, such information can be measured from Infrared (IR) or Raman Spectroscopy, and Inelastic Neutron/X-ray Scattering. In a MD simulation, the Vibrational Density of States is closely related to the Velocity Autocorrelation Function (VACF). The VDOS provides information about the frequencies at which particles in a system vibrate, while the VACF gives insight into how the velocity of a particle at one time is correlated with its velocity at a later time. 
+In addition to RDF, another commond characterization is to understand how particles in a system vibrate. In experiment, such information can be measured from Infrared (IR) or Raman Spectroscopy, and Inelastic Neutron/X-ray Scattering. In a MD simulation, the Vibrational Density of States (VDOS) is closely related to the Velocity Autocorrelation Function (VACF). The VDOS provides information about the frequencies at which particles in a system vibrate, while the VACF gives insight into how the velocity of a particle at one time is correlated with its velocity at a later time. 
 
 The VDOS, $D(\omega)$, is essentially the frequency spectrum of atomic vibrations in the system. It is computed by taking the Fourier transform of the VACF. This relationship is derived from the fact that oscillatory motions (vibrations) in the system are directly reflected in the velocity autocorrelation function, and the Fourier transform allows us to extract the frequency components of these vibrations.
 
@@ -118,7 +123,7 @@ Where:
 
 The Fourier transform is performed over the time correlation $\tau$ to convert the time-domain information in the VACF into frequency-domain information in the VDOS.
 
-The Velocity Autocorrelation Function (VACF) measures how the velocity of a particle at a given time $t$ correlates with its velocity at some later time $t + \tau$. It is useful for understanding particle dynamics and is related to the vibrational properties and transport coefficients (like diffusion).
+The VACF measures how the velocity of a particle at a given time $t$ correlates with its velocity at some later time $t + \tau$. It is useful for understanding particle dynamics and is related to the vibrational properties and transport coefficients (like diffusion).
 
 $$
 \text{VACF}(\tau) = \frac{1}{N} \sum_{i=1}^{N} \left\langle \mathbf{v}_i(0) \cdot \mathbf{v}_i(\tau) \right\rangle
@@ -162,4 +167,3 @@ plt.show()
 
 - Interpretation of RDF: Peaks in RDF tells the atomic neighbor counts. Liquid and solid have very different behaviors in their RDF.  
 - Interpretation of VDOS: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the Low-frequency and high-frequency modes and link them to atomic motions from MD trajectory
-- 
