@@ -130,7 +130,11 @@ mpirun -np 128 lmp_mpi -in input_file.in    # Run LAMMPS in parallel across 128 
 
 
 ## 4.7 Further discussions
-
-- Check the implementation of distance calculation in the LAMMPS code.
+- Finish exercise on the [colab](https://colab.research.google.com/drive/1gY6_1oA_PkuV-P56dztCsmvLSyLEWojo?usp=share_link)
+- Check the implementation of [neighbor_list](https://docs.lammps.org/Developer_par_neigh.html) in the LAMMPS code.
 - Check the thermostats/barostats codes in LAMMPS and compare it with our previous Python implementations.
+  1. [compute_pressure](https://github.com/lammps/lammps/blob/develop/src/compute_pressure.cpp)
+  2. [fix_press_berendsen](https://github.com/lammps/lammps/blob/develop/src/fix_press_berendsen.cpp)
+  3. [fix_nh](https://github.com/lammps/lammps/blob/develop/src/fix_nh.cpp)
+  4. [pair_lj_cut](https://github.com/lammps/lammps/blob/develop/src/pair_lj_cut.cpp) 
 - What kind of MD simulations would you like to explore with LAMMPS?
