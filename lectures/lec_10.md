@@ -1,5 +1,6 @@
 # Week 10. Band Structure Analysis
 
+## 10.1 Formation of Energy Bands: From Molecule to Crystal
 The electronic band structure describes the energy levels that electrons can occupy in a solid. Unlike in isolated atoms, where electrons occupy discrete energy levels, in a crystal the periodic potential causes these levels to broaden into bands.
 
 - Valence Band: The highest energy band that is completely filled with electrons at 0 K.
@@ -8,13 +9,21 @@ The electronic band structure describes the energy levels that electrons can occ
 
 A conductor has overlapping bands (or a partially filled conduction band), while a semiconductor or insulator has a band gap separating the valence and conduction bands.
 
-To explain, 
+How are the bands created from the very beginning. You can think about [the process of carbon atoms being brought together to form a diamond crystal](https://en.wikipedia.org/wiki/Band_gap). 
+- The right graph shows the energy levels as a function of the spacing between atoms. When far apart (right side of graph) all the atoms have discrete valence orbitals p and s with the same energies.
+- When the atoms come closer (left side), their electron orbitals begin to spatially overlap and hybridize into $N$ molecular orbitals each with a different energy, where $N$ is the number of atoms in the crystal. Since $N$ is such a large number, adjacent orbitals are extremely close together in energy so the orbitals can be considered a continuous energy band.
+- When the carbon atoms get closer and closer to form a diamond crystal cell, multiple bands are formed, called the valence and conduction bands. In the case of diamond, the highest valence band and the lowest conduction band are separated by a 5.5 eV band gap. The Pauli exclusion principle limits the number of electrons in a single orbital to two, and the bands are filled beginning with the lowest energy.
+- 
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Solid_state_electronic_band_structure.svg/880px-Solid_state_electronic_band_structure.svg.png" alt="Alt text" width="600"/>
+</p>
 
+## 10.2 A Quantitative Tight-Binding model 
+Although the above explaination provides a intuitive picture about the formation of bands. In this lecture, we plan to be more analytical about this process. Specifically, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
 
 The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the p_z orbitals.
 
-In this lecture, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
-
+## 10.3 Application of TB model on Graphene
 Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the p_z orbitals of the carbon atoms.
 
 Graphene Lattice and Hamiltonian Setup
@@ -32,7 +41,7 @@ where $t$ is the hopping energy between neighboring sites (typically around 2.7 
 
 1. Define the Graphene Lattice in Python
 
-We begin by defining the graphene lattice, with lattice vectors  \mathbf{a}_1  and  \mathbf{a}_2 , and the three nearest-neighbor vectors  \delta_1 ,  \delta_2 , and  \delta_3 .
+We begin by defining the graphene lattice, with lattice vectors $\mathbf{a}_1$  and  $\mathbf{a}_2$, and the three nearest-neighbor vectors  $\delta_1$,  $\delta_2$, and  $\delta_3$.
 
 ```python
 import numpy as np
