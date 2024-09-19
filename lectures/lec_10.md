@@ -3,30 +3,30 @@
 ## 10.1 Formation of Energy Bands: From Molecule to Crystal
 The electronic band structure describes the energy levels that electrons can occupy in a solid. Unlike in isolated atoms, where electrons occupy discrete energy levels, in a crystal the periodic potential causes these levels to broaden into bands.
 
-- Valence Band: The highest energy band that is completely filled with electrons at 0 K.
-- Conduction Band: The lowest energy band that is partially filled or completely empty at 0 K.
-- Band Gap: The energy difference between the top of the valence band and the bottom of the conduction band.
+- **Valence Band**: The highest energy band that is completely filled with electrons at 0 K.
+- **Conduction Band**: The lowest energy band that is partially filled or completely empty at 0 K.
+- **Band Gap**: The energy difference between the top of the valence band and the bottom of the conduction band.
 
 A conductor has overlapping bands (or a partially filled conduction band), while a semiconductor or insulator has a band gap separating the valence and conduction bands.
 
 How are the bands created from the very beginning. You can think about [the process of carbon atoms being brought together to form a diamond crystal](https://en.wikipedia.org/wiki/Band_gap). 
-- The right graph shows the energy levels as a function of the spacing between atoms. When far apart (right side of graph) all the atoms have discrete valence orbitals p and s with the same energies.
+- The right graph shows the energy levels as a function of the spacing between atoms. When far apart (right side of graph) all the atoms have discrete valence orbitals $p$ and $s$ with the same energies.
 - When the atoms come closer (left side), their electron orbitals begin to spatially overlap and hybridize into $N$ molecular orbitals each with a different energy, where $N$ is the number of atoms in the crystal. Since $N$ is such a large number, adjacent orbitals are extremely close together in energy so the orbitals can be considered a continuous energy band.
 - When the carbon atoms get closer and closer to form a diamond crystal cell, multiple bands are formed, called the valence and conduction bands. In the case of diamond, the highest valence band and the lowest conduction band are separated by a 5.5 eV band gap. The Pauli exclusion principle limits the number of electrons in a single orbital to two, and the bands are filled beginning with the lowest energy.
-- 
+
 <p align="center">
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Solid_state_electronic_band_structure.svg/880px-Solid_state_electronic_band_structure.svg.png" alt="Alt text" width="600"/>
 </p>
 
 ## 10.2 A Quantitative Tight-Binding model 
-Although the above explaination provides a intuitive picture about the formation of bands. In this lecture, we plan to be more analytical about this process. Specifically, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
+Although the above explaination provides an intuitive picture about the formation of bands. In this lecture, we plan to be more analytical about this process. Specifically, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
 
-The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the p_z orbitals.
+The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the $p_z$ orbitals.
 
 ## 10.3 Application of TB model on Graphene
-Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the p_z orbitals of the carbon atoms.
+Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the $p_z$ orbitals of the carbon atoms.
 
-Graphene Lattice and Hamiltonian Setup
+### 10.3.1 Graphene Lattice and Hamiltonian Setup
 
 - Lattice vectors: Graphene’s lattice is hexagonal with two basis atoms (A and B) per unit cell.
 - Nearest-neighbor hopping: Electrons can hop between neighboring A and B atoms with a hopping parameter $t$.
@@ -38,8 +38,6 @@ H = -t \sum_{\langle i,j \rangle} \left( a_i^\dagger b_j + b_j^\dagger a_i \righ
 $$
 
 where $t$ is the hopping energy between neighboring sites (typically around 2.7 eV for graphene), and $a_i^\dagger$ and $b_j^\dagger$ are the creation operators for sublattice A and B, respectively.
-
-1. Define the Graphene Lattice in Python
 
 We begin by defining the graphene lattice, with lattice vectors $\mathbf{a}_1$  and  $\mathbf{a}_2$, and the three nearest-neighbor vectors  $\delta_1$,  $\delta_2$, and  $\delta_3$.
 
@@ -78,7 +76,7 @@ plt.show()
 This code defines the graphene lattice and plots it. Each carbon atom is connected to three neighboring carbon atoms, forming the characteristic honeycomb structure.
 
 
-2. Tight-Binding Hamiltonian
+### 10.3.2 Tight-Binding Hamiltonian
 
 We now construct the tight-binding Hamiltonian for graphene, taking into account the nearest-neighbor hopping between sublattices A and B.
 
@@ -98,7 +96,7 @@ The eigenvalues of this matrix give us the band energies for the π-bands.
 
 3. Define the Hamiltonian in k-Space
 
-Let’s define the function  f(\mathbf{k})  that represents the hopping terms in the Hamiltonian.
+Let’s define the function $f(\mathbf{k})$ that represents the hopping terms in the Hamiltonian.
 
 ```python
 def f_k(kx, ky, a, t):
@@ -119,7 +117,7 @@ def graphene_band_structure(kx, ky, a, t):
     return eigenvalues
 ```
 
-4. Compute and Plot the Band Structure Along High-Symmetry Directions
+4. Compute Band Structure Along High-Symmetry Directions
 
 Now we compute the band structure along high-symmetry points in the Brillouin zone. The typical path is $\Gamma \rightarrow K \rightarrow M \rightarrow \Gamma$.
 
@@ -167,7 +165,7 @@ plt.grid(True)
 plt.show()
 ```
 
-Interpretation of the Band Structure
+## 10.4 Interpretation of the Band Structure
 
 In the plotted band structure of graphene:
 
@@ -175,12 +173,11 @@ In the plotted band structure of graphene:
 - Near the Dirac points, the bands show a linear dispersion, which indicates the massless Dirac fermions that are responsible for graphene’s unique electronic properties.
 - The bands are symmetric about the zero energy level, representing the bonding and anti-bonding states from the tight-binding model.
 
-Linear Dispersion: The tight-binding model shows a linear energy dispersion near the Dirac points (located at the  K  and  K{\prime}  points in the Brillouin zone). This linear relationship between energy and momentum is characteristic of massless Dirac fermions, which are responsible for the high mobility of charge carriers in graphene.
-	2.	Zero Band Gap: At the Dirac points, the valence and conduction bands touch, resulting in zero band gap. This makes graphene a semimetal (or more precisely, a zero-gap semiconductor), where the conduction and valence bands meet at the Fermi level.
-	3.	Bonding and Anti-Bonding States: The two bands that arise from the tight-binding Hamiltonian correspond to the bonding (lower) and anti-bonding (upper) states. These bands arise due to the interaction between the p_z orbitals on neighboring carbon atoms in the honeycomb lattice.
+Some notable properties include
+1. **Linear Dispersion**: The tight-binding model shows a linear energy dispersion near the Dirac points (located at the $K$ and $K{\prime}$ points in the Brillouin zone). This linear relationship between energy and momentum is characteristic of massless Dirac fermions, which are responsible for the high mobility of charge carriers in graphene.
+2. **Zero Band Gap**: At the Dirac points, the valence and conduction bands touch, resulting in zero band gap. This makes graphene a semimetal (or more precisely, a zero-gap semiconductor), where the conduction and valence bands meet at the Fermi level.
+3. **Bonding and Anti-Bonding States**: The two bands that arise from the tight-binding Hamiltonian correspond to the bonding (lower) and anti-bonding (upper) states. These bands arise due to the interaction between the p_z orbitals on neighboring carbon atoms in the honeycomb lattice.
+4. **High Electron Mobility**: The linear dispersion near the Dirac points leads to high electron mobility in graphene. The electrons behave like massless Dirac fermions, which is why graphene exhibits exceptional electrical conductivity.
+5. **Optical Properties**: The unique band structure of graphene also influences its optical properties. The zero band gap allows graphene to absorb light across a wide range of frequencies, making it useful for optoelectronic applications.
 
-1. High Electron Mobility: The linear dispersion near the Dirac points leads to high electron mobility in graphene. The electrons behave like massless Dirac fermions, which is why graphene exhibits exceptional electrical conductivity.
-2.	Ambipolar Behavior: Since the conduction and valence bands touch at the Dirac points, graphene can conduct both electrons (n-type) and holes (p-type) depending on the external doping or electric field applied to it.
-3.	Optical Properties: The unique band structure of graphene also influences its optical properties. The zero band gap allows graphene to absorb light across a wide range of frequencies, making it useful for optoelectronic applications.
-
-This lecture could form a foundation for further studies on more complex materials and advanced band structure concepts using tight binding and other methods like DFT.
+This lecture could form a foundation for further studies on more complex materials and advanced band structure concepts using tight binding. Similarly, the calculation of band structure can be done in DFT as well, but with a heavier computational cost.
