@@ -107,26 +107,26 @@ plt.show()
 ## 5.4 Vibration Spectrum
 In addition to RDF, another commond characterization is to understand how particles in a system vibrate. In experiment, such information can be measured from Infrared (IR) or Raman Spectroscopy, and Inelastic Neutron/X-ray Scattering. An analogical measurement in MD is the **Vibrational Density of States** (VDOS). 
 
-In a MD simulation, the VDOS ($D(\omega)$) is essentially the frequency spectrum of atomic vibrations in the system. The VDOS is closely related to the **Velocity Autocorrelation Function** (VACF). The VDOS provides information about the frequencies at which particles in a system vibrate, while the VACF gives insight into how the velocity of a particle at one time is correlated with its velocity at a later time. It is computed by taking the Fourier transform of the VACF. This relationship is derived from the fact that oscillatory motions (vibrations) in the system are directly reflected in the velocity autocorrelation function, and the Fourier transform allows us to extract the frequency components of these vibrations.
+In a MD simulation, the VDOS, called $D(\omega)$ is essentially the frequency spectrum of atomic vibrations in the system. The VDOS is closely related to the **Velocity Autocorrelation Function** (VACF). The VDOS provides information about the frequencies at which particles in a system vibrate, while the VACF gives insight into how the velocity of a particle at one time is correlated with its velocity at a later time. It is computed by taking the Fourier transform of the VACF. This relationship is derived from the fact that oscillatory motions (vibrations) in the system are directly reflected in the velocity autocorrelation function, and the Fourier transform allows us to extract the frequency components of these vibrations.
 
 Mathematically, the relationship is:
 
 $$
-D(\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} \text{VACF}(\tau) e^{-i\omega\tau}  d\tau
+D(\omega) = \frac{1}{2\pi} \int_{-\infty}^{\infty} C(\tau) e^{-i\omega\tau}  d\tau
 $$
 
 Where:
 
-- $\text{VACF}(\tau)$ is the velocity autocorrelation function.
+- $C(\tau)$ is the velocity autocorrelation function.
 - $\omega$ is the angular frequency.
 - $\tau$ is the time lag.
 
 The Fourier transform is performed over the time correlation $\tau$ to convert the time-domain information in the VACF into frequency-domain information in the VDOS.
 
-The VACF measures how the velocity of a particle at a given time $t$ correlates with its velocity at some later time $t + \tau$. It is useful for understanding particle dynamics and is related to the vibrational properties and transport coefficients (like diffusion).
+The **VACF**, called $C(\tau)$, measures how the velocity of a particle at a given time $t$ correlates with its velocity at some later time $t + \tau$. It is useful for understanding particle dynamics and is related to the vibrational properties and transport coefficients (like diffusion).
 
 $$
-\text{VACF}(\tau) = \frac{1}{N} \sum_{i=1}^{N} \left\langle \mathbf{v}_i(0) \cdot \mathbf{v}_i(\tau) \right\rangle
+C(\tau) = \frac{1}{N} \sum_{i=1}^{N} \left\langle \mathbf{v}_i(0) \cdot \mathbf{v}_i(\tau) \right\rangle
 $$
 
 - $N$ is the total number of time steps in the simulation.
@@ -135,7 +135,7 @@ $$
 In practice, because simulations are finite and VACF data is computed over a limited time interval, we typically use the discrete Fourier transform (DFT) or fast Fourier transform (FFT) to compute the VDOS numerically:
 
 $$
-D(\omega) = \frac{1}{2\pi} \int_0^{\infty} \text{VACF}(\tau) \cos(\omega \tau) d\tau
+D(\omega) = \frac{1}{2\pi} \int_0^{\infty} C(\tau) \cos(\omega \tau) d\tau
 $$
 
 
@@ -163,7 +163,70 @@ plt.title('Vibration Spectrum')
 plt.show()
 ```
 
-## 5.5 Further discussions
+## 5.5 Why is VACF related to VDOS? 
 
-- Interpretation of RDF: Peaks in RDF tells the atomic neighbor counts. Liquid and solid have very different behaviors in their RDF.  
-- Interpretation of VDOS: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the Low-frequency and high-frequency modes and link them to atomic motions from MD trajectory
+### 5.5.1 Normal modes
+In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is 3$N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. And each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion. And each normal mode in a system is orthogonal to the others. 
+
+How can you measure the vibration experimentally? Using IR, Raman or Neutron scattering, you will see ***. How can we measure the vibration from MD trajectory?
+
+### 5.5.2 Vibration Frequency of a single harmonic oscillator
+Let's imagine a simplest case of a single harmonic oscillator, the velocity of an atom is related to its position by:
+
+$$
+v(t) = \frac{d}{dt} r(t)
+$$
+
+For sinusoidal motion  $r(t) = A \cos(\omega t + \phi)$ , where  $A$  is the amplitude, the velocity becomes:
+
+$$
+v(t) = -A \omega \sin(\omega t + \phi)
+$$
+
+This shows that the velocity oscillates at the same frequency $\omega$ as the position but is phase-shifted. Since the velocities are derived from the same harmonic motion, the VACF (which tracks velocity correlations over time) encodes the vibrational frequencies of the system.
+
+The **power spectrum** is given by the Fourier transform of the VACF:
+
+$$
+S(\omega) = \int_{-\infty}^{\infty} C_v(t) e^{-i \omega t} dt
+$$
+
+$S(\omega)$ reveals the frequencies at which the velocities oscillate. For a system of harmonic oscillators, these frequencies correspond directly to the vibrational frequencies of the system because atomic vibrations drive the velocity behavior. Hence $S(\omega)$ captures the strength of the velocity fluctuations at each frequency $\omega$. 
+
+Since these frequencies arise from the harmonic vibrations of atoms, the power spectrum $S(\omega)$ gives us direct insight into the vibrational modes of the system. Hence $S(\omega)$ should be proportional to the VDOS $D(\omega)$ because both describe the distribution of vibrational frequencies in the system. In the harmonic approximation:
+
+- $D(\omega)$ counts the number of vibrational modes at frequency $\omega$,
+- $S(\omega)$ measures the velocity oscillations caused by these vibrational modes.
+
+To express this mathematically, we use the relation:
+
+$$
+D(\omega) \propto S(\omega)
+$$
+
+This says that the VDOS is proportional to the power spectrum of the VACF. To get the VDOS from the power spectrum, we can normalize it so that:
+
+$$
+D(\omega) = A \int_{-\infty}^{\infty} C_v(t) e^{-i\omega t} dt
+$$
+
+where $A$ is a normalization constant.
+
+Since $C_v(t)$ is a real and even function (i.e., $C_v(t) = C_v(-t)$ ), we can simplify the integral by considering only the positive time part and using the cosine transform instead of the full complex Fourier transform. This gives:
+
+$$
+D(\omega) = A \int_{0}^{\infty} C_v(t) \cos(\omega t) dt
+$$
+
+This form shows that the VDOS is directly obtained by taking the cosine transform of the VACF, which captures the oscillatory nature of the velocity correlations and connects them to the vibrational frequencies in the system.
+
+### 5.5.3 Vibration Frequencies of many harmonic oscillators
+If the system has only one normal mode, we can trivially found the frequency by computing the $S(\omega)$. What if the system consists of two normal modes? The $S(\omega)$ would carry the information for both modes. Remember that each normal mode in a system is **orthogonal** to the others. Each mode will make its own contribution to $S(\omega)$. If these modes are identical, you will see a peak with the doubled magnitude. If these modes are different, you will a two distant peaks. Therefore, you just need to compute the total VACF once and then compute $S(\omega)$ from its Fourier Transform. 
+
+Here is a report regarding the [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf)
+
+## 5.6 Further discussions
+
+- **Interpretation of RDF**: Peaks in RDF tells the atomic neighbor counts. Liquid and solid have very different behaviors in their RDF.  
+- **Interpretation of VDOS**: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the Low-frequency and high-frequency modes and link them to atomic motions from MD trajectory.
+- **Practical issues in computing VDOS**. Assuming there exist a very small frequency, how can you ensure that such a vibraion mode can be relected in your VACF?
