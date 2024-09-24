@@ -1,13 +1,19 @@
 # Week 5: MD Analysis I: Structural Characterization
 
-So far, we have learned some fundamentals about how to develop a MD simulation to model the atomistic process of materials. By running the simulation, we expect to generate a set of time-dependent atomic trajectories by solving Newton’s equations of motion for a system of particles. Next, it is important to understand the simulation results. Indeed, post-analysis is essential for interpreting these trajectories to extract meaningful physical properties. In this lecture, we will cover several fundamental post-analysis techniques: evolution of observables, visualization of MD trajectories, the radial distribution function (RDF), and the vibrational spectrum.
+So far, we have learned some fundamentals about how to write a code and run a MD simulation to model the atomistic process of materials. By running the simulation, we expect to generate a set of time-dependent atomic trajectories by solving Newton’s equations of motion for a system of particles. Next, it is important to understand these simulation results. Indeed, it is essential to extract meaningful physical properties from the simulation results. In this lecture, we will cover several fundamental post-analysis techniques: 
 
-## 5.1 Evolution of Macroscopic Observables 
+1. Validation of MD simulation by tracking the evolution of observables,
+2. Visualization of MD trajectories,
+3. Radial distribution function (RDF),
+4. Vibrational spectrum.
+
+## 5.1 Evolution of Macroscopic Observables
+
 In the previous lecture and coding exercises, we have frequently mentioned the tracking of observables like total energy, volume, and temperature throughout an MD simulation to ensure the system reaches equilibrium and conserves energy (in appropriate ensembles).
 
-- Constant Energy (NVE): Total energy should remain constant.
-- Constant Temperature (NVT): Temperature is maintained constant via a thermostat (a fluctuation of Temperature or kinetic energy around some values).
-- Constant Pressure (NPT): Both Temperature and Volume fluctuate to maintain temperature and pressure.
+1. NVE: Total energy should remain constant.
+2. NVT: A fluctuation of Temperature or kinetic energy around some values).
+3. NPT: Both Temperature and Volume fluctuate to maintain temperature and pressure.
 
 In your MD simulation, it is advised to save these values every some time interval. Many codes would print out these information to some file. You must go over these results to ensure your simulation results make sense!
 
@@ -43,10 +49,10 @@ plt.title('Evolution of Temperature')
 ```
 
 ## 5.2 MD Trajectory Visualization
-Visualization allows researchers to visually inspect the dynamics of the system, spot abnormalities, and better understand atomic movements. Tools like VMD and OVITO are commonly used. Please refer to OVITO pape to find more functions.
+Visualization allows researchers to visually inspect the dynamics of the system, spot abnormalities, and better understand atomic movements. Tools like [OVITO](https://www.ovito.org) are commonly used. Please refer to [OVITO](https://www.ovito.org) pape to find more functions.
 
 ## 5.3 Radial Distribution Function (RDF)
-The [RDF](https://en.wikipedia.org/wiki/Radial_distribution_function) $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
+The [Radial Distribution Function ](https://en.wikipedia.org/wiki/Radial_distribution_function) $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
 
 $$
 g(r) = \frac{V}{N^2} \left\langle \sum_{i=1}^{N} \sum_{j \neq i}^{N} \delta(r - r_{ij}) \right\rangle \cdot \frac{1}{4 \pi r^2 \Delta r}
@@ -65,15 +71,17 @@ Where:
   <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Lennard-Jones_Radial_Distribution_Function.svg/1920px-Lennard-Jones_Radial_Distribution_Function.svg.png" alt="rdf" width="400"/>
 </p>
 
-It is commonly used to characterize the short-range order in liquids and gases. In a RDF, we are interested the location of Peaks and their spreads, as they indicate common interatomic distances (e.g., nearest-neighbor distance).
-
-To compute $g(r)$, one should
-1. **Compute the distance pair** $r_{ij}$ between every pair of particles $i$ and $j$ .
-2. **Group the distances** into bins of width $\Delta r$ to accumulate how many pairs of particles have a separation within each bin.
-3. **Normalize the number of pairs** in each bin by:
-- The number of particle pairs $N(N-1)/2$.
-- The volume of the spherical shell at distance $r$, given by $4\pi r^2 \Delta r$.
-- The average particle density $N/V$.
+```mermaid
+graph TD
+    A[Start] --> B[Compute the distance pairs]
+    B --> C[Group distances into bins]
+    C --> D[Update each bin's count]
+    D --> E[Normalization]
+    E --> F[Total number of pairs]
+    E --> G[Shell Volume 4πr²Δr]
+    E --> H[Particle density N/V]
+    G --> I[End]
+```
 
 ```Python
 def compute_rdf(positions, num_bins=100, r_max=10.0):
@@ -103,6 +111,8 @@ plt.ylabel('g(r)')
 plt.title('Radial Distribution Function')
 plt.show()
 ```
+
+RDF is commonly used to characterize the short-range order in liquids and gases. In a RDF, we are interested the location of Peaks and their spreads, as they indicate common interatomic distances (e.g., 1st and 2nd nearest-neighbor distance).
 
 ## 5.4 Vibration Spectrum
 In addition to RDF, another commond characterization is to understand how particles in a system vibrate. In experiment, such information can be measured from Infrared (IR) or Raman Spectroscopy, and Inelastic Neutron/X-ray Scattering. An analogical measurement in MD is the **Vibrational Density of States** (VDOS). 
