@@ -5,7 +5,7 @@
 * The Los Alamos MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer) became operational in 1952. This event marks a significant milestone in the history of computing. Nicholas Metropolis, as the most notable early user, developed the Monte Carlo method, a statistical technique that utilizes random sampling to solve complex mathematical problems. 
 
 * The launch of computer also opened the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people have to to do it either analytically (e.g., thermodynamics and statiscal mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagentic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lacks the atomic detail. An alterative approach is directly model the system (straightforward but very time consuming and tedious). Notable examples include. 
-1. [Buffon's needle experiment to compute $\pi$](https://en.wikipedia.org/wiki/Buffon%27s_needle_problem), 
+1. [Buffon's needle experiment](https://en.wikipedia.org/wiki/Buffon%27s_needle_problem) to compute $\pi$, 
 2. [Bernal's ball-bearing model](https://iopscience.iop.org/article/10.1088/0953-8984/26/46/463102), 
 3. [Kitaigorodskii’s structure seeker](https://pubs.acs.org/doi/10.1021/acs.cgd.8b00972).
 
@@ -26,27 +26,17 @@
 
 ### 1.2.1 A Simple MD workflow
 
-```pseudo
-I. Initialization
-    * Set simulation parameters (e.g., number of particles, temperature, time step)
-    1. particle positions (R) randomly or on a lattice
-    2 particle velocities (V) Maxwell-Boltzmann distribution
-
-II. Computation of Energy and Forces
-    * Compute potential energy using the chosen potential
-    * Compute forces on each particle by differentiating the potential energy
-
-III. Integration (Time Evolution)
-    * For each time step:
-        1. Update particle positions using the integration algorithm (e.g., Verlet)
-        2. Update particle velocities based on the computed forces
-        3. Apply periodic boundary conditions (if necessary)
-        4. Recompute forces on all particles
-        5. Update potential energy
-
-IV. Termination
-    * Check if the simulation time has reached the desired number of steps
+```mermaid
+flowchart TD
+    A[Initialization] --> B[Set Positions and Velocities]
+    B --> C[Compute Energy and Forces]
+    C --> D[Integration]
+    D --> E[Update Positions, Velocities, Forces]
+    D --> F[Apply periodic boundary conditions if necessary]    
+    E --> G{Termination}
+    F --> G
 ```
+
 ### 1.2.2 Interatomic potential
 
 [Lennard Jones Potential](https://en.wikipedia.org/wiki/Lennard-Jones_potential) express the assumes that all particles interact with each other via pairwise interactions (i.e., the interaction energy only depends on the distance).
