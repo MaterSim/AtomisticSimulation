@@ -4,7 +4,7 @@ So far, we have learned some fundamentals about how to write a code and run a MD
 
 1. Validation of MD simulation by tracking the evolution of observables,
 2. Visualization of MD trajectories,
-3. Radial distribution function (RDF),
+3. Radial distribution function,
 4. Vibrational spectrum.
 
 ## 5.1 Evolution of Macroscopic Observables
@@ -178,7 +178,7 @@ plt.show()
 ### 5.5.1 Normal modes
 In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is 3$N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. And each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion. And each normal mode in a system is orthogonal to the others. 
 
-How can you measure the vibration experimentally? Using IR, Raman or Neutron scattering, you will see ***. How can we measure the vibration from MD trajectory?
+In experiment, you can measure the vibration using IR, Raman or Neutron scattering. How can we measure the vibration from MD trajectory? The key is to extract the viration frequencies from each normal mode.
 
 ### 5.5.2 Vibration Frequency of a single harmonic oscillator
 Let's imagine a simplest case of a single harmonic oscillator, the velocity of an atom is related to its position by:
