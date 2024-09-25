@@ -176,7 +176,7 @@ plt.show()
 ## 5.5 Why is VACF related to VDOS? 
 
 ### 5.5.1 Normal modes
-In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is 3$N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. And each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion. And each normal mode in a system is orthogonal to the others. 
+In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is $3N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. And each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion. And each normal mode in a system is orthogonal to the others. 
 
 In experiment, you can measure the vibration using IR, Raman or Neutron scattering. How can we measure the vibration from MD trajectory? The key is to extract the viration frequencies from each normal mode.
 
@@ -233,7 +233,7 @@ This form shows that the VDOS is directly obtained by taking the cosine transfor
 ### 5.5.3 Vibration Frequencies of many harmonic oscillators
 If the system has only one normal mode, we can trivially found the frequency by computing the $S(\omega)$. What if the system consists of two normal modes? The $S(\omega)$ would carry the information for both modes. Remember that each normal mode in a system is **orthogonal** to the others. Each mode will make its own contribution to $S(\omega)$. If these modes are identical, you will see a peak with the doubled magnitude. If these modes are different, you will a two distant peaks. Therefore, you just need to compute the total VACF once and then compute $S(\omega)$ from its Fourier Transform. 
 
-Here is a report regarding the [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf)
+Here is a report regarding the [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf).
 
 ## 5.6 Further discussions
 
