@@ -233,9 +233,102 @@ This form shows that the VDOS is directly obtained by taking the cosine transfor
 ### 5.5.3 Vibration Frequencies of many harmonic oscillators
 If the system has only one normal mode, we can trivially found the frequency by computing the $S(\omega)$. What if the system consists of two normal modes? The $S(\omega)$ would carry the information for both modes. Remember that each normal mode in a system is **orthogonal** to the others. Each mode will make its own contribution to $S(\omega)$. If these modes are identical, you will see a peak with the doubled magnitude. If these modes are different, you will a two distant peaks. Therefore, you just need to compute the total VACF once and then compute $S(\omega)$ from its Fourier Transform. 
 
-Here is a report regarding the [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf).
+### 5.5.4 Computational Experiment 
+To understand the concept of VACF, we can perform a simple numerical experiment to simulate two model systems based on an O$_2$ diatomic molecule. In a O$_2$, the equilibrium distance is we consider the atoms are connected by a spring with $k$=1180 N/m. 
+In the first model, we seek to simulate a simple vibration harmonic, by creating the initial velocities along the spring. In the second model, we simulate the combination of vibration and rotation by creating the initial velocites not aligned on the spring. 
+
+   ![Lec_05_models](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_05_diatomic.png)
+
+Running the following MD code, you expect to simulate the motions and then compute the corresponding VACF and VDOS.
+```python
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.fftpack import fft
+
+def harmonic_force(r1, r2, k, r_eq):
+    # Function to compute force due to harmonic potential
+    r12 = np.linalg.norm(r2 - r1)
+    force_mag = -k * (r12 - r_eq)
+    force = -force_mag * (r2 - r1) / r12
+    return force
+
+def MD(r1, r2, v1, v2, N_steps):
+    velocities = np.zeros([N_steps, 6])
+    F12 = harmonic_force(r1, r2, k, r_eq)
+
+    for step in range(N_steps):
+        # Verlet update
+        r1 += v1 * dt + 0.5 * F12 / mass * dt ** 2
+        r2 += v2 * dt - 0.5 * F12 / mass * dt ** 2
+
+        F12_new = harmonic_force(r1, r2, k, r_eq)
+
+        v1 += 0.5 * (F12 + F12_new) * dt / mass
+        v2 -= 0.5 * (F12 + F12_new) * dt / mass
+
+        F12 = F12_new
+        velocities[step][:3] = v1
+        velocities[step][3:6] = v2
+    return velocities
+
+if __name__ == "__main__":
+
+    # Parameters for the simulation
+    dt = 1e-15
+    data = [
+            ('O$_2$ (vibration)', 1.16, 1180, 2.66e-26, 2000, False),
+            ('O$_2$ (vibration + rotation)', 1.16, 1180, 2.66e-26, 5000, True),
+            #('H2', 0.74,  510, 1.67e-27),
+            #('N2', 1.10, 2294, 2.33e-26)
+           ]
+    fig, axs = plt.subplots(2, len(data), figsize=(12, 6))
+
+    for i, (name, r, k, mass, N_steps, rotate) in enumerate(data):
+        print(name, r, k, mass)
+        r_eq = r * 1e-10        # equlibrium distance in m
+
+        # Initial positions
+        r1 = np.array([0.0, 0.0, 0.0])
+        r2 = np.array([0.0, 0.0, r_eq*1.2])
+
+        # Initialize velocities
+        v1 = np.zeros(3)
+        v2 = np.zeros(3)
+        if rotate:
+            v1[0] += 50
+            v2[0] -= 50
+
+        # MD simulation
+        velocities = MD(r1, r2, v1, v2, N_steps)
+
+        # Plot VACF
+        VACF = np.array([np.dot(velocities[0], velocities[t]) for t in range(N_steps)])
+        axs[0, i].plot(np.arange(N_steps)*dt*1e12, VACF)
+        axs[0, i].set_title(name)
+        axs[0, i].set_xlabel('Time (ps)')
+        axs[0, i].set_ylabel('VACF')
+
+        # Plot VDOS
+        VDOS = np.abs(fft(VACF))**2
+        freqs = np.fft.fftfreq(N_steps, dt) / 1e12
+        axs[1, i].plot(freqs[:N_steps//2], VDOS[:N_steps//2])
+        axs[1, i].set_xlabel('Frequency (THz)')
+        axs[1, i].set_ylabel('log-VDOS')
+        axs[1, i].set_xlim([0, 60])
+        axs[1, i].set_yscale('log')
+    plt.tight_layout()
+    plt.show()
+```
+   ![Lec_05_models](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_05_VACF.png)
+
+For the ideal harmonic oscillators, you should expect that the VACF remain the same behavior overtime. Thanks to Fourier analysis, we can conveniently extract the vibrational frequencies for a single and mutiple harmonic oscillators. However, some numerical aspects must be noted. For instance, the low-frequency modes cannot be sampled efficiently within a short VACF run time. The magnitude needs to be properly rescaled if needed.
+
+Here is a report regarding the simulation of most realistic system [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf).
+
 
 ## 5.6 Further discussions
+
+For the realistic system, LAMMPS allows the computation of both RDF and VACF. Therefore, one just needs to directly get them from the lammps output and then plot them on your own.
 
 - **Interpretation of RDF**: Peaks in RDF tells the atomic neighbor counts. Liquid and solid have very different behaviors in their RDF.  
 - **Interpretation of VDOS**: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the Low-frequency and high-frequency modes and link them to atomic motions from MD trajectory.
