@@ -4,7 +4,7 @@ Transport properties describe how particles, energy, and momentum move within a 
 
 ## 6.1 Diffusion
 
-According to Fick's 2nd law, the diffusion equation is a partial differential equation that describes how a substance spreads over time. For an one-dimension system under equilibrium, it is given by:
+According to [Fick's 2nd law](https://en.wikipedia.org/wiki/Fick%27s_laws_of_diffusion), the diffusion equation is a partial differential equation that describes how a substance spreads over time. For an one-dimension system under equilibrium, it is given by:
 
 $$
 \frac{\partial C(x,t)}{\partial t} = D \frac{\partial^2 C(x,t)}{\partial x^2}
@@ -24,7 +24,7 @@ C(x,t) = \frac{1}{\sqrt{4\pi D t}} \exp\left( -\frac{x^2}{4Dt} \right)
 $$
 
 The Gaussian form suggests that
-1. The peak of the distribution (the center, at x = 0) remains at the origin because particles are assumed to start there.
+1. The peak of the distribution (the center, at $x$ = 0) remains at the origin because particles are assumed to start there.
 2. The spread of the distribution increases with time, meaning that particles are more likely to be found farther away from the origin as time goes on.
 
 To find the mean squared displacement (MSD), we calculate the expected value of $x^2$ with respect to this distribution. The MSD in one dimension is:
@@ -41,8 +41,8 @@ $$
 
 Where:
 
-- $\langle \Delta r^2(t) \rangle$ is the mean square displacement (MSD) of the particle after time  t .
-- $d$ is the number of spatial dimensions (e.g.,  d = 3  for 3D).
+- $\langle \Delta r^2(t) \rangle$ is the mean square displacement (MSD) of the particle after time $t$.
+- $d$ is the number of spatial dimensions (e.g.,  $d$ = 3  for 3D).
 
 <!Now, suppose we apply a small external force $F$ to the system (e.g., an electric field $E$ acting on a charged particle with charge $q$). The particle will respond to the applied force by moving with a drift velocity $v_d$ .
 
@@ -67,7 +67,7 @@ D = \mu k_B T = \frac{\langle \Delta r^2(t) \rangle}{2dt}
 $$
 |>
 
-In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD(t)-t curve to find the diffusion constant.
+In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD($t$)-$t$ curve to find the diffusion constant.
 
 ```python
 def compute_msd(positions):
@@ -102,7 +102,7 @@ plt.show()
 ```
 
 ## 6.2 The Green-Kubo Relation
-In addition to Einstein relation, $D$ can also be derived from the velocity autocorrelation function (VACF).
+In addition to the use of MSD, $D$ can also be derived from the velocity autocorrelation function (VACF).
 
 $$
 D = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle \, dt
