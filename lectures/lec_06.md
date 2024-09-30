@@ -212,6 +212,10 @@ plt.show()
 
 ## 6.4 Further disscusions
 
+Finally, it is important to note that the techniques to compute diffusion coefficients or thermal conductivity are indirect. They rely on the statistical properties of the system. They are essentially rooted from Fluctuation-Dissipation Theorem, a principle underlying the connection between the fluctuations in a system at equilibrium and its response to perturbations. The theorem states that the response of a system to a small perturbation can be related to the equilibrium fluctuations of observables. Rather than measuring these properties directly, which can be difficult or impossible in practice, we can derive them from measurable fluctuations in the system.
+
+That said, it is possible to use socall nonequilibrium MD to directly measure transport properties like diffusion coefficients and thermal conductivity, but there are limitations and challenges associated with this approach. The system might take a long time to reach a steady state, or the steady state might not be easy to achieve in practice.
+
 - Discuss how the MSD should scale linearly with time at longer time scales if the system has reached diffusive behavior.
 - Explain the process of calculating the HCACF.
 - Integrating the HCACF gives the thermal conductivity.
