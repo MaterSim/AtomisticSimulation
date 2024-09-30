@@ -35,7 +35,7 @@ $$
 Since thermal motion drives diffusion, and temperature is the main source of this motion, we expect the diffusion constant  D  to be related to temperature $T$. At steady state, when the system is in thermal equilibrium, the diffusion constant is related to the particle’s mobility through the **Einstein relation**:
 
 $$
-D = \mu k_B T = \frac{1}{2d} \frac{d}{dt} \langle \Delta r^2(t) \rangle
+D = \mu k_B T = \frac{\langle \Delta r^2(t) \rangle}{2dt}
 $$
 
 In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions.
