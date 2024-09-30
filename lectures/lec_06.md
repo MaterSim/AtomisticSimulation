@@ -119,13 +119,14 @@ $$
 
 $$
 \begin{align*}
-\langle \Delta x^2(t) \rangle 
-&= \bigg\langle \big(\int_0^t dt\prime v_x(t\prime)\big)^2 \bigg\rangle \\
-&= \int_0^t dt\prime \int_0^t dt\prime\prime \langle v_x(t\prime) v_x(t\prime\prime) \rangle \\
-&= 2 \int_0^t dt\prime \int_0 dt\prime\prime \langle v_x(t\prime) v_x(t\prime\prime) \rangle
+\langle \Delta x^2(t) \rangle &= \left\langle \left( \int_0^t dt{\prime}  v_x(t{\prime}) \right)^2 \right\rangle \\
+&= \left\langle\int_0^t dt{\prime} v_x(t{\prime}) \int_0^t dt{\prime}{\prime} v_x(t{\prime}{\prime})\right\rangle\\
+& = \int_0^t dt{\prime} \int_0^t dt{\prime}{\prime}  \langle v_x(t{\prime}) v_x(t{\prime}{\prime}) \rangle \\
+&= 2 \int_0^t dt{\prime} \int_0^{t{\prime}} dt{\prime}{\prime}  \langle v_x(t{\prime}) v_x(t{\prime}{\prime}) \rangle
 \end{align*}
 $$
 
+Note that the factor of 2 arises because the integral over the entire $t$-range is equivalent to twice the integral over the *half-space* where $t{\prime} > t{\prime}{\prime}$ (or vice versa, due to symmetry). 
 Hence, $D$ can be computed by the VACF as introduced in the previous lecture. 
 
 $$
@@ -151,10 +152,10 @@ These relations are derived from linear response theory, which states that the r
 Thermal conductivity $\kappa$ is a measure of a material’s ability to conduct heat. The Green-Kubo relation is used to calculate $\kappa$ from the heat current autocorrelation function (HCACF):
 
 $$
-\kappa = \frac{1}{k_B T^2 V} \int_0^\infty \langle J_Q(0) \cdot J_Q(t) \rangle dt
+\kappa = \frac{1}{k_B T^2 V} \int_0^\infty \langle J(0) \cdot J(t) \rangle dt
 $$
 
-where $J_Q(t)$ is the heat current, $k_B$ is the Boltzmann constant,  $T$ is temperature, and $V$ is the system volume.
+where $J(t)$ is the heat current, $k_B$ is the Boltzmann constant,  $T$ is temperature, and $V$ is the system volume.
 
 
 The heat current is defined as the rate at which energy crosses a unit area per unit time. Thue, $J$ can be computed using:
