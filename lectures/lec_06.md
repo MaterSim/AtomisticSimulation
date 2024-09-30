@@ -4,7 +4,36 @@ Transport properties describe how particles, energy, and momentum move within a 
 
 ## 6.1 Diffusion
 
-Diffusion constant $D$ describes how fast particles diffuse through the medium. In a simple random walk model of diffusion (based on Brownian motion), we assume that a particle is undergoing random, uncorrelated displacements over time. The mean square displacement (MSD) of a particle is a function of time, given by:
+According to Fick's 2nd law, the diffusion equation is a partial differential equation that describes how a substance spreads over time. For an one-dimension system under equilibrium, it is given by:
+
+$$
+\frac{\partial C(x,t)}{\partial t} = D \frac{\partial^2 C(x,t)}{\partial x^2}
+$$
+
+where:
+
+- $C(x, t)$ is the concentration of particles at position $x$ and time $t$.
+- $D$ is the diffusion constant (or diffusivity), which characterizes how fast particles diffuse.
+
+The equation states that the rate of change of concentration over time $\frac{\partial C}{\partial t}$ is proportional to the second spatial derivative of the concentration $\frac{\partial^2 C}{\partial x^2}$. 
+
+The solution to the diffusion equation gives the probability distribution for the particle’s position over time. In the case of one-dimensional diffusion starting from a point, the solution is a Gaussian distribution:
+
+$$
+C(x,t) = \frac{1}{\sqrt{4\pi D t}} \exp\left( -\frac{x^2}{4Dt} \right)
+$$
+
+The Gaussian form suggests that
+1. The peak of the distribution (the center, at x = 0) remains at the origin because particles are assumed to start there.
+2. The spread of the distribution increases with time, meaning that particles are more likely to be found farther away from the origin as time goes on.
+
+To find the mean squared displacement (MSD), we calculate the expected value of $x^2$ with respect to this distribution. The MSD in one dimension is:
+
+$$
+\langle x^2(t) \rangle = \int_{-\infty}^{\infty} x^2 C(x,t) dx = 2Dt
+$$
+
+Hence we end up with the following relation.
 
 $$
 \langle \Delta r^2(t) \rangle = 2d D t
@@ -14,9 +43,8 @@ Where:
 
 - $\langle \Delta r^2(t) \rangle$ is the mean square displacement (MSD) of the particle after time  t .
 - $d$ is the number of spatial dimensions (e.g.,  d = 3  for 3D).
-- $t$ is time.
 
-Now, suppose we apply a small external force $F$ to the system (e.g., an electric field $E$ acting on a charged particle with charge $q$). The particle will respond to the applied force by moving with a drift velocity $v_d$ .
+<!Now, suppose we apply a small external force $F$ to the system (e.g., an electric field $E$ acting on a charged particle with charge $q$). The particle will respond to the applied force by moving with a drift velocity $v_d$ .
 
 From Newton’s second law $F = m \frac{dv}{dt}$, causing the particle to accelerate. However, in a system with thermal motion (e.g., Brownian motion), the particle reaches a steady-state drift velocity $v_d$ due to the balance between the external force and the opposing forces from random collisions with the surrounding particles,
 
@@ -37,8 +65,9 @@ Since thermal motion drives diffusion, and temperature is the main source of thi
 $$
 D = \mu k_B T = \frac{\langle \Delta r^2(t) \rangle}{2dt}
 $$
+|>
 
-In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions.
+In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD(t)-t curve to find the diffusion constant.
 
 ```python
 def compute_msd(positions):
