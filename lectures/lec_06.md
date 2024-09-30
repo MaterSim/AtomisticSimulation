@@ -105,13 +105,13 @@ plt.show()
 In addition to the use of MSD, $D$ can also be derived from the velocity autocorrelation function (VACF).
 
 $$
-D = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle \, dt
+D = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle  dt
 $$
 
 It comes from linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under a spontaneous fluctuations in thermal equilibrium. More generally, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
 
 $$
-\lambda = \int_0^\infty \langle J(0) J(t) \rangle \, dt
+\lambda = \int_0^\infty \langle J(0) J(t) \rangle  dt
 $$
 
 - Diffusion constant .v.s velocity. The flux of velocity causes diffusion. If a particle “forgets” its initial velocity, the particle loses memory of its initial velocity, leading to faster diffusion.
