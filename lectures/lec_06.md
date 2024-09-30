@@ -44,6 +44,12 @@ Where:
 - $\langle \Delta r^2(t) \rangle$ is the mean square displacement (MSD) of the particle after time $t$.
 - $d$ is the number of spatial dimensions (e.g.,  $d$ = 3  for 3D).
 
+It is also convenient to write it in the derivative form
+
+$$
+\frac {\partial \langle \Delta r^2(t) \rangle}{\partial t} = 2d D
+$$
+
 <!Now, suppose we apply a small external force $F$ to the system (e.g., an electric field $E$ acting on a charged particle with charge $q$). The particle will respond to the applied force by moving with a drift velocity $v_d$ .
 
 From Newton’s second law $F = m \frac{dv}{dt}$, causing the particle to accelerate. However, in a system with thermal motion (e.g., Brownian motion), the particle reaches a steady-state drift velocity $v_d$ due to the balance between the external force and the opposing forces from random collisions with the surrounding particles,
@@ -67,7 +73,7 @@ D = \mu k_B T = \frac{\langle \Delta r^2(t) \rangle}{2dt}
 $$
 |>
 
-In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD($t$)-$t$ curve to find the diffusion constant.
+In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD($t$) curve to find the diffusion constant.
 
 ```python
 def compute_msd(positions):
@@ -102,13 +108,32 @@ plt.show()
 ```
 
 ## 6.2 The Green-Kubo Relation
-In addition to the use of MSD, $D$ can also be derived from the velocity autocorrelation function (VACF).
+
+### 6.2.1 The alternative expression of MSD
+
+Let's introduce the alternative definition of the displacement of an atom.
 
 $$
-D = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle  dt
+\Delta x(t) = \int_0^t dt\prime v_x(t\prime)
 $$
 
-It comes from linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under a spontaneous fluctuations in thermal equilibrium. More generally, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
+$$
+\begin{align*}
+\langle \Delta x^2(t) \rangle 
+&= \bigg\langle \big(\int_0^t dt\prime v_x(t\prime)\big)^2 \bigg\rangle \\
+&= \int_0^t dt\prime \int_0^t dt\prime\prime \langle v_x(t\prime) v_x(t\prime\prime) \rangle \\
+&= 2 \int_0^t dt\prime \int_0 dt\prime\prime \langle v_x(t\prime) v_x(t\prime\prime) \rangle
+\end{align*}
+$$
+
+Hence, $D$ can be computed by the VACF as introduced in the previous lecture. 
+$$
+D = \frac {\partial \langle \Delta r^2(t) \rangle}{2d \partial t} = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle  dt
+$$
+
+## 6.2.2 The General Green-Kubo Relation
+
+In fact, the previous expression between $D$ and VACF is a specical case. According to the linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under a spontaneous fluctuations in thermal equilibrium. More generally, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
 
 $$
 \lambda = \int_0^\infty \langle J(0) J(t) \rangle  dt
@@ -118,7 +143,8 @@ $$
 - Thermal conductivity .v.s heat current. Applying a temperature gradient causes a heat current to flow, leading to thermal conductivity. The faster the decay of heat current autocorrelation, the lower the thermal conductivity.
 - Viscosity .v.s stress tensors. In a fluid, applying a shear stress leads to a flow, related to viscosity. A high viscosity fluid (like honey) will have a slower decay of the stress autocorrelation function, meaning the fluid “remembers” shear stresses for a longer time compared to a low viscosity fluid (like water).
 
-These relations are derived from linear response theory, which states that the response of a system to a small perturbation is proportional to the equilibrium fluctuations of microscopic quantities (e.g., heat current, velocity, or stress)
+These relations are derived from linear response theory, which states that the response of a system to a small perturbation is proportional to the equilibrium fluctuations of microscopic quantities (e.g., heat current, velocity, or stress).
+
 
 ## 6.3 Thermal Conductivity 
 Thermal conductivity $\kappa$ is a measure of a material’s ability to conduct heat. The Green-Kubo relation is used to calculate $\kappa$ from the heat current autocorrelation function (HCACF):
