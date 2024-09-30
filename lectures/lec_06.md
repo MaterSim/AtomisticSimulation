@@ -127,6 +127,7 @@ $$
 $$
 
 Hence, $D$ can be computed by the VACF as introduced in the previous lecture. 
+
 $$
 D = \frac {\partial \langle \Delta r^2(t) \rangle}{2d \partial t} = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle  dt
 $$
@@ -136,12 +137,12 @@ $$
 In fact, the previous expression between $D$ and VACF is a specical case. According to the linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under a spontaneous fluctuations in thermal equilibrium. More generally, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
 
 $$
-\lambda = \int_0^\infty \langle J(0) J(t) \rangle  dt
+\lambda = \int_0^\infty \langle J(0) \cdot J(t) \rangle  dt
 $$
 
-- Diffusion constant .v.s velocity. The flux of velocity causes diffusion. If a particle “forgets” its initial velocity, the particle loses memory of its initial velocity, leading to faster diffusion.
-- Thermal conductivity .v.s heat current. Applying a temperature gradient causes a heat current to flow, leading to thermal conductivity. The faster the decay of heat current autocorrelation, the lower the thermal conductivity.
-- Viscosity .v.s stress tensors. In a fluid, applying a shear stress leads to a flow, related to viscosity. A high viscosity fluid (like honey) will have a slower decay of the stress autocorrelation function, meaning the fluid “remembers” shear stresses for a longer time compared to a low viscosity fluid (like water).
+- **Diffusion constant .v.s velocity**. The flux of velocity causes diffusion. If a particle *forgets* its initial velocity, the particle loses memory of its initial velocity, leading to faster diffusion.
+- **Thermal conductivity .v.s heat current**. Applying a temperature gradient causes a heat current to flow, leading to thermal conductivity. The faster the decay of heat current autocorrelation, the lower the thermal conductivity.
+- **Viscosity .v.s stress tensors**. In a fluid, applying a shear stress leads to a flow, related to viscosity. A high viscosity fluid (like honey) will have a slower decay of the stress autocorrelation function, meaning the fluid *remembers* shear stresses for a longer time compared to a low viscosity fluid (like water).
 
 These relations are derived from linear response theory, which states that the response of a system to a small perturbation is proportional to the equilibrium fluctuations of microscopic quantities (e.g., heat current, velocity, or stress).
 
@@ -150,11 +151,32 @@ These relations are derived from linear response theory, which states that the r
 Thermal conductivity $\kappa$ is a measure of a material’s ability to conduct heat. The Green-Kubo relation is used to calculate $\kappa$ from the heat current autocorrelation function (HCACF):
 
 $$
-\kappa = \frac{1}{k_B T^2 V} \int_0^\infty \langle J_Q(t) J_Q(0) \rangle dt
+\kappa = \frac{1}{k_B T^2 V} \int_0^\infty \langle J_Q(0) \cdot J_Q(t) \rangle dt
 $$
 
 where $J_Q(t)$ is the heat current, $k_B$ is the Boltzmann constant,  $T$ is temperature, and $V$ is the system volume.
 
+
+The heat current is defined as the rate at which energy crosses a unit area per unit time. Thue, $J$ can be computed using:
+
+$$
+J = \sum_i^N \left( \frac{1}{2} m v_i^2 + U_i \right) \mathbf{v}_i,
+$$
+
+where 
+- $m$  is the mass of the particles,
+- $v_i$  is the velocity of particle  $i$ ,
+- $k$  is the force constant,
+- $r_i$  is the position of particle  $i$ ,
+- $V$  is the volume of the simulation box.
+
+In an equilibrium state, the average potential energy can be considered constant over time, and thus its contribution to the heat current may be negligible in the short term. The fluctuations of $U$ around its average can be less significant when considering the instantaneous heat current.
+
+And the HCACF can be numerically evaluated as
+
+$$
+\langle J(t) \cdot J(0) \rangle_{\text{eq}} = \frac{1}{N} \sum_{i=1}^{N} \langle J_i(t) \cdot J_i(0) \rangle
+$$
 
 ```python
 def compute_hcacf(heat_current):
