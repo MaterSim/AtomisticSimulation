@@ -158,18 +158,18 @@ $$
 where $J(t)$ is the heat current, $k_B$ is the Boltzmann constant,  $T$ is temperature, and $V$ is the system volume.
 
 
-The heat current is defined as the rate at which energy crosses a unit area per unit time. Thue, $J$ can be computed using:
+The heat current is defined as the rate at which energy crosses a unit area per unit time. Thue, $J$ can be computed using the [following relation](https://docs.lammps.org/compute_heat_flux.html)
 
 $$
-J = \sum_i^N \left( \frac{1}{2} m v_i^2 + U_i \right) \mathbf{v}_i,
+\mathbf{J} = \frac{1}{V} \left[ \sum_i e_i \mathbf{v}_i - \sum_i S_i \mathbf{v}_i \right]
 $$
+
+
 
 where 
-- $m$  is the mass of the particles,
-- $v_i$  is the velocity of particle  $i$ ,
-- $k$  is the force constant,
-- $r_i$  is the position of particle  $i$ ,
-- $V$  is the volume of the simulation box.
+- $e_i$ is the per-atom energy (potential and kinetic). 
+- $S_i$ is the per-atom stress tensor
+- $v_i$ is the velocity
 
 In an equilibrium state, the average potential energy can be considered constant over time, and thus its contribution to the heat current may be negligible in the short term. The fluctuations of $U$ around its average can be less significant when considering the instantaneous heat current.
 
