@@ -13,3 +13,7 @@
 - [Week 10: Electronic Band Structure Analysis](lectures/lec_10.md)
 - [Week 11: Introduction to VASP](lectures/lec_11.md)
 - [Week 12: Phonon calculation from both classical force field and DFT](lectures/lec_12.md)
+
+## To add
+- Enhanced Sampling
+- Representation of Local Atomic Environment
