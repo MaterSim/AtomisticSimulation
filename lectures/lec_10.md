@@ -1,183 +1,222 @@
-# Week 10. Band Structure Analysis
+# 10 DFT Simulation of a Hydrogen Molecule
 
-## 10.1 Formation of Energy Bands: From Molecule to Crystal
-The electronic band structure describes the energy levels that electrons can occupy in a solid. Unlike in isolated atoms, where electrons occupy discrete energy levels, in a crystal the periodic potential causes these levels to broaden into bands.
+Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
+By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H$_2$ and the
+electron distribution.
 
-- **Valence Band**: The highest energy band that is completely filled with electrons at 0 K.
-- **Conduction Band**: The lowest energy band that is partially filled or completely empty at 0 K.
-- **Band Gap**: The energy difference between the top of the valence band and the bottom of the conduction band.
+## 10.1 Basic Setup
 
-A conductor has overlapping bands (or a partially filled conduction band), while a semiconductor or insulator has a band gap separating the valence and conduction bands.
+In a H<sub>2</sub>  molecule, we need to consider the following variables in the KS equation.
 
-How are the bands created from the very beginning. You can think about [the process of carbon atoms being brought together to form a diamond crystal](https://en.wikipedia.org/wiki/Band_gap). 
-- The right graph shows the energy levels as a function of the spacing between atoms. When far apart (right side of graph) all the atoms have discrete valence orbitals $p$ and $s$ with the same energies.
-- When the atoms come closer (left side), their electron orbitals begin to spatially overlap and hybridize into $N$ molecular orbitals each with a different energy, where $N$ is the number of atoms in the crystal. Since $N$ is such a large number, adjacent orbitals are extremely close together in energy so the orbitals can be considered a continuous energy band.
-- When the carbon atoms get closer and closer to form a diamond crystal cell, multiple bands are formed, called the valence and conduction bands. In the case of diamond, the highest valence band and the lowest conduction band are separated by a 5.5 eV band gap. The Pauli exclusion principle limits the number of electrons in a single orbital to two, and the bands are filled beginning with the lowest energy.
+- Nuclei: Two protons, located at positions $R_1$ and $R_2$ .
+- Electrons: Two electrons interacting with the protons and each other.
 
-<p align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Solid_state_electronic_band_structure.svg/880px-Solid_state_electronic_band_structure.svg.png" alt="Alt text" width="600"/>
-</p>
-
-## 10.2 A Quantitative Tight-Binding model 
-Although the above explaination provides an intuitive picture about the formation of bands. In this lecture, we plan to be more analytical about this process. Specifically, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
-
-The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the $p_z$ orbitals.
-
-## 10.3 Application of TB model on Graphene
-Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the $p_z$ orbitals of the carbon atoms.
-
-### 10.3.1 Graphene Lattice and Hamiltonian Setup
-
-- Lattice vectors: Graphene’s lattice is hexagonal with two basis atoms (A and B) per unit cell.
-- Nearest-neighbor hopping: Electrons can hop between neighboring A and B atoms with a hopping parameter $t$.
-
-The tight-binding Hamiltonian for graphene can be written as:
+We first write down its Hamiltonian,
 
 $$
-H = -t \sum_{\langle i,j \rangle} \left( a_i^\dagger b_j + b_j^\dagger a_i \right)
+\text{Hamiltonian} \quad \hat{H} = \hat{T}_e + \hat{V} _{\text{ext}} + \hat{V} _{\text{ee}} + \hat{V} _{\text{nn}}
 $$
 
-where $t$ is the hopping energy between neighboring sites (typically around 2.7 eV for graphene), and $a_i^\dagger$ and $b_j^\dagger$ are the creation operators for sublattice A and B, respectively.
+Where
+- $\hat{T}_e$ : Kinetic energy of the electrons.
+- $\hat{V}_{\text{ext}}$ : External potential due to nuclei.
+- $\hat{V}_{\text{ee}}$ : Electron-electron interaction.
+- $\hat{V}_{\text{nn}}$ : Nucleus-nucleus interaction.
 
-We begin by defining the graphene lattice, with lattice vectors $\mathbf{a}_1$  and  $\mathbf{a}_2$, and the three nearest-neighbor vectors  $\delta_1$,  $\delta_2$, and  $\delta_3$.
+Hence, Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H<sub>2</sub>, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as $\rho(x) = 2 |\phi_0(x)|^2$. **If you want to solve a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.**
 
+$$
+\left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
+$$
+
+1. The total energy is
+   
+$$
+E[\rho] = T_s[\rho] + E_{\text{ext}}[\rho] + E_H[\rho] + E_{\text{XC}}[\rho]
+$$
+
+Where:
+- $T_s[\rho]$ : Kinetic energy of non-interacting electrons.
+- $E_{\text{ext}}[\rho]$ : Interaction with external potential.
+- $E_H[\rho]$ : Hartree energy (electron-electron repulsion).
+- $E_{\text{XC}}[\rho]$ : Exchange-correlation energy.
+
+2. The external potential  $V_{\text{ext}}(\mathbf{r})$  for each electron is given by the Coulomb interaction with the two protons:
+
+$$
+V_{\text{ext}}(\mathbf{r}) = -\frac{1}{|\mathbf{r} - \mathbf{R}_1|} - \frac{1}{|\mathbf{r} - \mathbf{R}_2|}
+$$
+
+## 10.2 Python Implementation
+
+1. Define a spatial grid and use the finite difference method to approximate the kinetic energy operator.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Define lattice vectors for graphene
-a = 1.42  # Carbon-carbon bond length in Angstroms
+# Spatial grid parameters
+x_min, x_max = -10.0, 10.0  # Grid boundaries
+N = 1000  # Number of grid points
+x = np.linspace(x_min, x_max, N)
+dx = x[1] - x[0]  # Grid spacing
 
-# Lattice vectors
-a1 = np.array([np.sqrt(3) * a, 0])
-a2 = np.array([np.sqrt(3) / 2 * a, 3 * a / 2])
-
-# Nearest-neighbor vectors (bond vectors)
-delta1 = np.array([0, a])
-delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
-delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
-
-# All nearest-neighbor vectors
-deltas = [delta1, delta2, delta3]
-
-# Plot the lattice
-plt.figure(figsize=(6, 6))
-for i in range(-2, 3):
-    for j in range(-2, 3):
-        R = i * a1 + j * a2
-        plt.plot(R[0], R[1], 'ko')  # Carbon atoms
-        for delta in deltas:
-            plt.plot([R[0], R[0] + delta[0]], [R[1], R[1] + delta[1]], 'k-')
-plt.title('Graphene lattice')
-plt.gca().set_aspect('equal')
-plt.show()
+# Define external potential for H2 molecule
+R1, R2 = -1.0, 1.0  # Proton positions
+V_ext = -1 / np.abs(x - R1) - 1 / np.abs(x - R2)
 ```
 
-This code defines the graphene lattice and plots it. Each carbon atom is connected to three neighboring carbon atoms, forming the characteristic honeycomb structure.
+2. Initialize Electron Density
+```python
+# Initial guess for electron density (uniform)
+rho = np.ones(N) * 0.01
+```
 
-
-### 10.3.2 Tight-Binding Hamiltonian
-
-We now construct the tight-binding Hamiltonian for graphene, taking into account the nearest-neighbor hopping between sublattices A and B.
-
-The Hamiltonian in k-space is written as:
-
-$$
-H(\mathbf{k}) =
-\begin{pmatrix}
-0 & f(\mathbf{k}) \\
-f^*(\mathbf{k}) & 0
-\end{pmatrix}
-$$
-
-where $f(\mathbf{k}) = -t \left( e^{i \mathbf{k} \cdot \delta_1} + e^{i \mathbf{k} \cdot \delta_2} + e^{i \mathbf{k} \cdot \delta_3} \right)$.
-
-The eigenvalues of this matrix give us the band energies for the π-bands.
-
-3. Define the Hamiltonian in k-Space
-
-Let’s define the function $f(\mathbf{k})$ that represents the hopping terms in the Hamiltonian.
+3. Compute Effective Potential $V_{\text{eff}}(x)$ including 
+- external potential
+- Hartree potential
+- exchange-correlation potential.
 
 ```python
-def f_k(kx, ky, a, t):
-    """Function f(k) representing hopping terms in k-space."""
-    delta1 = np.array([0, a])
-    delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
-    delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
-    return -t * (np.exp(1j * (kx * delta1[0] + ky * delta1[1])) +
-                 np.exp(1j * (kx * delta2[0] + ky * delta2[1])) +
-                 np.exp(1j * (kx * delta3[0] + ky * delta3[1])))
+def compute_hartree_potential(rho, dx):
+    """Compute Hartree potential from the electron density."""
+    V_H = np.convolve(rho, 1 / np.abs(x - x[:, None]), mode='same') * dx
+    return V_H
 
-# Define the band structure computation
-def graphene_band_structure(kx, ky, a, t):
-    """Compute the band structure of graphene using the tight-binding model."""
-    f = f_k(kx, ky, a, t)
-    H_k = np.array([[0, f], [np.conj(f), 0]])  # Tight-binding Hamiltonian in k-space
-    eigenvalues = np.linalg.eigvalsh(H_k)
-    return eigenvalues
+# Exchange-correlation potential (local density approximation)
+def compute_exchange_correlation_potential(rho):
+    return -(3 / np.pi)**(1/3) * rho**(1/3)
+
+def compute_effective_potential(rho, V_ext, dx):
+    V_H = compute_hartree_potential(rho, dx)
+    V_XC = compute_exchange_correlation_potential(rho)
+    return V_ext + V_H + V_XC
 ```
 
-4. Compute Band Structure Along High-Symmetry Directions
-
-Now we compute the band structure along high-symmetry points in the Brillouin zone. The typical path is $\Gamma \rightarrow K \rightarrow M \rightarrow \Gamma$.
+4. Iterative update with the self-consistent field (SCF) approach
 
 ```python
-# High-symmetry points in k-space
-K_point = [4*np.pi/(3*np.sqrt(3)*a), 0]
-M_point = [np.pi/(np.sqrt(3)*a), np.pi/a]
-Gamma_point = [0, 0]
+# Kinetic energy operator (finite difference approximation)
+T = (-2 * np.eye(N) + np.eye(N, k=1) + np.eye(N, k=-1)) / dx**2
 
-# Interpolation between high-symmetry points
-def interpolate_points(p1, p2, n):
-    return np.linspace(p1, p2, n)
+def solve_kohn_sham(V_eff, T):
+    # Hamiltonian
+    H = -0.5 * T + np.diag(V_eff)
+    energies, orbitals = np.linalg.eigh(H)
+    return energies, orbitals
 
-# Parameters for graphene
-t = 2.7  # Hopping energy in eV
+# Solve self-consistently
+for iteration in range(100):
+    V_eff = compute_effective_potential(rho, V_ext, dx)
+    energies, orbitals = solve_kohn_sham(V_eff, T)
 
-# Compute the band structure along high-symmetry directions
-n_points = 100
-kx_values = []
-ky_values = []
-kx_values += interpolate_points(Gamma_point[0], K_point[0], n_points).tolist()
-ky_values += interpolate_points(Gamma_point[1], K_point[1], n_points).tolist()
-kx_values += interpolate_points(K_point[0], M_point[0], n_points).tolist()
-ky_values += interpolate_points(K_point[1], M_point[1], n_points).tolist()
-kx_values += interpolate_points(M_point[0], Gamma_point[0], n_points).tolist()
-ky_values += interpolate_points(M_point[1], Gamma_point[1], n_points).tolist()
+    # Update electron density (2 electrons in total, filling the lowest orbital)
+    rho_new = 2 * np.abs(orbitals[:, 0])**2
 
-# Calculate the energy bands
-bands = []
-for kx, ky in zip(kx_values, ky_values):
-    bands.append(graphene_band_structure(kx, ky, a, t))
+    # Check for convergence
+    if np.linalg.norm(rho_new - rho) < 1e-6:
+        print(f"Converged after {iteration+1} iterations")
+        break
 
-bands = np.array(bands)
+    rho = rho_new
+```
+The code iteratively solves the KS equations. In each iteration, the electron density is updated from the orbitals, and the effective potential is recalculated using the new density. This process continues until the electron density converges (i.e., when the difference between the new and old density is smaller than a set tolerance).
 
-# Plot the band structure
-plt.figure(figsize=(8, 6))
-plt.plot(bands[:, 0], label='Lower band')
-plt.plot(bands[:, 1], label='Upper band')
-plt.xticks(ticks=[0, n_points, 2*n_points, 3*n_points],
-           labels=['Gamma', 'K', 'M', 'Gamma'])
-plt.ylabel('Energy (eV)')
-plt.title('Band Structure of Graphene')
-plt.legend()
-plt.grid(True)
-plt.show()
+Here the function ``np.linalg.eigh(H)`` solves the eigenvalue problem for the Hamiltonian, returning the Kohn-Sham energies and orbitals. Once the Hamiltonian is constructed and solved, the Kohn-Sham orbitals  $\phi_i(x)$  are used to update the electron density  $\rho(x)$ . The SCF loop continues until the electron density converges.
+
+5. Compute Total Energy
+
+```python
+def compute_total_energy(rho, V_ext, V_eff, T, orbitals, dx):
+    # Kinetic energy
+    T_s = -0.5 * np.sum(orbitals[:, 0] * np.dot(T, orbitals[:, 0])) * dx
+
+    # External potential energy
+    E_ext = np.sum(rho * V_ext) * dx
+
+    # Hartree energy
+    E_H = 0.5 * np.sum(rho * compute_hartree_potential(rho, dx)) * dx
+
+    # Exchange-correlation energy (LDA)
+    E_XC = np.sum(-(3 / np.pi)**(1/3) * rho**(4/3)) * dx
+
+    return T_s + E_ext + E_H + E_XC
+
+total_energy = compute_total_energy(rho, V_ext, V_eff, T, orbitals, dx)
+print(f"Total Energy of H2 molecule: {total_energy:.4f} Hartree")
 ```
 
-## 10.4 Interpretation of the Band Structure
+6. Visualize the Electron Density
+```python
+plt.plot(x, rho)
+plt.title('Electron Density for H2 Molecule')
+plt.xlabel('x (Bohr)')
+plt.ylabel('Electron Density')
+plt.show()
+```
+## 10.3 GGA implementation 
+In the previous example, we used Local Density Approximation (LDA) for the exchange-correlation energy $E_{\text{XC}}$.
 
-In the plotted band structure of graphene:
+$$
+E_{\text{XC}}^{\text{LDA}}[\rho] = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) \, d\mathbf{r}
+$$
 
-- The Dirac points at the  K -point are where the valence and conduction bands meet, and the energy gap is zero.
-- Near the Dirac points, the bands show a linear dispersion, which indicates the massless Dirac fermions that are responsible for graphene’s unique electronic properties.
-- The bands are symmetric about the zero energy level, representing the bonding and anti-bonding states from the tight-binding model.
+The Generalized Gradient Approximation (GGA) improves upon the LDA by including not only the electron density  $\rho(\mathbf{r})$  but also the gradient of the electron density $\nabla \rho(\mathbf{r})$. This allows for a more accurate representation of the exchange-correlation effects, especially in systems where the electron density varies significantly, such as in molecular systems like H<sub>2</sub>.
 
-Some notable properties include
-1. **Linear Dispersion**: The tight-binding model shows a linear energy dispersion near the Dirac points (located at the $K$ and $K{\prime}$ points in the Brillouin zone). This linear relationship between energy and momentum is characteristic of massless Dirac fermions, which are responsible for the high mobility of charge carriers in graphene.
-2. **Zero Band Gap**: At the Dirac points, the valence and conduction bands touch, resulting in zero band gap. This makes graphene a semimetal (or more precisely, a zero-gap semiconductor), where the conduction and valence bands meet at the Fermi level.
-3. **Bonding and Anti-Bonding States**: The two bands that arise from the tight-binding Hamiltonian correspond to the bonding (lower) and anti-bonding (upper) states. These bands arise due to the interaction between the p_z orbitals on neighboring carbon atoms in the honeycomb lattice.
-4. **High Electron Mobility**: The linear dispersion near the Dirac points leads to high electron mobility in graphene. The electrons behave like massless Dirac fermions, which is why graphene exhibits exceptional electrical conductivity.
-5. **Optical Properties**: The unique band structure of graphene also influences its optical properties. The zero band gap allows graphene to absorb light across a wide range of frequencies, making it useful for optoelectronic applications.
+$$
+E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) \, d\mathbf{r}
+$$
 
-This lecture could form a foundation for further studies on more complex materials and advanced band structure concepts using tight binding. Similarly, the calculation of band structure can be done in DFT as well, but with a heavier computational cost.
+where $f(\rho, \nabla \rho)$ is a function that depends on both the local density $\rho$ and its gradient $\nabla \rho$.
+
+To implement GGA, we need to modify the exchange-correlation potential $V_{\text{XC}}$  and the corresponding exchange-correlation energy  $E_{\text{XC}}$. For simplicity, we will use the PBE (Perdew-Burke-Ernzerhof) form of GGA, which is widely used in DFT calculations. In this case, both the exchange-correlation energy and potential are functions of $\rho(\mathbf{r})$ and $|\nabla \rho(\mathbf{r})|$.
+
+```python
+def compute_density_gradient(rho, dx):
+    # Central difference for gradient
+    grad_rho = (np.roll(rho, -1) - np.roll(rho, 1)) / (2 * dx)
+    return grad_rho
+
+def compute_exchange_correlation_gga(rho, grad_rho):
+    # PBE-like GGA exchange-correlation energy density
+    # Simplified for the purpose of this example
+    A = -(3 / np.pi)**(1/3)  # Constant for exchange energy
+    k = 0.804  # Gradient correction term (simplified)
+
+    # LDA part
+    exc_lda = A * rho**(4/3)
+
+    # GGA part (simplified version)
+    s = np.abs(grad_rho) / rho**(4/3)  # Reduced gradient
+    exc_gga = exc_lda * (1 + k * s**2)
+
+    return exc_gga
+
+def compute_total_energy_gga(rho, V_ext, T, orbitals, dx):
+    # Kinetic energy (same as before)
+    T_s = -0.5 * np.sum(orbitals[:, 0] * np.dot(T, orbitals[:, 0])) * dx
+
+    # External potential energy (same as before)
+    E_ext = np.sum(rho * V_ext) * dx
+
+    # Hartree energy (same as before)
+    E_H = 0.5 * np.sum(rho * compute_hartree_potential(rho, dx)) * dx
+
+    # Compute the density gradient for GGA
+    grad_rho = compute_density_gradient(rho, dx)
+
+    # GGA exchange-correlation energy
+    E_XC = np.sum(compute_exchange_correlation_gga(rho, grad_rho)) * dx
+
+    return T_s + E_ext + E_H + E_XC
+```
+
+
+## 10.4 Further discussions
+
+- Interpret the Ground State Energy
+- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
+- Discuss how the electron density represents the covalent bonding between the two protons.
+- Compare the results obtained from LDA and GGA
+- Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
+- Discuss the numerical aspects when extending DFT to more complicated systems (molecules or crystals)
+

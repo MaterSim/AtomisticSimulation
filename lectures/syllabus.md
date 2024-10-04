@@ -22,21 +22,18 @@ The expected outcomes include:
 
 ## Tenative schedules
 
-### I: Molecular dynamics simulation
 - Week 1: Motivating example 1: Argon under the NVE ensemble
 - Week 2: Motivating example 2: Thermostat NVT ensemble
 - Week 3: Motivating example 3: Simulation of solids under the NPT ensemble 
 - Week 4: Introduction to the LAMMPS package
 - Week 5: MD Analysis I: structural characterization (RDF), degree of order
 - Week 6: MD Analysis II: transport processes
-- Week 7: Selected presentations from students
-
-### II: Electronic structure calculation
-- Week 8: Gentle introduction to Density functional theory 
-- Week 9: Motivating example 4: DFT treatment of H2 molecule
-- Week 10: From molecule to the periodic system
-- Week 11: Introduction to VASP
+- Week 7: Representation of Local Atomic Environment
+- Week 8: Enhanced Sampling with Metadynamics
+- Week 9: Introduction to Density Functional Theory
+- Week 10: DFT Simulation of a Hydrogen Molecule
+- Week 11: DFT Simulation of the Periodic System
 - Week 12: Band structure analysis
-- Week 13: Phonon calculation from both classical force field and DFT
-- Week 14: Selected presentations from students 
+- Week 13: Introduction to VASP
+- Week 14: Phonon calculation 
 

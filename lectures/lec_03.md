@@ -1,4 +1,4 @@
-# Week 3: Barostat under the NPT ensemble
+# 3 Barostat under the NPT ensemble
 
 ## 3.1 Moltivation
 The introduction of temperature control in the previous lecture allows us to simulation the system to maintain a constant temperature through a heat exchange with the reservior. While this *canonical ensemble* enables more realistic modelling of the real world, it still has some limitation. Just imagine that you want to model a periodic system under different temperatures, it is natural to think about the volume of the system is subject to change due to the thermal expansion effects.

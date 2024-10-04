@@ -1,98 +1,88 @@
-# Week 11. Introduction to VASP
+# 11 DFT Simulation of the Periodic System
 
-For practical application, it is not recommended to run DFT calculation with your own code. In the past, researchers have developped many excellent choice of DFT-based codes. Among them,  the Vienna Ab initio Simulation Package (VASP) is one of the most widely used computational tools for performing first-principles calculations based on Density Functional Theory (DFT), Hartree-Fock (HF), and hybrid functionals. 
-It employs plane-wave basis sets and pseudopotentials or PAW (Projector Augmented-Wave) potentials to represent the wavefunctions and the core-electron interaction, respectively.
-VASP is highly efficient in calculating the electronic structure, total energies, and properties of materials.
+DFT has proven to be one of the most reliable methods for predicting material properties such as band structure, electronic density, and ground-state energy for crystals.
 
-## 11.1 Key Concepts in VASP
+However, it is not straightforward to extend DFT from molecule to crystals. Unlike molecules, crystals are periodic and extend infinitely. We need methods that respect this periodicity and allow us to work with finite-sized models.
 
-1. **Plane-Wave Basis Sets**. In VASP, the electronic wavefunctions are expanded in terms of plane waves. The accuracy of this expansion is controlled by the energy cutoff  E_{\text{cutoff}} , which limits the maximum kinetic energy of the plane waves included in the calculation.
+Silicon (Si) is a semiconductor and an important material for electronics. DFT can help us study its electronic band structure, density of states, and structural properties like lattice constants.
 
-2. **Pseudopotentials and PAW**. To speed up calculation, Pseudopotentials are used to replace the core electrons with a smoother potential, allowing only the valence electrons to be explicitly treated. In VASP, the so called PAW Potentials were used to reconstruct the all-electron wavefunction from the pseudopotential wavefunction.
+## 11.1 Bloch’s Theorem:
+Bloch’s theorem simplifies the problem by showing that the wavefunctions in periodic potentials can be written as plane waves modulated by a periodic function. This allows us to work in k-space and reduce the complexity.
 
-3. **Exchange-Correlation Functionals**. VASP support a variety of exchange-correlation functionals to account for the interactions between electrons, including LDA, GGA or more advanced hybrid functionals.
+According to Bloch’s Theorem, the wavefunctions of an electron in a periodic potential take the form:
 
-4. **K-Point Sampling**. The Brillouin zone of a crystal is sampled using k-points. VASP uses a Monkhorst-Pack grid or Gamma-centered grid to sample the k-points. Denser k-point grids yield more accurate results, especially for band structure calculations.
+$$
+\psi_{\mathbf{k}}(\mathbf{r}) = e^{i \mathbf{k} \cdot \mathbf{r}} u_{\mathbf{k}}(\mathbf{r})
+$$
 
-5. **Self-Consistent Field (SCF) Iteration**. In VASP, the SCF process iteratively solves the Kohn-Sham equations to obtain the electronic ground state. This iterative procedure continues until convergence is achieved based on the total energy or electronic density.
+Where $\mathbf{k}$ is the wavevector and $u_{\mathbf{k}}(\mathbf{r})$ is a periodic function with the periodicity of the lattice.
 
+- The periodic nature of $u_{\mathbf{k}}(\mathbf{r})$ means we only need to solve the problem within a unit cell.
+- Reciprocal Lattice:
+- For crystals, it is useful to define the reciprocal lattice, which is the Fourier transform of the real-space lattice. The reciprocal lattice defines k-points that represent wavevectors in reciprocal space.
+- The Brillouin zone is the primitive cell in reciprocal space. In the case of silicon, the first Brillouin zone is particularly important for computing the electronic structure.
 
-## 11.2 Workflow for a VASP Calculation
+## 11.2 KS DFT for Crystals
 
-A typical VASP calculation consists of several input files and a few critical steps:
+The Kohn-Sham equations for periodic solids are solved in reciprocal space (k-space). The Hamiltonian in k-space is periodic and can be solved using plane-wave basis sets.
 
-### 11.2.1 Input Files
+In periodic solids, it is convenient to expand the wavefunction  \psi_{\mathbf{k}}(\mathbf{r})  as a sum of plane waves:
 
-- POSCAR: Defines the crystal structure (atomic positions, lattice vectors, and unit cell).
-- INCAR: Contains the calculation parameters (energy cutoff, type of calculation, convergence criteria).
-- POTCAR: Contains the pseudopotentials for the elements in the system.
-- KPOINTS: Defines the k-point mesh used to sample the Brillouin zone.
+$$
+\psi_{\mathbf{k}}(\mathbf{r}) = \sum_{\mathbf{G}} C_{\mathbf{k}, \mathbf{G}} e^{i (\mathbf{k} + \mathbf{G}) \cdot \mathbf{r}}
+$$
 
-### 11.2.2 Output Files
+where $\mathbf{G}$ are the reciprocal lattice vectors and $C_{\mathbf{k}, \mathbf{G}}$ are the expansion coefficients.
 
-- OUTCAR: Provides detailed information about the entire calculation, including the total energy and convergence status.
-- CONTCAR: Contains the relaxed atomic positions if ionic relaxation was performed.
-- EIGENVAL: Contains the eigenvalues, which are used for band structure and DOS calculations.
-- DOSCAR: Contains the density of states data.
-Many other files 
+The accuracy of the calculation depends on the plane-wave energy cutoff, which determines how many plane waves are included in the basis set.
 
-## 11.3 Example: Band Structure Calculation for Silicon
+## 11.3 Brillouin Zone Sampling
 
-Let’s walk through an example to compute the band structure of silicon (Si) using VASP.
+When studying crystalline solids in DFT, we need to account for the periodic nature of the crystal lattice. The behavior of electrons in a crystal is described in terms of Bloch states, which means that their wavefunctions depend on the wavevector $\mathbf{k}$ in reciprocal space (also known as k-space). The reciprocal space of a crystal is divided into regions known as Brillouin zones, and solving the DFT equations over the entire Brillouin zone is crucial to accurately capture the electronic properties of the system.
 
-## 11.3.1 Preparing the Input Files
+In periodic solids, the electronic properties (such as energy levels and densities) depend on the wavevector  \mathbf{k} . Since the wavevector can take continuous values within the Brillouin zone, we cannot solve the Kohn-Sham equations for every possible  \mathbf{k} -point. Instead, we need to sample the Brillouin zone at a discrete set of points and integrate over the zone to compute quantities like the total energy, charge density, and density of states.
 
-POSCAR: Silicon Crystal Structure
-```
-Si
-1.0
-   0.000000  2.715000  2.715000
-   2.715000  0.000000  2.715000
-   2.715000  2.715000  0.000000
-Si
-2
-Direct
-  0.000000  0.000000  0.000000
-  0.250000  0.250000  0.250000
-```
+Brillouin zone sampling is typically done by choosing a grid of k-points that represent the possible electronic states within the zone. The accuracy of the DFT calculation depends on how well the Brillouin zone is sampled. The more k-points you use, the more accurate your results will be, but it will also increase the computational cost.
 
-INCAR: General Input Parameters
-```
-SYSTEM = Silicon
-PREC = Accurate
-ENCUT = 400
-ISMEAR = 0
-SIGMA = 0.05
-IBRION = -1
-ISIF = 2
-NSW = 0
-LWAVE = .FALSE.
-LCHARG = .FALSE.
-EDIFF = 1E-6
+```python
+def generate_k_points(N_k):
+    """Generate a Monkhorst-Pack grid for Brillouin zone sampling."""
+    k_points = []
+    for i in range(N_k):
+        for j in range(N_k):
+            for k in range(N_k):
+                kx = (i - (N_k // 2)) / N_k
+                ky = (j - (N_k // 2)) / N_k
+                kz = (k - (N_k // 2)) / N_k
+                k_points.append([kx, ky, kz])
+    return np.array(k_points)
+
+k_points = generate_k_points(N_k=4)  # 4x4x4 k-point grid
 ```
 
-POTCAR: Pseudopotential File (from each VASP distribution)
-```
-Si_PBE
-```
-KPOINTS: K-Point Mesh for SCF Calculation
-```
-Automatic mesh
-0
-Monkhorst-Pack
-8 8 8
-0 0 0
-```
+## 11.4 Pseudopotentials 
+In crystalline materials, there are many electrons, but only the valence electrons (those in the outer shells) play a significant role in chemical bonding and material properties. The core electrons (those closer to the nucleus) are tightly bound and do not change much between different environments. To simplify the problem, DFT often uses pseudopotentials to represent the effect of the core electrons and the nucleus, so that only the valence electrons need to be explicitly treated.
 
+A pseudopotential is a simplified model that replaces the full Coulomb potential of the nucleus and the core electrons with a smoother, effective potential. The pseudopotential is constructed so that:
 
-Run the SCF Calculation
+- The valence electrons feel the correct effective potential due to the nucleus and core electrons.
+- The wavefunctions of the valence electrons are smooth and can be described by a plane-wave basis.
 
-Run VASP using the prepared input files to get the ground-state electronic density. This is required before computing the band structure.
+In this way, the pseudopotential approximates the effects of the core electrons without explicitly solving for them. This drastically reduces the computational cost, as fewer electrons need to be handled, and the smoother wavefunctions of the valence electrons require fewer plane waves for an accurate representation.
 
-After the SCF run, you’ll get files like OUTCAR, EIGENVAL, and CHGCAR.
+Pseudopotentials are created by:
 
+- Solving the all-electron Schrödinger equation for an isolated atom.
+- Removing the core electron states and keeping only the valence states.
+- Replacing the Coulomb potential with a smoother potential that reproduces the valence wavefunctions in the regions of interest.
 
-Plotting the Band Structure
+The result is a pseudopotential that accurately mimics the interaction between the valence electrons and the atomic nucleus + core electrons without having to model the core electrons explicitly.
 
-To complete
+## 11.5 Self-Consistent Field (SCF) Loop
+
+We implement the SCF loop to solve the Kohn-Sham equations iteratively. For each k-point:
+1.	Solve the Kohn-Sham equations using a plane-wave basis.
+2.	Update the electron density.
+3.	Recompute the effective potential.
+4.	Repeat until convergence is achieved.
 

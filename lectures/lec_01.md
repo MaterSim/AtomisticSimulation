@@ -1,4 +1,4 @@
-# Week 1: Simulation under the NVE ensemble
+# 1 Simulation under the NVE ensemble
 
 ## 1.1 Overview
 ### 1.1.1 Prehistory of Computer Simulation:

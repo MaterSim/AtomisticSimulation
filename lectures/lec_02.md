@@ -1,4 +1,4 @@
-# Week 2: Thermostat under the NVT ensemble
+# 2 Thermostat under the NVT ensemble
 
 ## 2.1 Moltivation
 ### 2.1.1 The limitation of NVE ensemble

@@ -1,4 +1,4 @@
-# Week 4: Realistic MD simulation with LAMMPS
+# 4 Realistic MD simulation with LAMMPS
 
 ## 4.1 Introduction to LAMMPS
 [LAMMPS](https://www.lammps.org) (Large-scale Atomic/Molecular Massively Parallel Simulator) is an open-source software tool designed for performing classical molecular dynamics (MD) simulations. It can be used to model an array of particle interactions, ranging from simple atomic systems to complex materials and biomolecular systems. As one of the most population materials simulation package, LAMMPS is specifically optimized for large-scale simulations, which involve millions to billions of particles, making it suitable for high-performance computing (HPC) environments. Its versatility allows for simulations of a variety of systems such as metals, polymers, proteins and membranes. Some typical applications include

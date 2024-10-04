@@ -1,222 +1,255 @@
-# Week 8. DFT Simulation of a Hydrogen Molecule
+# 8 Enhanced Sampling with Metadynamics
 
-Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
-By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H$_2$ and the
-electron distribution.
+In standard MD, the system evolves under Newtonian dynamics, meaning that it can get stuck in local minima for long periods. 
+This limits the exploration of the free energy surface, making it difficult to observe transitions between different states. 
+To address this challenge, one may consider the use of enhanced sampling techniques. In this lecture, we will focus on a particular type 
+of technique called Metadynamics.
 
-## 8.1 Basic Setup
 
-In a H<sub>2</sub>  molecule, we need to consider the following variables in the KS equation.
+## 8.1 What is Metadynamics?
 
-- Nuclei: Two protons, located at positions $R_1$ and $R_2$ .
-- Electrons: Two electrons interacting with the protons and each other.
+Metadynamics is a MD-based sampling technique to explore free energy landscapes and overcome energy barriers. 
+It is particularly useful for systems where traditional MD struggles to sample rare events due to high energy barriers or complex transitions. 
+not only accelerates the sampling of rare events but also provides a mechanism for reconstructing the free energy surface. 
+This is achieved by systematically filling the energy wells with biasing potentials, eventually allowing the system to overcome energy barriers 
+and explore alternative configurations. 
 
-We first write down its Hamiltonian,
+Compared to the traditional MD simulation, Metadynamics adds the following concepts:
 
-$$
-\text{Hamiltonian} \quad \hat{H} = \hat{T}_e + \hat{V} _{\text{ext}} + \hat{V} _{\text{ee}} + \hat{V} _{\text{nn}}
-$$
+1. **Biasing Potential**: The fundamental idea is to add a bias potential to the system that changes over time. 
+By adding Gaussian-shaped potentials periodically to the explored regions, the system is pushed out of energy wells, allowing for better exploration. 
+The accumulation of these Gaussians eventually results in a bias that compensates for the underlying free energy, 
+enabling the system to explore new configurations freely.
 
-Where
-- $\hat{T}_e$ : Kinetic energy of the electrons.
-- $\hat{V}_{\text{ext}}$ : External potential due to nuclei.
-- $\hat{V}_{\text{ee}}$ : Electron-electron interaction.
-- $\hat{V}_{\text{nn}}$ : Nucleus-nucleus interaction.
+2. **Collective Variables (CVs)**: Metadynamics works by adding the bias in the space of carefully chosen collective variables (CVs). 
+CVs are reduced-dimensional representations of the system, such as distances between atoms, angles, or other descriptors capturing essential behavior. 
+The choice of CVs is crucial, as it directly influences the efficiency and success of the metadynamics simulation. 
+Properly chosen CVs can significantly accelerate the exploration of relevant conformational space, while poorly chosen CVs may lead to incomplete sampling.
 
-Hence, Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H<sub>2</sub>, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as $\rho(x) = 2 |\phi_0(x)|^2$. **If you want to solve a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.**
+3. **Free Energy Estimation***: As the bias potential accumulates, it fills the wells of the free energy landscape. 
+The accumulated bias potential can be used to reconstruct the underlying free energy surface, providing valuable insights into the 
+thermodynamic properties of the system. This reconstruction allows researchers to identify stable states, transition states, 
+and the pathways connecting them, which is critical for understanding the behavior of molecular systems.
 
-$$
-\left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
-$$
+## 8.2 MD and Metadynamics in 1D potential well
 
-1. The total energy is
-   
-$$
-E[\rho] = T_s[\rho] + E_{\text{ext}}[\rho] + E_H[\rho] + E_{\text{XC}}[\rho]
-$$
-
-Where:
-- $T_s[\rho]$ : Kinetic energy of non-interacting electrons.
-- $E_{\text{ext}}[\rho]$ : Interaction with external potential.
-- $E_H[\rho]$ : Hartree energy (electron-electron repulsion).
-- $E_{\text{XC}}[\rho]$ : Exchange-correlation energy.
-
-2. The external potential  $V_{\text{ext}}(\mathbf{r})$  for each electron is given by the Coulomb interaction with the two protons:
+To demonstrate the concept of Metadynamics, let's consider simple model system with a particle moving in a double-well potential as follows
 
 $$
-V_{\text{ext}}(\mathbf{r}) = -\frac{1}{|\mathbf{r} - \mathbf{R}_1|} - \frac{1}{|\mathbf{r} - \mathbf{R}_2|}
+V(x) = x^4 - 2x^2
 $$
 
-## 8.2 Python Implementation
-
-1. Define a spatial grid and use the finite difference method to approximate the kinetic energy operator.
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Spatial grid parameters
-x_min, x_max = -10.0, 10.0  # Grid boundaries
-N = 1000  # Number of grid points
-x = np.linspace(x_min, x_max, N)
-dx = x[1] - x[0]  # Grid spacing
+# Define the double well potential
+def double_well_potential(x):
+    return x**4 - 2*x**2
 
-# Define external potential for H2 molecule
-R1, R2 = -1.0, 1.0  # Proton positions
-V_ext = -1 / np.abs(x - R1) - 1 / np.abs(x - R2)
-```
+# Derivative of the potential (force)
+def potential_force(x):
+    return -4*x**3 + 4*x
 
-2. Initialize Electron Density
-```python
-# Initial guess for electron density (uniform)
-rho = np.ones(N) * 0.01
-```
+# Time evolution of the particle using Langevin dynamics 
+def md(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
+    x = 0.0  # initial position
+    x_positions = [x]
 
-3. Compute Effective Potential $V_{\text{eff}}(x)$ including 
-- external potential
-- Hartree potential
-- exchange-correlation potential.
+    for step in range(steps):
+        # Langevin dynamics with force from the double well potential
+        force = potential_force(x)
+        thermal_force = np.sqrt(2 * gamma * temp / dt) * np.random.normal()
 
-```python
-def compute_hartree_potential(rho, dx):
-    """Compute Hartree potential from the electron density."""
-    V_H = np.convolve(rho, 1 / np.abs(x - x[:, None]), mode='same') * dx
-    return V_H
+        # Update position with Langevin equation
+        x += force * dt - gamma * x * dt + thermal_force * np.sqrt(dt)
+        x_positions.append(x)
 
-# Exchange-correlation potential (local density approximation)
-def compute_exchange_correlation_potential(rho):
-    return -(3 / np.pi)**(1/3) * rho**(1/3)
+    return np.array(x_positions), centers
 
-def compute_effective_potential(rho, V_ext, dx):
-    V_H = compute_hartree_potential(rho, dx)
-    V_XC = compute_exchange_correlation_potential(rho)
-    return V_ext + V_H + V_XC
-```
+# Run the simulation
+x_positions = md()
 
-4. Iterative update with the self-consistent field (SCF) approach
+# Plot the results
+x_vals = np.linspace(-2, 2, 100)
+potential_vals = double_well_potential(x_vals)
 
-```python
-# Kinetic energy operator (finite difference approximation)
-T = (-2 * np.eye(N) + np.eye(N, k=1) + np.eye(N, k=-1)) / dx**2
-
-def solve_kohn_sham(V_eff, T):
-    # Hamiltonian
-    H = -0.5 * T + np.diag(V_eff)
-    energies, orbitals = np.linalg.eigh(H)
-    return energies, orbitals
-
-# Solve self-consistently
-for iteration in range(100):
-    V_eff = compute_effective_potential(rho, V_ext, dx)
-    energies, orbitals = solve_kohn_sham(V_eff, T)
-
-    # Update electron density (2 electrons in total, filling the lowest orbital)
-    rho_new = 2 * np.abs(orbitals[:, 0])**2
-
-    # Check for convergence
-    if np.linalg.norm(rho_new - rho) < 1e-6:
-        print(f"Converged after {iteration+1} iterations")
-        break
-
-    rho = rho_new
-```
-The code iteratively solves the KS equations. In each iteration, the electron density is updated from the orbitals, and the effective potential is recalculated using the new density. This process continues until the electron density converges (i.e., when the difference between the new and old density is smaller than a set tolerance).
-
-Here the function ``np.linalg.eigh(H)`` solves the eigenvalue problem for the Hamiltonian, returning the Kohn-Sham energies and orbitals. Once the Hamiltonian is constructed and solved, the Kohn-Sham orbitals  $\phi_i(x)$  are used to update the electron density  $\rho(x)$ . The SCF loop continues until the electron density converges.
-
-5. Compute Total Energy
-
-```python
-def compute_total_energy(rho, V_ext, V_eff, T, orbitals, dx):
-    # Kinetic energy
-    T_s = -0.5 * np.sum(orbitals[:, 0] * np.dot(T, orbitals[:, 0])) * dx
-
-    # External potential energy
-    E_ext = np.sum(rho * V_ext) * dx
-
-    # Hartree energy
-    E_H = 0.5 * np.sum(rho * compute_hartree_potential(rho, dx)) * dx
-
-    # Exchange-correlation energy (LDA)
-    E_XC = np.sum(-(3 / np.pi)**(1/3) * rho**(4/3)) * dx
-
-    return T_s + E_ext + E_H + E_XC
-
-total_energy = compute_total_energy(rho, V_ext, V_eff, T, orbitals, dx)
-print(f"Total Energy of H2 molecule: {total_energy:.4f} Hartree")
-```
-
-6. Visualize the Electron Density
-```python
-plt.plot(x, rho)
-plt.title('Electron Density for H2 Molecule')
-plt.xlabel('x (Bohr)')
-plt.ylabel('Electron Density')
+plt.figure(figsize=(10, 6))
+plt.plot(x_vals, potential_vals, label="Double Well Potential", color="blue")
+plt.xlabel('Position (x)')
+plt.ylabel('Potential Energy')
+plt.legend()
+plt.title('Double Well Potential with Langevin dynamics')
+plt.grid(True)
 plt.show()
 ```
-## 8.3 GGA implementation 
-In the previous example, we used Local Density Approximation (LDA) for the exchange-correlation energy $E_{\text{XC}}$.
+
+Clearly, one can find that the particle would just oscillate around the energy well in this simulation. 
+
+If one is interested in sampling. 
 
 $$
-E_{\text{XC}}^{\text{LDA}}[\rho] = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) \, d\mathbf{r}
+V_{\text{biased}}(s,t) = V_{\text{system}}(s) + \sum_{t{\prime} \leq t} W \exp\left( -\frac{(s - s(t{\prime}))^2}{2 \sigma^2} \right)
 $$
 
-The Generalized Gradient Approximation (GGA) improves upon the LDA by including not only the electron density  $\rho(\mathbf{r})$  but also the gradient of the electron density $\nabla \rho(\mathbf{r})$. This allows for a more accurate representation of the exchange-correlation effects, especially in systems where the electron density varies significantly, such as in molecular systems like H<sub>2</sub>.
-
-$$
-E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) \, d\mathbf{r}
-$$
-
-where $f(\rho, \nabla \rho)$ is a function that depends on both the local density $\rho$ and its gradient $\nabla \rho$.
-
-To implement GGA, we need to modify the exchange-correlation potential $V_{\text{XC}}$  and the corresponding exchange-correlation energy  $E_{\text{XC}}$. For simplicity, we will use the PBE (Perdew-Burke-Ernzerhof) form of GGA, which is widely used in DFT calculations. In this case, both the exchange-correlation energy and potential are functions of $\rho(\mathbf{r})$ and $|\nabla \rho(\mathbf{r})|$.
+Metadynamics adds a bias to the system to prevent the particle from getting stuck in one well, 
+allowing it to explore the other regions of the potential landscape.
 
 ```python
-def compute_density_gradient(rho, dx):
-    # Central difference for gradient
-    grad_rho = (np.roll(rho, -1) - np.roll(rho, 1)) / (2 * dx)
-    return grad_rho
+def gaussian_bias(x, centers, width=0.1, height=0.1):
+    bias = 0
+    for c in centers:
+        bias += height * np.exp(-0.5 * (x - c)**2 / width**2)
+    return bias
 
-def compute_exchange_correlation_gga(rho, grad_rho):
-    # PBE-like GGA exchange-correlation energy density
-    # Simplified for the purpose of this example
-    A = -(3 / np.pi)**(1/3)  # Constant for exchange energy
-    k = 0.804  # Gradient correction term (simplified)
+# Time evolution of the particle using Langevin dynamics with Metadynamics
+def metadynamics_simulation(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
+    x = 0.0  # initial position
+    x_positions = [x]
+    centers = []  # store the positions where bias is added
 
-    # LDA part
-    exc_lda = A * rho**(4/3)
+    for step in range(steps):
+        # Langevin dynamics with force from the double well potential
+        force = potential_force(x)
+        thermal_force = np.sqrt(2 * gamma * temp / dt) * np.random.normal()
 
-    # GGA part (simplified version)
-    s = np.abs(grad_rho) / rho**(4/3)  # Reduced gradient
-    exc_gga = exc_lda * (1 + k * s**2)
+        # Apply bias from metadynamics
+        bias_force = -np.gradient(gaussian_bias(x, centers))
 
-    return exc_gga
+        # Update position with Langevin equation
+        x += (force + bias_force) * dt - gamma * x * dt + thermal_force * np.sqrt(dt)
+        x_positions.append(x)
 
-def compute_total_energy_gga(rho, V_ext, T, orbitals, dx):
-    # Kinetic energy (same as before)
-    T_s = -0.5 * np.sum(orbitals[:, 0] * np.dot(T, orbitals[:, 0])) * dx
+        # Add Gaussian bias every 100 steps
+        if step % 100 == 0:
+            centers.append(x)
 
-    # External potential energy (same as before)
-    E_ext = np.sum(rho * V_ext) * dx
+    return np.array(x_positions), centers
 
-    # Hartree energy (same as before)
-    E_H = 0.5 * np.sum(rho * compute_hartree_potential(rho, dx)) * dx
+# Run the simulation
+x_positions, centers = metadynamics_simulation()
 
-    # Compute the density gradient for GGA
-    grad_rho = compute_density_gradient(rho, dx)
+# Plot the results
+x_vals = np.linspace(-2, 2, 100)
+potential_vals = double_well_potential(x_vals)
+bias_vals = [gaussian_bias(x, centers) for x in x_vals]
 
-    # GGA exchange-correlation energy
-    E_XC = np.sum(compute_exchange_correlation_gga(rho, grad_rho)) * dx
-
-    return T_s + E_ext + E_H + E_XC
+plt.figure(figsize=(10, 6))
+plt.plot(x_vals, potential_vals, label="Double Well Potential", color="blue")
+plt.plot(x_vals, potential_vals + bias_vals, label="Metadynamics Bias", color="orange")
+plt.xlabel('Position (x)')
+plt.ylabel('Potential Energy')
+plt.legend()
+plt.title('Double Well Potential with Metadynamics Bias')
+plt.grid(True)
+plt.show()
 ```
 
+This simple illstrate the main idea behind metadynamics. 
 
-## 8.4 Further discussions
 
-- Interpret the Ground State Energy
-- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
-- Discuss how the electron density represents the covalent bonding between the two protons.
-- Compare the results obtained from LDA and GGA
-- Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
-- Discuss the numerical aspects when extending DFT to more complicated systems (molecules or crystals)
 
+## 8.3 How Metadynamics Works?
+
+In practice, metadynamics simulations can be applied to higher-dimensional systems and more complex potentials 
+such as chemical reactions, protein folding and phase transitions. 
+It typically involves the following steps:
+
+1. Initialization: Select appropriate CVs that describe the transition of interest. 
+The choice of CVs is critical as they determine how effectively metadynamics can enhance sampling. 
+CVs should capture the essential degrees of freedom involved in the transition, and their proper selection often requires prior knowledge of the system.
+
+2. Bias Addition: During the simulation, small Gaussian potentials are periodically added along the CVs to the current position of the system. 
+This gradually discourages the system from revisiting already visited states. 
+The height and width of these Gaussians are important parameters that control the rate of exploration; 
+a careful balance must be struck to ensure efficient sampling without overshooting important regions of the free energy landscape.
+
+3. Exploration of the Free Energy Surface: By continuously adding Gaussians, the system is encouraged to move out of energy minima, 
+eventually allowing the exploration of the entire relevant free energy landscape. The bias potential effectively smooths out the energy barriers, 
+enabling the system to transition between states more easily. Over time, the system visits all accessible regions of the free energy surface, 
+and the accumulated bias provides an estimate of the free energy differences between states.
+
+The bias potential is given by:
+
+Where:
+
+ is the height of the Gaussian.
+
+ is the width of the Gaussian.
+
+ represents the CVs at time .
+
+Gaussian Parameters: The height and width of the Gaussians must be carefully chosen to balance between exploration speed and accuracy. 
+If the Gaussians are too high or too wide, the system may be forced to explore unphysical regions, 
+whereas too small Gaussians may lead to slow convergence.
+
+## 8.4 Choice of CVs
+
+The efficiency of metadynamics heavily depends on the proper choice of CVs. Poor selection can lead to ineffective sampling, 
+as the system may not be driven along the most relevant pathways. 
+The process of selecting suitable CVs often requires trial and error or prior knowledge of the system.
+
+
+## 8.5 Well-Tempered Metadynamics
+
+In traditional metadynamics, the constant addition of Gaussian potentials can lead to excessive bias accumulation, 
+which may result in poor sampling or an inaccurate free energy landscape. 
+Well-tempered metadynamics addresses this by gradually reducing the height of the Gaussians added over time, 
+which helps prevent oversampling and ensures that the system does not accumulate too much bias in any particular region.
+ As such, it is expected to improve convergence and enhance the accuracy of the free energy surface estimation. 
+
+
+The key idea behind well-tempered metadynamics is to scale the bias deposition rate according to the amount of bias already present. 
+This scaling is achieved by introducing a parameter called the bias factor , 
+which controls how much the bias potential decreases as the simulation progresses. 
+The bias factor is related to a fictitious temperature that effectively dictates how smoothly the bias is added. 
+The bias potential in well-tempered metadynamics evolves as:
+
+Where:
+
+ is the Boltzmann constant.
+
+ is the bias factor that determines the rate of decrease in bias deposition.
+
+The bias factor  effectively controls the level of exploration versus exploitation in the simulation. 
+A larger bias factor results in slower reduction of the bias potential, allowing the system to continue exploring new regions of the free energy surface. 
+Conversely, a smaller bias factor leads to faster convergence, which is beneficial for accurately reconstructing the free energy surface without excessive biasing.
+
+Well-tempered metadynamics has several advantages over traditional metadynamics. By reducing the rate of bias deposition over time, 
+it ensures that the system can focus more on the most relevant regions of the free energy surface, leading to a more accurate reconstruction. 
+Additionally, well-tempered metadynamics helps maintain a balance between exploration of new configurations and refinement of previously visited regions, 
+which is crucial for systems with multiple metastable states or complex free energy landscapes.
+
+Another significant benefit of well-tempered metadynamics is that it provides a natural mechanism for achieving convergence of the free energy surface. 
+As the system becomes more thoroughly explored, the bias added to the system decreases, ultimately reaching a point where it no longer significantly alters the free energy landscape. This gradual reduction in bias allows the system to settle into the correct free energy minima, providing a reliable estimate of the underlying free energy differences between states.
+
+Well-tempered metadynamics has been successfully applied to a wide range of systems, from simple model potentials to complex biomolecular and materials 
+science applications. Its ability to adaptively control the bias potential makes it a versatile tool for studying processes such as protein folding, 
+chemical reactions, and phase transitions. By providing a more controlled and convergent approach to free energy estimation, 
+well-tempered metadynamics has become a preferred method for enhanced sampling in many challenging molecular simulations.
+
+Moreover, well-tempered metadynamics can be used in conjunction with other enhanced sampling methods, 
+further improving the efficiency and accuracy of molecular simulations. For instance, combining well-tempered metadynamics 
+with umbrella sampling or replica exchange can provide additional sampling power and improve the characterization of complex energy landscapes. 
+This versatility makes well-tempered metadynamics a valuable tool in the toolbox of computational chemists and molecular modelers.
+
+Well-tempered metadynamics also benefits from relatively simple implementation, 
+which makes it accessible for integration into various molecular dynamics software packages. 
+Popular MD software such as GROMACS, LAMMPS, and PLUMED offer built-in support for well-tempered metadynamics, 
+allowing researchers to easily incorporate this technique into their workflows. 
+This accessibility has contributed to the widespread adoption of well-tempered metadynamics in both academic research and industrial applications, 
+where the ability to accurately estimate free energy surfaces is of great interest.
+
+
+Metadynamics is a powerful enhanced sampling technique to overcome the limitations of traditional MD simulation. 
+Its ability to reconstruct free energy surfaces makes it an invaluable tool for studying complex molecular systems, phase transitions, and reaction mechanisms. 
+However, its success depends on careful selection of collective variables and parameters. 
+By systematically adding bias potentials, metadynamics allows for the study of rare events and provides detailed insights into the thermodynamics and 
+kinetics of molecular systems. Its versatility and adaptability make it a widely used technique in various fields of molecular simulation, 
+from chemistry to materials science.
+
+References
+
+Laio, A., & Parrinello, M. (2002). Escaping free-energy minima. Proceedings of the National Academy of Sciences, 99(20), 12562-12566.
+
+Barducci, A., Bussi, G., & Parrinello, M. (2008). Well-Tempered Metadynamics: A Smoothly Converging and Tunable Free-Energy Method. Physical Review Letters, 100(2), 020603.

@@ -1,367 +1,183 @@
-# Week 12. Phonon calculation from both classical force field and DFT
+# 12. Band Structure Analysis
 
-## 12.1 A simple spring
+## 12.1 Formation of Energy Bands: From Molecule to Crystal
+The electronic band structure describes the energy levels that electrons can occupy in a solid. Unlike in isolated atoms, where electrons occupy discrete energy levels, in a crystal the periodic potential causes these levels to broaden into bands.
 
-In a simple spring, Hooke’s Law states that the force $F$ exerted by a spring is proportional to the displacement $x$ from its equilibrium position:
+- **Valence Band**: The highest energy band that is completely filled with electrons at 0 K.
+- **Conduction Band**: The lowest energy band that is partially filled or completely empty at 0 K.
+- **Band Gap**: The energy difference between the top of the valence band and the bottom of the conduction band.
 
-$$
-F = -k x
-$$
+A conductor has overlapping bands (or a partially filled conduction band), while a semiconductor or insulator has a band gap separating the valence and conduction bands.
 
-According to Newton’s second law, the net force $F$ acting on a mass $m$ causes an acceleration $a$:
+How are the bands created from the very beginning. You can think about [the process of carbon atoms being brought together to form a diamond crystal](https://en.wikipedia.org/wiki/Band_gap). 
+- The right graph shows the energy levels as a function of the spacing between atoms. When far apart (right side of graph) all the atoms have discrete valence orbitals $p$ and $s$ with the same energies.
+- When the atoms come closer (left side), their electron orbitals begin to spatially overlap and hybridize into $N$ molecular orbitals each with a different energy, where $N$ is the number of atoms in the crystal. Since $N$ is such a large number, adjacent orbitals are extremely close together in energy so the orbitals can be considered a continuous energy band.
+- When the carbon atoms get closer and closer to form a diamond crystal cell, multiple bands are formed, called the valence and conduction bands. In the case of diamond, the highest valence band and the lowest conduction band are separated by a 5.5 eV band gap. The Pauli exclusion principle limits the number of electrons in a single orbital to two, and the bands are filled beginning with the lowest energy.
 
-$$
-F = m a = m \frac{d^2 x}{dt^2}
-$$
+<p align="center">
+  <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Solid_state_electronic_band_structure.svg/880px-Solid_state_electronic_band_structure.svg.png" alt="Alt text" width="600"/>
+</p>
 
-Therefore, we obtain the following differential equation to describe the motion,
+## 12.2 A Quantitative Tight-Binding model 
+Although the above explaination provides an intuitive picture about the formation of bands. In this lecture, we plan to be more analytical about this process. Specifically, we will use the tight-binding model to compute the band structure of graphene step by step in Python.
 
-$$
-m \frac{d^2 x}{dt^2} = -k x
-$$
+The tight-binding model is a simple yet powerful method for understanding the electronic band structure of materials. It’s particularly useful for systems like graphene, where the electrons are tightly bound to atoms but can still hop between neighboring atomic sites. In graphene, the tight-binding model provides a good approximation for describing the π-bands, which arise from the $p_z$ orbitals.
 
-Obviously, the general solution is a sin function.
+## 12.3 Application of TB model on Graphene
+Graphene’s band structure can be derived from a simple nearest-neighbor tight-binding model. We will focus on the π-bands, which are formed by the $p_z$ orbitals of the carbon atoms.
 
-$$
-x(t) = A \cos(\omega t + \phi)
-$$
+### 12.3.1 Graphene Lattice and Hamiltonian Setup
 
-And $\omega = \sqrt{\frac{k}{m}}$ is the angular frequency.
+- Lattice vectors: Graphene’s lattice is hexagonal with two basis atoms (A and B) per unit cell.
+- Nearest-neighbor hopping: Electrons can hop between neighboring A and B atoms with a hopping parameter $t$.
 
-Thus, the vibration frequency $f$ is related to the force constant $k$ and the mass $m$  as:
-
-$$
-f = \frac{1}{2\pi} \sqrt{\frac{k}{m}}
-$$
-
-
-## 12.2 An 1D Infinite Chain of Identical Atoms
-Now let's consider a relatively more complex system with a infinite number of identical spring. This model helps in understanding phonons, the quantized vibrations in a lattice, which are critical in thermal and electrical properties of solids.
+The tight-binding Hamiltonian for graphene can be written as:
 
 $$
-A_1 \sim\sim\sim A_2 \sim\sim\sim  A_3 \cdots\cdots\cdots A_{n-1} \sim\sim\sim A_{n} \sim\sim\sim A_{n+1} \cdots\cdots\cdots 
+H = -t \sum_{\langle i,j \rangle} \left( a_i^\dagger b_j + b_j^\dagger a_i \right)
 $$
 
+where $t$ is the hopping energy between neighboring sites (typically around 2.7 eV for graphene), and $a_i^\dagger$ and $b_j^\dagger$ are the creation operators for sublattice A and B, respectively.
 
-We’ll consider a chain of identical atoms, each with mass $m$, connected by springs with force constant $k$. In this model, the atoms are spaced a distance $a$ apart. Each atom oscillates around its equilibrium position.
-
-## 12.2.1 Problem setup
-Let $u_n(t)$ represent the displacement of the $n$-th atom from its equilibrium position at time $t$. For the $n$-th atom, the total force exerted on it comes from its interactions with its nearest neighbors, i.e., the ($n$+1)-th atom and the ($n$-1)-th atom.
-
-According to Hooke’s Law, the force on the $n$-th atom due to its neighbors is:
-
-$$
-F_n = -k \left( u_n(t) - u_{n-1}(t) \right) - k \left( u_n(t) - u_{n+1}(t) \right)
-$$
-
-$$
-F_n = -k \left( 2 u_n(t) - u_{n+1}(t) - u_{n-1}(t) \right)
-$$
-
-Using $F_n = m \frac{d^2 u_n}{dt^2}$, the equation of motion for the $n$-th atom becomes:
-
-$$
-m \frac{d^2 u_n}{dt^2} = -k \left( 2 u_n(t) - u_{n+1}(t) - u_{n-1}(t) \right)
-$$
-
-
-### 12.2.2 Solution
-Intuitively, we can see that the general solution should behave like some waves
-
-$$
-u_n(t) = A e^{i (nqa - \omega t)}
-$$
-
-Where:
-
-- $A$ is the amplitude of the wave.
-- $q$  is the wavevector, related to the wavelength of the vibration.
-- $\omega$  is the angular frequency of the oscillation.
-- $a$  is the distance between neighboring atoms.
-
-Plugging this solution into the equation of motion, we get:
-
-$$
-m \frac{d^2 u_n}{dt^2} = -m \omega^2 u_n(t)
-$$
-
-Substitute this into the equation of motion:
-
-$$
-m \omega^2 A e^{i(nqa - \omega t)} = -k \left( 2 A e^{i(nqa - \omega t)} - A e^{i((n+1)qa - \omega t)} - A e^{i((n-1)qa - \omega t)} \right)
-$$
-
-Simplifying the right-hand side:
-
-$$
-k A \left( 2 - e^{iqa} - e^{-iqa} \right) e^{i(nqa - \omega t)}
-$$
-
-Using the identity  e^{iqa} + e^{-iqa} = 2 \cos(qa) , we obtain:
-
-$$
-m \omega^2 A e^{i(nqa - \omega t)} = -k A \left( 2 - 2 \cos(qa) \right) e^{i(nqa - \omega t)}
-$$
-
-Canceling common terms, we are left with:
-
-$$
-m \omega^2 = 2k \left( 1 - \cos(qa) \right)
-$$
-
-Hence, the angular frequency $\omega$ is given by:
-
-$$
-\omega(q) = \sqrt{\frac{2k}{m} \left( 1 - \cos(qa) \right)}
-$$
-
-Using the trigonometric identity $1 - \cos(qa) = 2 \sin^2\left( \frac{qa}{2} \right)$ , we can rewrite the angular frequency as:
-
-$$
-\omega(q) = 2 \sqrt{\frac{k}{m}} \left| \sin\left( \frac{qa}{2} \right) \right|
-$$
-
-Using $f(q) = \frac{\omega(q)}{2\pi}$, we get $f(q)$
-
-$$
-f(q) = \frac{1}{\pi} \sqrt{\frac{k}{m}} \left| \sin\left( \frac{qa}{2} \right) \right|
-$$
-
-
-### 12.2.3 Physical Insights
-- Dispersion relation. we find the vibrational frequency depends on the wavevector. 
-- Long Wavelength Limit: For small $q$, $\sin(q a / 2) \approx q a / 2$, so the frequency becomes approximately linear in $q$, i.e.,  $\omega(q) \propto q$, which is typical for acoustic phonons.
-- At the edge of the Brillouin zone, where $q = \frac{\pi}{a}$, the frequency reaches its maximum value:
+We begin by defining the graphene lattice, with lattice vectors $\mathbf{a}_1$  and  $\mathbf{a}_2$, and the three nearest-neighbor vectors  $\delta_1$,  $\delta_2$, and  $\delta_3$.
 
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Parameters
-k = 1.0  # Force constant (N/m)
-m = 1.0  # Mass of each atom (kg)
-a = 1.0  # Lattice constant (m)
+# Define lattice vectors for graphene
+a = 1.42  # Carbon-carbon bond length in Angstroms
 
-# Function to compute angular frequency omega(q)
-def omega_q(q, k, m, a):
-    return 2 * np.sqrt(k / m) * np.abs(np.sin(q * a / 2))
+# Lattice vectors
+a1 = np.array([np.sqrt(3) * a, 0])
+a2 = np.array([np.sqrt(3) / 2 * a, 3 * a / 2])
 
-# Generate q-values in the first Brillouin zone (-pi/a to pi/a)
-q_values = np.linspace(-np.pi/a, np.pi/a, 100)
+# Nearest-neighbor vectors (bond vectors)
+delta1 = np.array([0, a])
+delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
+delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
 
-# Compute the corresponding frequencies
-omega_values = omega_q(q_values, k, m, a)
+# All nearest-neighbor vectors
+deltas = [delta1, delta2, delta3]
 
-# Plot the vibrational frequency vs. wavevector q
-plt.figure(figsize=(8, 6))
-plt.plot(q_values, omega_values, label=r'$\omega(q)$')
-plt.xlabel(r'Wavevector $q$ (1/m)')
-plt.ylabel(r'Angular frequency $\omega(q)$ (rad/s)')
-plt.title('Vibrational Frequency vs. Wavevector in a 1D Chain')
-plt.axhline(0, color='black', lw=0.5)
-plt.axvline(0, color='black', lw=0.5)
-plt.legend()
-plt.grid(True)
+# Plot the lattice
+plt.figure(figsize=(6, 6))
+for i in range(-2, 3):
+    for j in range(-2, 3):
+        R = i * a1 + j * a2
+        plt.plot(R[0], R[1], 'ko')  # Carbon atoms
+        for delta in deltas:
+            plt.plot([R[0], R[0] + delta[0]], [R[1], R[1] + delta[1]], 'k-')
+plt.title('Graphene lattice')
+plt.gca().set_aspect('equal')
 plt.show()
 ```
 
-## 12.3 An 1D diatomic chain model
-In the 1D diatomic chain model, we consider two different types of atoms (A and B) with masses $m_A$ and $m_B$, alternating along the chain. The atoms are connected by springs with a spring constant $k$.
+This code defines the graphene lattice and plots it. Each carbon atom is connected to three neighboring carbon atoms, forming the characteristic honeycomb structure.
+
+
+### 12.3.2 Tight-Binding Hamiltonian
+
+We now construct the tight-binding Hamiltonian for graphene, taking into account the nearest-neighbor hopping between sublattices A and B.
+
+The Hamiltonian in k-space is written as:
 
 $$
-\textcolor{red}{A_1} \sim\sim\sim \textcolor{blue}{B_1} \sim\sim\sim  \textcolor{red}{A_2} \sim\sim\sim \textcolor{blue}{B_2}  \cdots\cdots\cdots \textcolor{red}{A_n} \sim\sim\sim \textcolor{blue}{B_n}  \sim\sim\sim \textcolor{red}{A_{n+1}}\sim\sim\sim \textcolor{blue}{B_{n+1}}  \cdots\cdots\cdots 
-$$
-
-## 12.3.1 Equation of Motions
-The displacement of atom A in the $n$-th unit cell is denoted by $u_n^A(t)$, and the displacement of atom B is  $u_n^B(t)$. And the forces on each atom come from the interactions with neighboring atoms. Using Hooke’s law and Newton’s second law, the equations of motion for atoms A and B are:
-
-$$
-m_A \frac{d^2 u_n^A}{dt^2} = -k \left( u_n^A - u_n^B \right) - k \left( u_n^A - u_{n-1}^B \right)
-$$
-
-$$
-m_B \frac{d^2 u_n^B}{dt^2} = -k \left( u_n^B - u_n^A \right) - k \left( u_n^B - u_{n+1}^A \right)
-$$
-
-## 12.3.2 Solutions
-We assume wave-like solutions for the displacements of atoms A and B:
-
-$$
-u_n^A(t) = A e^{i(nqa - \omega t)}
-$$
-
-$$
-u_n^B(t) = B e^{i(nqa - \omega t)}
-$$
-
-Substituting these into the equations of motion, we get two coupled equations:
-
-$$
--m_A \omega^2 A = -k A \left( 2 - e^{-iqa} - e^{iqa} \right) + k B \left( 1 + e^{iqa} \right)
-$$
-
-$$
--m_B \omega^2 B = -k B \left( 2 - e^{-iqa} - e^{iqa} \right) + k A \left( 1 + e^{-iqa} \right)
-$$
-
-Using the identity  e^{iqa} + e^{-iqa} = 2 \cos(qa) , we simplify these to:
-
-$$
--m_A \omega^2 A = -2k A \left( 1 - \cos(qa) \right) + k B \left( 2 \cos(qa) \right)
-$$
-
-$$
--m_B \omega^2 B = -2k B \left( 1 - \cos(qa) \right) + k A \left( 2 \cos(qa) \right)
-$$
-
-Substituting these into the equations of motion, we get a system of equations that can be written as a matrix equation:
-
-$$
+H(\mathbf{k}) =
 \begin{pmatrix}
-m_A \omega^2 & 0 \\
-0 & m_B \omega^2
-\end{pmatrix}
-\begin{pmatrix}
-A \\
-B
-\end{pmatrix}
-=k
-\begin{pmatrix}
-2 - 2 \cos(qa) & -2 \cos(qa) \\
--2 \cos(qa) & 2 - 2 \cos(qa)
-\end{pmatrix}
-\begin{pmatrix}
-A \\
-B
+0 & f(\mathbf{k}) \\
+f^*(\mathbf{k}) & 0
 \end{pmatrix}
 $$
 
-Moving the mass terms from left to right, we define the dynamical matrix $D(q)$, which describes the interaction between atoms A and B in the lattice.
+where $f(\mathbf{k}) = -t \left( e^{i \mathbf{k} \cdot \delta_1} + e^{i \mathbf{k} \cdot \delta_2} + e^{i \mathbf{k} \cdot \delta_3} \right)$.
 
-$$
-D(q) =
-\frac{k}{m_A m_B}
-\begin{pmatrix}
-m_B(2 - 2 \cos(qa)) & -2m_B \cos(qa) \\
--2m_A \cos(qa) & m_A(2 - 2 \cos(qa))
-\end{pmatrix}
-$$
+The eigenvalues of this matrix give us the band energies for the π-bands.
 
-To find the phonon frequencies, we solve the **eigenvalue problem**:
+3. Define the Hamiltonian in k-Space
 
-$$
-D(q) \begin{pmatrix} A \\ B \end{pmatrix} = \omega^2 \begin{pmatrix} A \\ B \end{pmatrix}
-$$
-
-Solving this determinant equation gives the dispersion relations for the acoustic and optical phonon modes, 
-
-- For the acoustic mode, the atoms move in phase, and the frequency $\omega(q)$ is small at small $q$. The dispersion relation is approximately linear for small  q :
-
-$$
-\omega_{\text{acoustic}}(q) \approx \frac{c_s}{a} |q|
-$$
-
-Where  $c_s$  is the speed of sound in the material.
-
-- For the optical mode, the atoms move out of phase, and the frequency  $\omega(q)$  is larger. The optical phonon mode has a higher frequency because the atoms are oscillating against each other.
-
+Let’s define the function $f(\mathbf{k})$ that represents the hopping terms in the Hamiltonian.
 
 ```python
-import numpy as np
-import matplotlib.pyplot as plt
+def f_k(kx, ky, a, t):
+    """Function f(k) representing hopping terms in k-space."""
+    delta1 = np.array([0, a])
+    delta2 = np.array([np.sqrt(3)/2 * a, -a / 2])
+    delta3 = np.array([-np.sqrt(3)/2 * a, -a / 2])
+    return -t * (np.exp(1j * (kx * delta1[0] + ky * delta1[1])) +
+                 np.exp(1j * (kx * delta2[0] + ky * delta2[1])) +
+                 np.exp(1j * (kx * delta3[0] + ky * delta3[1])))
 
-# Parameters
-k = 1.0  # Force constant (N/m)
-m_A = 1.0  # Mass of atom A (kg)
-m_B = 2.0  # Mass of atom B (kg)
-a = 1.0   # Lattice constant (m)
+# Define the band structure computation
+def graphene_band_structure(kx, ky, a, t):
+    """Compute the band structure of graphene using the tight-binding model."""
+    f = f_k(kx, ky, a, t)
+    H_k = np.array([[0, f], [np.conj(f), 0]])  # Tight-binding Hamiltonian in k-space
+    eigenvalues = np.linalg.eigvalsh(H_k)
+    return eigenvalues
+```
 
-# Dispersion relation for the acoustic and optical phonon modes
-def phonon_dispersion(q, k, m_A, m_B, a):
-    term = 2 * k * (1 - np.cos(q * a))
-    omega_acoustic = np.sqrt(term / (m_A + m_B))
-    omega_optical = np.sqrt(term * (m_A + m_B) / (m_A * m_B))
-    return omega_acoustic, omega_optical
+4. Compute Band Structure Along High-Symmetry Directions
 
-# Generate q-values in the first Brillouin zone (-pi/a to pi/a)
-q_values = np.linspace(-np.pi/a, np.pi/a, 100)
+Now we compute the band structure along high-symmetry points in the Brillouin zone. The typical path is $\Gamma \rightarrow K \rightarrow M \rightarrow \Gamma$.
 
-# Compute the corresponding phonon frequencies
-omega_acoustic_values = []
-omega_optical_values = []
-for q in q_values:
-    omega_acoustic, omega_optical = phonon_dispersion(q, k, m_A, m_B, a)
-    omega_acoustic_values.append(omega_acoustic)
-    omega_optical_values.append(omega_optical)
+```python
+# High-symmetry points in k-space
+K_point = [4*np.pi/(3*np.sqrt(3)*a), 0]
+M_point = [np.pi/(np.sqrt(3)*a), np.pi/a]
+Gamma_point = [0, 0]
 
-# Plot the acoustic and optical phonon dispersion relations
+# Interpolation between high-symmetry points
+def interpolate_points(p1, p2, n):
+    return np.linspace(p1, p2, n)
+
+# Parameters for graphene
+t = 2.7  # Hopping energy in eV
+
+# Compute the band structure along high-symmetry directions
+n_points = 100
+kx_values = []
+ky_values = []
+kx_values += interpolate_points(Gamma_point[0], K_point[0], n_points).tolist()
+ky_values += interpolate_points(Gamma_point[1], K_point[1], n_points).tolist()
+kx_values += interpolate_points(K_point[0], M_point[0], n_points).tolist()
+ky_values += interpolate_points(K_point[1], M_point[1], n_points).tolist()
+kx_values += interpolate_points(M_point[0], Gamma_point[0], n_points).tolist()
+ky_values += interpolate_points(M_point[1], Gamma_point[1], n_points).tolist()
+
+# Calculate the energy bands
+bands = []
+for kx, ky in zip(kx_values, ky_values):
+    bands.append(graphene_band_structure(kx, ky, a, t))
+
+bands = np.array(bands)
+
+# Plot the band structure
 plt.figure(figsize=(8, 6))
-plt.plot(q_values, omega_acoustic_values, label='Acoustic Mode')
-plt.plot(q_values, omega_optical_values, label='Optical Mode')
-plt.xlabel(r'Wavevector $q$ (1/m)')
-plt.ylabel(r'Angular frequency $\omega(q)$ (rad/s)')
-plt.title('Phonon Dispersion Relations in 1D Diatomic Chain')
-plt.axhline(0, color='black', lw=0.5)
-plt.axvline(0, color='black', lw=0.5)
+plt.plot(bands[:, 0], label='Lower band')
+plt.plot(bands[:, 1], label='Upper band')
+plt.xticks(ticks=[0, n_points, 2*n_points, 3*n_points],
+           labels=['Gamma', 'K', 'M', 'Gamma'])
+plt.ylabel('Energy (eV)')
+plt.title('Band Structure of Graphene')
 plt.legend()
 plt.grid(True)
 plt.show()
 ```
 
+## 12.4 Interpretation of the Band Structure
 
-## 12.3.2 Physical Insights
-The 1D diatomic chain model gives rise to both acoustic and optical phonon modes. In the acoustic mode, atoms oscillate in phase, leading to low-frequency vibrations, while in the optical mode, atoms oscillate out of phase, leading to higher-frequency vibrations. These two phonon branches are a direct consequence of having two different types of atoms in the unit cell, and they play an essential role in the thermal and optical properties of materials.
+In the plotted band structure of graphene:
 
-The dynamical matrix is a key concept in lattice dynamics and phonon theory. It arises in the context of solving the equations of motion for atoms in a crystal lattice, especially when dealing with harmonic vibrations in the lattice, such as in the 1D chain model with two types of atoms (diatomic chain). The dynamical matrix relates the forces on atoms to their displacements and encapsulates the vibrational properties of the system.
+- The Dirac points at the  K -point are where the valence and conduction bands meet, and the energy gap is zero.
+- Near the Dirac points, the bands show a linear dispersion, which indicates the massless Dirac fermions that are responsible for graphene’s unique electronic properties.
+- The bands are symmetric about the zero energy level, representing the bonding and anti-bonding states from the tight-binding model.
 
-## 12.4 Extension to realistic systems
+Some notable properties include
+1. **Linear Dispersion**: The tight-binding model shows a linear energy dispersion near the Dirac points (located at the $K$ and $K{\prime}$ points in the Brillouin zone). This linear relationship between energy and momentum is characteristic of massless Dirac fermions, which are responsible for the high mobility of charge carriers in graphene.
+2. **Zero Band Gap**: At the Dirac points, the valence and conduction bands touch, resulting in zero band gap. This makes graphene a semimetal (or more precisely, a zero-gap semiconductor), where the conduction and valence bands meet at the Fermi level.
+3. **Bonding and Anti-Bonding States**: The two bands that arise from the tight-binding Hamiltonian correspond to the bonding (lower) and anti-bonding (upper) states. These bands arise due to the interaction between the p_z orbitals on neighboring carbon atoms in the honeycomb lattice.
+4. **High Electron Mobility**: The linear dispersion near the Dirac points leads to high electron mobility in graphene. The electrons behave like massless Dirac fermions, which is why graphene exhibits exceptional electrical conductivity.
+5. **Optical Properties**: The unique band structure of graphene also influences its optical properties. The zero band gap allows graphene to absorb light across a wide range of frequencies, making it useful for optoelectronic applications.
 
-To compute phonon dispersions for a realistic 3D crystal, we need to extend the concepts from the 1D chain to a 3D lattice, which involves considering all the interactions between atoms in the crystal unit cell. In a 3D crystal, the phonon dispersion relation tells us how the phonon frequencies (or energies) depend on the wavevector $\mathbf{q}$ in different directions of the Brillouin zone.
-
-If there are $N$ atoms in the unit cell, each atom has three degrees of freedom (x, y, z). Therefore, the system has $3N$ degrees of freedom, leading to $3N$ phonon modes at each wavevector $\mathbf{q}$. These include:
-
-- 3 acoustic phonon modes: Low-frequency vibrations where the entire unit cell moves in phase.
-- 3$N$ - 3 optical phonon modes: Higher-frequency modes where the atoms in the unit cell vibrate relative to each other.
-
-The dynamical matrix in 3D describes the interaction between all the atoms in the unit cell, taking into account their positions and the interatomic forces. For a crystal with $N$ atoms per unit cell, the dynamical matrix  $D(\mathbf{q})$  is a  $3N \times 3N$  matrix.
-
-The dynamical matrix is computed from the force constants $\Phi$ between atoms, which describe the second derivatives of the potential energy with respect to atomic displacements. The matrix elements of the dynamical matrix are:
-
-$$
-D_{\alpha\beta}^{ij}(\mathbf{q}) = \frac{1}{\sqrt{m_i m_j}} \sum_{\mathbf{R}} \Phi_{\alpha\beta}^{ij}(\mathbf{R}) e^{i \mathbf{q} \cdot \mathbf{R}}
-$$
-
-Where:
-
-- $i$, $j$  index the atoms in the unit cell.
-- $\alpha$, $\beta$  represent the Cartesian components $(x, y, z)$.
-- $m_i$, $m_j$  are the masses of atoms $i$ and $j$.
-- $\Phi_{\alpha\beta}^{ij}(\mathbf{R})$  are the force constants between atoms $i$ and $j$ in unit cells separated by the vector $\mathbf{R}$.
-- $\mathbf{q}$ is the wavevector.
-
-This matrix must be diagonalized to obtain the phonon frequencies  \omega(\mathbf{q})  for each mode at each wavevector.
-
-Below are the steps to Compute Phonon in a 3D Crystal.
-
-
-1. Get Atomic Positions: Obtain the positions of atoms in the unit cell and lattice vectors that define the crystal structure.
-
-2. Compute Force constants: These describe the interaction between atoms and can either be obtained from ab initio calculations (using DFT) or from experimental data. The force constants can be represented as a matrix that relates atomic displacements to forces.
-
-3. Construct the Dynamical Matrix.  For each wavevector $\mathbf{q}$ in the Brillouin zone, construct the dynamical matrix  $D(\mathbf{q})$  using the force constants. The dynamical matrix will be a $3N \times 3N$  matrix, where $N$ is the number of atoms in the unit cell.
-
-4. Diagonalize the Dynamical Matrix. For each wavevector $\mathbf{q}$, diagonalize the dynamical matrix $D(\mathbf{q})$. The eigenvalues of the matrix give the squared frequencies $\omega^2(\mathbf{q})$, and the eigenvectors describe the polarization vectors (atomic displacements) for the phonon modes.
-
-5. Compute the Phonon Dispersion Relation and density of states. Once the phonon frequencies  $\omega(\mathbf{q})$  are computed, plot them as a function of $\mathbf{q}$ along high-symmetry directions in the Brillouin zone.
-
-6. Optionally, compute the phonon density of states. To compute the phonon DOS, you must sample the Brillouin zone using a k-point grid or a q-point grid. The finer the grid, the more accurate your calculation will be. The total number of wavevectors sampled is denoted as $N_q$.
-
-$$
-g(\omega) = \frac{1}{N_q} \sum_{\mathbf{q}, j} \delta(\omega - \omega_j(\mathbf{q}))
-$$
-
-Where:
-
-- $\omega_j(\mathbf{q})$  are the phonon frequencies for the  $j$-th mode at wavevector $\mathbf{q}$.
-- $N_q$  is the total number of sampled wavevectors in the Brillouin zone.
-- The delta function  $\delta(\omega - \omega_j(\mathbf{q}))$  ensures that only the phonon states with frequencies near  $\omega$  contribute to the DOS at $\omega$.
+This lecture could form a foundation for further studies on more complex materials and advanced band structure concepts using tight binding. Similarly, the calculation of band structure can be done in DFT as well, but with a heavier computational cost.

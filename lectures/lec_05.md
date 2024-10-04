@@ -1,4 +1,4 @@
-# Week 5: MD Analysis I: Structural Characterization
+# 5 MD Analysis I: Structural Characterization
 
 So far, we have learned some fundamentals about how to write a code and run a MD simulation to model the atomistic process of materials. By running the simulation, we expect to generate a set of time-dependent atomic trajectories by solving Newton’s equations of motion for a system of particles. Next, it is important to understand these simulation results. Indeed, it is essential to extract meaningful physical properties from the simulation results. In this lecture, we will cover several fundamental post-analysis techniques: 
 

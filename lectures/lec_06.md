@@ -1,4 +1,4 @@
-# Week 6: MD Analysis II: Transport Processes
+# 6 MD Analysis II: Transport Processes
 
 Transport properties describe how particles, energy, and momentum move within a system. In the lecture, we’ll discuss two key transport properties: diffusion (particle transport) and thermal conductivity (heat transport). We’ll again use argon gas as an example, but the methods are generalizable to other systems.
 
