@@ -41,19 +41,21 @@ $$
 
 ```python
 import numpy as np
+import seaborn as sns
 import matplotlib.pyplot as plt
+sns.set(font_scale=1.2)
 
 # Define the double well potential
 def double_well_potential(x):
-    return x**4 - 2*x**2
+    return x**4 - 3*x**2
 
 # Derivative of the potential (force)
 def potential_force(x):
-    return -4*x**3 + 4*x
+    return -4*x**3 + 6*x
 
-# Time evolution of the particle using Langevin dynamics 
-def md(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
-    x = 0.0  # initial position
+# Time evolution of the particle using Langevin dynamics
+def md(steps=20000, dt=1e-2, gamma=0.02, temp=0.01):
+    x = 0.5  # initial position
     x_positions = [x]
 
     for step in range(steps):
@@ -65,28 +67,46 @@ def md(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
         x += force * dt - gamma * x * dt + thermal_force * np.sqrt(dt)
         x_positions.append(x)
 
-    return np.array(x_positions), centers
+    return np.array(x_positions)
 
 # Run the simulation
-x_positions = md()
+xs = md()
 
-# Plot the results
+# Create the figure with two subplots and shared x-axis
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+
+# First subplot: Double well potential with Langevin dynamics
 x_vals = np.linspace(-2, 2, 100)
 potential_vals = double_well_potential(x_vals)
 
-plt.figure(figsize=(10, 6))
-plt.plot(x_vals, potential_vals, label="Double Well Potential", color="blue")
-plt.xlabel('Position (x)')
-plt.ylabel('Potential Energy')
-plt.legend()
-plt.title('Double Well Potential with Langevin dynamics')
-plt.grid(True)
-plt.show()
+ax1.plot(x_vals, potential_vals, '--', lw=1.0, label="Double Well Potential", color="k")
+sc = ax1.scatter(xs, double_well_potential(xs), c=range(len(xs)), s=2, cmap='viridis', alpha=0.5)
+ax1.set_ylabel('Potential Energy')
+ax1.legend()
+ax1.set_title('Double Well Potential with Langevin Dynamics', fontweight='bold')
+ax1.grid(True)
+
+# Add a color bar and align it horizontally
+cbar = plt.colorbar(sc, ax=ax1, orientation='horizontal', pad=0.1)
+cbar.set_label('Time Step')
+
+# Second subplot: Histogram of x values
+ax2.hist(xs, bins=50, color='skyblue', edgecolor='black')
+ax2.set_xlabel('Position (x)')
+ax2.set_ylabel('Frequency')
+ax2.set_title('Histogram of Particle Positions')
+ax2.grid(True)
+
+# Adjust the layout to prevent overlapping
+plt.tight_layout()
+plt.savefig('1D-MD.png')
 ```
 
 Clearly, one can find that the particle would just oscillate around the energy well in this simulation. 
 
 If one is interested in sampling. 
+   ![MD](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_08_MD.png)
+
 
 $$
 V_{\text{biased}}(s,t) = V_{\text{system}}(s) + \sum_{t{\prime} \leq t} W \exp\left( -\frac{(s - s(t{\prime}))^2}{2 \sigma^2} \right)
@@ -96,15 +116,28 @@ Metadynamics adds a bias to the system to prevent the particle from getting stuc
 allowing it to explore the other regions of the potential landscape.
 
 ```python
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(font_scale=1.2)
+
+# Define the double well potential
+def double_well_potential(x):
+    return x**4 - 3*x**2
+
+# Derivative of the potential (force)
+def potential_force(x):
+    return -4*x**3 + 6*x
+
 def gaussian_bias(x, centers, width=0.1, height=0.1):
     bias = 0
     for c in centers:
         bias += height * np.exp(-0.5 * (x - c)**2 / width**2)
     return bias
 
-# Time evolution of the particle using Langevin dynamics with Metadynamics
-def metadynamics_simulation(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
-    x = 0.0  # initial position
+# Time evolution of the particle using Langevin dynamics
+def metaD(steps=20000, dt=1e-2, gamma=0.02, temp=0.01):
+    x = 0.5  # initial position
     x_positions = [x]
     centers = []  # store the positions where bias is added
 
@@ -114,38 +147,60 @@ def metadynamics_simulation(steps=5000, dt=0.01, gamma=0.1, temp=0.1):
         thermal_force = np.sqrt(2 * gamma * temp / dt) * np.random.normal()
 
         # Apply bias from metadynamics
-        bias_force = -np.gradient(gaussian_bias(x, centers))
+        force += bias_force(x, centers)
 
         # Update position with Langevin equation
-        x += (force + bias_force) * dt - gamma * x * dt + thermal_force * np.sqrt(dt)
+        x += force * dt - gamma * x * dt + thermal_force * np.sqrt(dt)
         x_positions.append(x)
 
         # Add Gaussian bias every 100 steps
         if step % 100 == 0:
             centers.append(x)
 
-    return np.array(x_positions), centers
+    return np.array(x_positions)
+
+# Derivative of the Gaussian bias (force due to bias)
+def bias_force(x, centers, width=0.1, height=0.1):
+    force = 0
+    for c in centers:
+        force += height * (x - c) / (width**2) * np.exp(-0.5 * (x - c)**2 / width**2)
+    return force
 
 # Run the simulation
-x_positions, centers = metadynamics_simulation()
+xs = metaD()
 
-# Plot the results
+# Create the figure with two subplots and shared x-axis
+fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 7), gridspec_kw={'height_ratios': [2, 1]}, sharex=True)
+
+# First subplot: Double well potential with Langevin dynamics
 x_vals = np.linspace(-2, 2, 100)
 potential_vals = double_well_potential(x_vals)
-bias_vals = [gaussian_bias(x, centers) for x in x_vals]
 
-plt.figure(figsize=(10, 6))
-plt.plot(x_vals, potential_vals, label="Double Well Potential", color="blue")
-plt.plot(x_vals, potential_vals + bias_vals, label="Metadynamics Bias", color="orange")
-plt.xlabel('Position (x)')
-plt.ylabel('Potential Energy')
-plt.legend()
-plt.title('Double Well Potential with Metadynamics Bias')
-plt.grid(True)
-plt.show()
+ax1.plot(x_vals, potential_vals, '--', lw=1.0, label="Double Well Potential", color="k")
+sc = ax1.scatter(xs, double_well_potential(xs), c=range(len(xs)), s=2, cmap='viridis', alpha=0.5)
+ax1.set_ylabel('Potential Energy')
+ax1.legend()
+ax1.set_title('Double Well Potential with MetaDynamics', fontweight='bold')
+ax1.grid(True)
+
+# Add a color bar and align it horizontally
+cbar = plt.colorbar(sc, ax=ax1, orientation='horizontal', pad=0.1)
+cbar.set_label('Time Step')
+
+# Second subplot: Histogram of x values
+ax2.hist(xs, bins=50, color='skyblue', edgecolor='black')
+ax2.set_xlabel('Position (x)')
+ax2.set_ylabel('Frequency')
+ax2.set_title('Histogram of Particle Positions')
+ax2.grid(True)
+
+# Adjust the layout to prevent overlapping
+plt.tight_layout()
+plt.savefig('1D-MetaD.png')
 ```
 
 This simple illstrate the main idea behind metadynamics. 
+![MetaD](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_08_MetaD.png)
 
 
 
