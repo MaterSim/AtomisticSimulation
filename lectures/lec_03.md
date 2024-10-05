@@ -1,8 +1,8 @@
 # 3 Barostat under the NPT ensemble
+## 3.1 Motivation
+The introduction of temperature control in the previous lecture allows us to simulate the system to maintain a constant temperature through heat exchange with the reservoir. While this *canonical ensemble* enables more realistic modeling of the real world, it still has some limitations. Just imagine that you want to model a periodic system under different temperatures; it is natural to think about the volume of the system being subject to change due to thermal expansion effects.
 
-## 3.1 Moltivation
-The introduction of temperature control in the previous lecture allows us to simulation the system to maintain a constant temperature through a heat exchange with the reservior. While this *canonical ensemble* enables more realistic modelling of the real world, it still has some limitation. Just imagine that you want to model a periodic system under different temperatures, it is natural to think about the volume of the system is subject to change due to the thermal expansion effects.
-Within the NVT ensemble, you need to manually adjust the volume of the system when initializing the positions for each different temperture. This can be very tedious and requires a trial and error iterations. Thus, we would like to seek a better solution to let the system adjust the volume by itself during the MD simulation. 
+Within the NVT ensemble, you need to manually adjust the volume of the system when initializing the positions for each different temperature. This can be very tedious and requires trial and error iterations. Thus, we would like to seek a better solution to let the system adjust the volume by itself during the MD simulation.
 
 Similar to how a thermostat maintains constant temperature, a barostat adjusts the simulation box dimensions and/or particle positions to ensure that the system stays at the desired pressure. This is crucial for simulating systems in ensembles like NPT, where pressure fluctuations need to be controlled. Below, I will introduce two barostat techniques.
 
@@ -10,7 +10,7 @@ Similar to how a thermostat maintains constant temperature, a barostat adjusts t
 ### 3.2.1 Berendsen Barostat
 This is a simple barostat that rescales the simulation box gradually toward the target pressure. To implement a barostat, the key idea is to adjust the simulation box size in response to the difference between the current pressure and the target pressure. This is done by scaling the box dimensions and particle positions, and updating the system’s volume accordingly.
 
-1. **Compute the instantaneous pressure**. The system pressure $P$ in an MD simulation can calculated using the virial equation. It includes contributions from the kinetic energy (related to ideal gas) and the virial of the system (related to particle interactions):
+1. **Compute the instantaneous pressure**. The system pressure $P$ in an MD simulation can be calculated using the virial equation. It includes contributions from the kinetic energy (related to ideal gas) and the virial of the system (related to particle interactions):
 
 $$
 P = \frac{N k_B T}{V} + \frac{1}{3V} \sum_{i \lt j} r_{ij} \cdot \mathbf{F}_{ij}
@@ -172,13 +172,13 @@ $$
 $$
 
 In short, this approach introduces a few additional variables:
-- $\mathbf{h}$ : The simulation box matrix, which evolves over time and controls both the size and shape of the box.
-- $Q$ : The fictitious mass associated with the barostat, controlling the rate of volume and shape changes.
-- $\mathbf{W}$ : The strain rate tensor, which governs how the box matrix changes over time.
+- $\mathbf{h}$: The simulation box matrix, which evolves over time and controls both the size and shape of the box.
+- $Q$: The fictitious mass associated with the barostat, controlling the rate of volume and shape changes.
+- $\mathbf{W}$: The strain rate tensor, which governs how the box matrix changes over time.
 
 These variables allow the Parrinello-Rahman barostat to apply pressure anisotropically, enabling the box to deform naturally while maintaining the target pressure in the system.
 
-Below is a pseudo code to achieve Parrinello-Rahman barostat.
+Below is a pseudocode to achieve the Parrinello-Rahman barostat.
 
 ```python
 import numpy as np
@@ -250,14 +250,10 @@ def parrinello_rahman_barostat(H, R, V, P_target, Q):
 
     return R, h_new
 ```
-
-
 A more complete discussion can be found [here](https://computecanada.github.io/molmodsim-md-theory-lesson-novice/08-barostats/index.html).
 
 ## 3.3 Full code to run NPT simulation
-1. Run the [lec_03_npt_liquid.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_liquid.py) to understand the bruteforce implementation of Berendsen Barostat for liquid simulation
-2. Run the [lec_03_npt_liquid_fast.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_liquid_fast.py)
+1. Run the [lec_03_npt_liquid.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_liquid.py) to understand the brute-force implementation of Berendsen Barostat for liquid simulation.
+2. Run the [lec_03_npt_liquid_fast.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_liquid_fast.py).
 3. Understand the differences of NVT and NPT simulations as shown from the following figure (obtained from running `lec_03_npt_liquid_fast.py`).
-   ![NPT .v.s NVT](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_nvt.png)
-
-
+    ![NPT vs. NVT](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_03_npt_nvt.png)

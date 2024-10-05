@@ -1,10 +1,9 @@
 # 6 MD Analysis II: Transport Processes
-
 Transport properties describe how particles, energy, and momentum move within a system. In the lecture, we’ll discuss two key transport properties: diffusion (particle transport) and thermal conductivity (heat transport). We’ll again use argon gas as an example, but the methods are generalizable to other systems.
 
 ## 6.1 Diffusion
 
-According to [Fick's 2nd law](https://en.wikipedia.org/wiki/Fick%27s_laws_of_diffusion), the diffusion equation is a partial differential equation that describes how a substance spreads over time. For an one-dimension system under equilibrium, it is given by:
+According to [Fick's 2nd law](https://en.wikipedia.org/wiki/Fick%27s_laws_of_diffusion), the diffusion equation is a partial differential equation that describes how a substance spreads over time. For a one-dimensional system under equilibrium, it is given by:
 
 $$
 \frac{\partial C(x,t)}{\partial t} = D \frac{\partial^2 C(x,t)}{\partial x^2}
@@ -15,7 +14,7 @@ where:
 - $C(x, t)$ is the concentration of particles at position $x$ and time $t$.
 - $D$ is the diffusion constant (or diffusivity), which characterizes how fast particles diffuse.
 
-The equation states that the rate of change of concentration over time $\frac{\partial C}{\partial t}$ is proportional to the second spatial derivative of the concentration $\frac{\partial^2 C}{\partial x^2}$. 
+The equation states that the rate of change of concentration over time $\frac{\partial C}{\partial t}$ is proportional to the second spatial derivative of the concentration $\frac{\partial^2 C}{\partial x^2}$.
 
 The solution to the diffusion equation gives the probability distribution for the particle’s position over time. In the case of one-dimensional diffusion starting from a point, the solution is a Gaussian distribution:
 
@@ -23,31 +22,31 @@ $$
 C(x,t) = \frac{1}{\sqrt{4\pi D t}} \exp\left( -\frac{x^2}{4Dt} \right)
 $$
 
-The Gaussian form suggests that
-1. The peak of the distribution (the center, at $x$ = 0) remains at the origin because particles are assumed to start there.
+The Gaussian form suggests that:
+1. The peak of the distribution (the center, at $x = 0$) remains at the origin because particles are assumed to start there.
 2. The spread of the distribution increases with time, meaning that particles are more likely to be found farther away from the origin as time goes on.
 
 To find the mean squared displacement (MSD), we calculate the expected value of $x^2$ with respect to this distribution. The MSD in one dimension is:
 
 $$
-\langle x^2(t) \rangle = \int_{-\infty}^{\infty} x^2 C(x,t) dx = 2Dt
+\langle x^2(t) \rangle = \int_{-\infty}^{\infty} x^2 C(x,t) \, dx = 2Dt
 $$
 
-Hence we end up with the following relation.
+Hence, we end up with the following relation:
 
 $$
 \langle \Delta r^2(t) \rangle = 2d D t
 $$
 
-Where:
+where:
 
-- $\langle \Delta r^2(t) \rangle$ is the mean square displacement (MSD) of the particle after time $t$.
-- $d$ is the number of spatial dimensions (e.g.,  $d$ = 3  for 3D).
+- $\langle \Delta r^2(t) \rangle$ is the mean squared displacement (MSD) of the particle after time $t$.
+- $d$ is the number of spatial dimensions (e.g., $d = 3$ for 3D).
 
-It is also convenient to write it in the derivative form
+It is also convenient to write it in the derivative form:
 
 $$
-\frac {\partial \langle \Delta r^2(t) \rangle}{\partial t} = 2d D
+\frac{\partial \langle \Delta r^2(t) \rangle}{\partial t} = 2d D
 $$
 
 <!Now, suppose we apply a small external force $F$ to the system (e.g., an electric field $E$ acting on a charged particle with charge $q$). The particle will respond to the applied force by moving with a drift velocity $v_d$ .
@@ -73,7 +72,7 @@ D = \mu k_B T = \frac{\langle \Delta r^2(t) \rangle}{2dt}
 $$
 |>
 
-In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From MSD, we can then perform linear regression to find the slope of MSD($t$) curve to find the diffusion constant.
+In MD simulations, the MSD is computed as the time-averaged square of the particle displacements from their initial positions. From the MSD, we can then perform linear regression to find the slope of the MSD($t$) curve to determine the diffusion constant.
 
 ```python
 def compute_msd(positions):
@@ -108,14 +107,15 @@ plt.show()
 ```
 
 ## 6.2 The Green-Kubo Relation
+### 6.2.1 The Alternative Expression of MSD
 
-### 6.2.1 The alternative expression of MSD
-
-Let's introduce the alternative definition of the displacement of an atom.
+Let's introduce an alternative definition of the displacement of an atom.
 
 $$
 \Delta x(t) = \int_0^t dt\prime v_x(t\prime)
 $$
+
+Hence, the MSD can be expressed as:
 
 $$
 \begin{align*}
@@ -126,8 +126,7 @@ $$
 \end{align*}
 $$
 
-Note that the factor of 2 arises because the integral over the entire $t$-range is equivalent to twice the integral over the *half-space* where $t{\prime} > t{\prime}{\prime}$ (or vice versa, due to symmetry). 
-Hence, $D$ can be computed by the VACF as introduced in the previous lecture. 
+Note that the factor of 2 arises because the integral over the entire $t$-range is equivalent to twice the integral over the *half-space* where $t{\prime} > t{\prime}{\prime}$ (or vice versa, due to symmetry). Hence, $D$ can be computed by the VACF as introduced in the previous lecture.
 
 $$
 D = \frac {\partial \langle \Delta r^2(t) \rangle}{2d \partial t} = \frac{1}{d} \int_0^\infty \langle \mathbf{v}(0) \cdot \mathbf{v}(t) \rangle  dt
@@ -135,18 +134,15 @@ $$
 
 ## 6.2.2 The General Green-Kubo Relation
 
-In fact, the previous expression between $D$ and VACF is a specical case. According to the linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under a spontaneous fluctuations in thermal equilibrium. More generally, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
+In fact, the previous expression between $D$ and VACF is a special case. According to the linear response theory, which relates macroscopic transport coefficients to time correlations of microscopic quantities under spontaneous fluctuations in thermal equilibrium, many transport processes can be described by the [Green-Kubo relation](https://en.wikipedia.org/wiki/Green–Kubo_relations). For any transport coefficient $\lambda$ (such as diffusion coefficient, thermal conductivity, or viscosity):
 
 $$
 \lambda = \int_0^\infty \langle J(0) \cdot J(t) \rangle  dt
 $$
-
-- **Diffusion constant .v.s velocity**. The flux of velocity causes diffusion. If a particle *forgets* its initial velocity, the particle loses memory of its initial velocity, leading to faster diffusion.
-- **Thermal conductivity .v.s heat current**. Applying a temperature gradient causes a heat current to flow, leading to thermal conductivity. The faster the decay of heat current autocorrelation, the lower the thermal conductivity.
-- **Viscosity .v.s stress tensors**. In a fluid, applying a shear stress leads to a flow, related to viscosity. A high viscosity fluid (like honey) will have a slower decay of the stress autocorrelation function, meaning the fluid *remembers* shear stresses for a longer time compared to a low viscosity fluid (like water).
-
+- **Diffusion constant vs. velocity**: The flux of velocity causes diffusion. If a particle quickly *forgets* its initial velocity, it leads to faster diffusion as the particle loses memory of its initial velocity.
+- **Thermal conductivity vs. heat current**: Applying a temperature gradient causes a heat current to flow, leading to thermal conductivity. The faster the decay of heat current autocorrelation, the greater the thermal conductivity.
+- **Viscosity vs. stress tensors**: In a fluid, applying a shear stress leads to a flow, related to viscosity. A high viscosity fluid (like honey) will have a slower decay of the stress autocorrelation function, meaning the fluid *remembers* shear stresses for a longer time compared to a low viscosity fluid (like water).
 These relations are derived from linear response theory, which states that the response of a system to a small perturbation is proportional to the equilibrium fluctuations of microscopic quantities (e.g., heat current, velocity, or stress).
-
 
 ## 6.3 Thermal Conductivity 
 Thermal conductivity $\kappa$ is a measure of a material’s ability to conduct heat. The Green-Kubo relation is used to calculate $\kappa$ from the heat current autocorrelation function (HCACF):
@@ -171,7 +167,7 @@ where
 - $S_i$ is the per-atom stress tensor
 - $v_i$ is the velocity
 
-In an equilibrium state, the average potential energy can be considered constant over time, and thus its contribution to the heat current may be negligible in the short term. The fluctuations of $U$ around its average can be less significant when considering the instantaneous heat current.
+This relation can be understood as a microscopic version of the derivative form of 1st law ($\dot{Q}=\dot{E}-\dot{W}$).
 
 And the HCACF can be numerically evaluated as
 
@@ -210,12 +206,11 @@ plt.ylabel('HCACF')
 plt.title(f'Thermal Conductivity: {thermal_conductivity:.3e} W/mK')
 plt.show()
 ```
+## 6.4 Further Discussions
 
-## 6.4 Further disscusions
+Finally, it is important to note that the techniques to compute diffusion coefficients or thermal conductivity are indirect. They rely on the statistical properties of the system. They are essentially rooted in the [Fluctuation-Dissipation Theorem](https://en.wikipedia.org/wiki/Fluctuation–dissipation_theorem), a principle underlying the connection between the fluctuations in a system at equilibrium and its response to perturbations. The theorem states that the response of a system to a small perturbation can be related to the equilibrium fluctuations of observables. Rather than measuring these properties directly, which can be difficult or impossible in practice, we can derive them from measurable fluctuations in the system.
 
-Finally, it is important to note that the techniques to compute diffusion coefficients or thermal conductivity are indirect. They rely on the statistical properties of the system. They are essentially rooted from [Fluctuation-Dissipation Theorem](https://en.wikipedia.org/wiki/Fluctuation–dissipation_theorem), a principle underlying the connection between the fluctuations in a system at equilibrium and its response to perturbations. The theorem states that the response of a system to a small perturbation can be related to the equilibrium fluctuations of observables. Rather than measuring these properties directly, which can be difficult or impossible in practice, we can derive them from measurable fluctuations in the system.
-
-That said, it is possible to use socall nonequilibrium MD to directly measure transport properties like diffusion coefficients and thermal conductivity, but there are limitations and challenges associated with this approach. The system might take a long time to reach a steady state, or the steady state might not be easy to achieve in practice.
+That said, it is possible to use so-called nonequilibrium MD to directly measure transport properties like diffusion coefficients and thermal conductivity, but there are limitations and challenges associated with this approach. The system might take a long time to reach a steady state, or the steady state might not be easy to achieve in practice.
 
 - Discuss how the MSD should scale linearly with time at longer time scales if the system has reached diffusive behavior.
 - Explain the process of calculating the HCACF.

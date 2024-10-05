@@ -4,12 +4,12 @@
 ### 1.1.1 Prehistory of Computer Simulation:
 * The Los Alamos MANIAC (Mathematical Analyzer, Numerical Integrator, and Computer) became operational in 1952. This event marks a significant milestone in the history of computing. Nicholas Metropolis, as the most notable early user, developed the Monte Carlo method, a statistical technique that utilizes random sampling to solve complex mathematical problems. 
 
-* The launch of computer also opened the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people have to to do it either analytically (e.g., thermodynamics and statiscal mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagentic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lacks the atomic detail. An alterative approach is directly model the system (straightforward but very time consuming and tedious). Notable examples include. 
+* The launch of computer also opened the door for the study of many fundamental problems. Most of the material systems consist of many atoms or molecules, how can we infer the properties of such systems? In the past, people had to do it either analytically (e.g., thermodynamics and statistical mechanics have been developed to study some classical systems such as ideal gas, Ising Model, ferromagnetic phase transition and alloys. Some analytic solutions can be derived). They are very intelligent but lack the atomic detail. An alternative approach is directly model the system (straightforward but very time-consuming and tedious). Notable examples include. 
 1. [Buffon's needle experiment](https://en.wikipedia.org/wiki/Buffon%27s_needle_problem) to compute $\pi$, 
 2. [Bernal's ball-bearing model](https://iopscience.iop.org/article/10.1088/0953-8984/26/46/463102), 
 3. [Kitaigorodskii’s structure seeker](https://pubs.acs.org/doi/10.1021/acs.cgd.8b00972).
 
-* Molecular dynamics Simulation is generally a technical to directly study the atomic evolution of atoms or molecules in the material system based on the simple law of Newtonian Dynamics. Immediately after the invention of computers, MD simulations have been quickly applied to several systems
+* Molecular dynamics Simulation is generally a technique to directly study the atomic evolution of atoms or molecules in the material system based on the simple law of Newtonian Dynamics. Immediately after the invention of computers, MD simulations were quickly applied to several systems
 1. First ever, 1956, Alder and Wainwright (Livermore), [Phase transition of hard spheres](https://gibbs.ccny.cuny.edu/teaching/s2021/labs/HardDiskSimulation/Alders&Wainwright1957.pdf)
 2. Real material, 1959, Gibson, Goland, Milgram, Vineyard (Brookhaven), [Dynamics of radiation damage](https://journals.aps.org/pr/abstract/10.1103/PhysRev.120.1229)
 3. Liquid, 1964, Rahman, [Correlations in Liquid Argon](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405)
@@ -18,13 +18,13 @@
 * Go beyond the experimental capability
 * Gain some physical insights
 
-### 1.1.3 Homework (W1M1): 
-1. Read the Alder & Wainwright's [1956 paper]([Phase transition of hard spheres](https://gibbs.ccny.cuny.edu/teaching/s2021/labs/HardDiskSimulation/Alders&Wainwright1957.pdf) and understand [hard sphere potential](https://en.wikipedia.org/wiki/Hard_spheres)
-2. Read the [Rahman](https://en.wikipedia.org/wiki/Aneesur_Rahman)'s [1964 paper](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405). We will try to reproduce some results from this work in this week. 
+### 1.1.3 Homework: 
+1. Read the Alder & Wainwright's 1956 paper [Phase transition of hard spheres](https://gibbs.ccny.cuny.edu/teaching/s2021/labs/HardDiskSimulation/Alders&Wainwright1957.pdf) and understand the [hard sphere potential](https://en.wikipedia.org/wiki/Hard_spheres)
+2. Read the [Rahman](https://en.wikipedia.org/wiki/Aneesur_Rahman)'s [1964 paper](https://journals.aps.org/pr/abstract/10.1103/PhysRev.136.A405). We will try to reproduce some results from this work this week. 
 
-## 1.2 A first MD simulation of liquid argon under NVE ensemble.
+## 1.2 A first MD simulation 
 
-### 1.2.1 A Simple MD workflow
+### 1.2.1 The workflow
 
 ```mermaid
 flowchart TD
@@ -39,7 +39,7 @@ flowchart TD
 
 ### 1.2.2 Interatomic potential
 
-[Lennard Jones Potential](https://en.wikipedia.org/wiki/Lennard-Jones_potential) express the assumes that all particles interact with each other via pairwise interactions (i.e., the interaction energy only depends on the distance).
+[Lennard-Jones Potential](https://en.wikipedia.org/wiki/Lennard-Jones_potential) assumes that all particles interact with each other via pairwise interactions (i.e., the interaction energy only depends on the distance).
 
 $$
 V(r) = 4\epsilon \left[ \left(\frac{\sigma}{r}\right)^{12} - \left(\frac{\sigma}{r}\right)^{6} \right]
@@ -60,32 +60,41 @@ This form has been widely used to model the essential features of interactions b
 
 ### 1.2.3 The computation of energy and forces
 
-After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system.
-Assuming the system consists of $N$ atoms, and the positions ($R$) are recorded by an array of [N, 3], we can use the following pseudo Python code for the given task.
+After knowing the energy model, we can proceed to compute the total energy and forces for each particle in the given system. Assuming the system consists of $N$ atoms, and the positions ($R$) are recorded by an array of [N, 3], we can use the following pseudocode to compute the energy and forces:
+
 ```python
-import numpy as np
-
-E = 0                    # Total Energy
-F = np.zeros([N, 3])     # Atomic forces
-
-for atom i in range(N-1):
-    for atom j in range(i+1, N):
-        Compute the distance: R = Ri - Rj
-        Compute the energy: V = V(R_ij)
-        E += V
-        Compute the derivative w.r.t R: dE/dR_i and dE/dR_j
-        F(i) -= dE/dR_i
-        F(j) -= dE/dR_j
+def compute_energy_forces(positions, epsilon, sigma):
+    N = len(positions)
+    energy = 0.0
+    forces = np.zeros_like(positions)
+    
+    for i in range(N):
+        for j in range(i + 1, N):
+            r_ij = positions[j] - positions[i]
+            r = np.linalg.norm(r_ij)
+            r6 = (sigma / r) ** 6
+            r12 = r6 ** 2
+            
+            # Lennard-Jones potential
+            e_ij = 4 * epsilon * (r12 - r6)
+            energy += e_ij
+            
+            # Force calculation
+            f_ij = 24 * epsilon * (2 * r12 - r6) / r**2 * r_ij
+            forces[i] += f_ij
+            forces[j] -= f_ij
+    
+    return energy, forces
 ```
 
-### 1.2.4 Notes: derivation of Forces
-The force  $\mathbf{F}(r)$ between two particles is the negative gradient of the potential:
+### 1.2.4 Notes: Derivation of Forces
+The force $\mathbf{F}(r)$ between two particles is the negative gradient of the potential:
 
 $$
 \mathbf{F}(r) = -\frac{dV(r)}{dr}
 $$
 
-Taking the derivative of the potential with respect to  r :
+Taking the derivative of the potential with respect to $r$:
 
 $$
 \begin{align*}
@@ -94,24 +103,14 @@ $$
 \end{align*}
 $$
 
-In practice, the $r$ is a 3-vector $(x, y, z)$, to compute the force component on like $F_x(r)$, there is an addition work.
-The distance $r$ between two particles can be written as:
+Thus, the force $\mathbf{F}(r)$ is:
 
 $$
-r = \sqrt{x^2 + y^2 + z^2}
+\mathbf{F}(r) = -\frac{dV(r)}{dr} = -\epsilon \left[ \frac{48\sigma^{12}}{r^{13}} - \frac{24\sigma^{6}}{r^{7}} \right]
 $$
-
-$$
-\begin{align*}
-F_x(r) &= -\frac{dV(x, y, z)}{dx} = -\frac{dV(x, y, z)}{dr}\frac{dr}{dx} \\
-       &= - \frac{dV(x, y, z)}{dr} \frac{x}{r} \\
-       &= x \epsilon \left[ \frac{48\sigma^{12}}{r^{14}} - \frac{24\sigma^{6}}{r^{8}} \right]
-\end{align*}
-$$
-
 
 ### 1.2.5 Initialization
-* Atoimic positions
+* Atomic positions
 If we study a system that mimics solid, we can just create the position on a lattice compatible with the structure that we aim to simulate. You must avoid the case of geometry consisting of two atoms with very short distances.
 
 * Velocities
@@ -120,7 +119,6 @@ Ideally, we should generate the initial velocities to follow the [Maxwell-Boltzm
 $$
 p(v) = 4\pi \left( \frac{m}{2\pi k_B T} \right)^{3/2} v^2 \exp\left(-\frac{mv^2}{2k_B T}\right)
 $$
-
 
 To achieve this, the idea is to sample velocities from a normal (Gaussian) distribution, where the standard deviation is related to the temperature and the mass of the particles.
 
@@ -159,7 +157,7 @@ Note, for the current task of NVE simulation, we would compute velocity from $\m
 --->
 
 ### 1.2.6 Integrator (updating rule)
-After knowing the forces, we can proceed to update the velocities (V) and positions (R) for the next time step:
+After initialization, we need to apply periodic boundary conditions if necessary. This ensures that particles leaving one side of the simulation box re-enter from the opposite side, maintaining a constant number of particles.
 
 $$
 \begin{align*}
@@ -185,21 +183,23 @@ According to Taylor expansion, this algorithm is accurate to $O(dt^3)$ in positi
 2. Run [lec_02_LJ.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_LJ.py) to understand how to implement LJ potential to compute energy and forces,
 3. Complete the codes in [Colab](https://colab.research.google.com/drive/1lB3R0N_s2gP-IhjrxBWq2mDW2VlqIE_c#scrollTo=KDtmzZIA2kvp),
 4. Debug [lec_01_nve_debug.py](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_01_nve_debug.py). You should get a constant `E_total` outputs as shown below if the code works.
+
    
 ```
 Step      0, PE: -9.74960e-18 KE: 1.60642e-18 E_total: -8.14319e-18 CPU_time: 7.93e-02
 Step     10, PE: -9.52152e-18 KE: 1.37792e-18 E_total: -8.14359e-18 CPU_time: 8.52e-01
 Step     20, PE: -8.88977e-18 KE: 7.47063e-19 E_total: -8.14271e-18 CPU_time: 1.62e+00
 Step     30, PE: -8.86056e-18 KE: 7.17322e-19 E_total: -8.14323e-18 CPU_time: 2.39e+00
-Step     40, PE: -8.98529e-18 KE: 8.41977e-19 E_total: -8.14331e-18 CPU_time: 3.16e+00
-Step     50, PE: -8.98938e-18 KE: 8.46170e-19 E_total: -8.14321e-18 CPU_time: 3.93e+00
 ```
 
-Hopefully, you are able to write a basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
+## 1.4 Summary
 
-Of course, there are many excellent open-source MD codes with more functional support. For productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular code for materials modelling.
+In this lecture, we covered the basics of molecular dynamics simulations under the NVE ensemble. We discussed the historical context, the fundamental principles, and the practical implementation steps, including initialization, force computation, integration of equations of motion, and analysis of results. By understanding these concepts, you will be able to simulate and analyze the behavior of atomic systems, gaining insights that are difficult to obtain through experimental methods alone.
 
-For students who already have LAMMPS experience, there is a bonus credit opportunity. 
-Please rerun the simulation in LAMMPS with the same parameter setup. Post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1).
+Hopefully, you are able to write basic code for MD simulation after this practice. You are expected to reinforce your understanding by writing your own code. 
+
+Of course, there are many excellent open-source MD codes with more functional support. For a productive research project, you would probably use those codes. In this course, we recommend the use of [LAMMPS](https://github.com/lammps/lammps), one of the most popular codes for materials modeling.
+
+For students who already have LAMMPS experience, there is a bonus credit opportunity. Please rerun the simulation in LAMMPS with the same parameter setup and post your LAMMPS script to [our forum](https://github.com/qzhu2017/AtomisticSimulation/issues/1).
 
 

@@ -1,6 +1,5 @@
 # 5 MD Analysis I: Structural Characterization
-
-So far, we have learned some fundamentals about how to write a code and run a MD simulation to model the atomistic process of materials. By running the simulation, we expect to generate a set of time-dependent atomic trajectories by solving Newton’s equations of motion for a system of particles. Next, it is important to understand these simulation results. Indeed, it is essential to extract meaningful physical properties from the simulation results. In this lecture, we will cover several fundamental post-analysis techniques: 
+So far, we have learned some fundamentals about how to write code and run an MD simulation to model the atomistic processes of materials. By running the simulation, we expect to generate a set of time-dependent atomic trajectories by solving Newton’s equations of motion for a system of particles. Next, it is important to understand these simulation results. Indeed, it is essential to extract meaningful physical properties from the simulation results. In this lecture, we will cover several fundamental post-analysis techniques:
 
 1. Validation of MD simulation by tracking the evolution of observables,
 2. Visualization of MD trajectories,
@@ -12,10 +11,10 @@ So far, we have learned some fundamentals about how to write a code and run a MD
 In the previous lecture and coding exercises, we have frequently mentioned the tracking of observables like total energy, volume, and temperature throughout an MD simulation to ensure the system reaches equilibrium and conserves energy (in appropriate ensembles).
 
 1. NVE: Total energy should remain constant.
-2. NVT: A fluctuation of Temperature or kinetic energy around some values).
-3. NPT: Both Temperature and Volume fluctuate to maintain temperature and pressure.
+2. NVT: A fluctuation of temperature or kinetic energy around some values.
+3. NPT: Both temperature and volume fluctuate to maintain temperature and pressure.
 
-In your MD simulation, it is advised to save these values every some time interval. Many codes would print out these information to some file. You must go over these results to ensure your simulation results make sense!
+In your MD simulation, it is advised to save these values at regular intervals. Many codes print out this information to some file. You must review these results to ensure your simulation results make sense!
 
 ```python
 import numpy as np
@@ -49,10 +48,10 @@ plt.title('Evolution of Temperature')
 ```
 
 ## 5.2 MD Trajectory Visualization
-Visualization allows researchers to visually inspect the dynamics of the system, spot abnormalities, and better understand atomic movements. Tools like [OVITO](https://www.ovito.org) are commonly used. Please refer to [OVITO](https://www.ovito.org) pape to find more functions.
+Visualization allows researchers to visually inspect the dynamics of the system, spot abnormalities, and better understand atomic movements. Tools like [OVITO](https://www.ovito.org) are commonly used. Please refer to the [OVITO](https://www.ovito.org) paper to find more functions.
 
 ## 5.3 Radial Distribution Function (RDF)
-The [Radial Distribution Function ](https://en.wikipedia.org/wiki/Radial_distribution_function) $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
+The [Radial Distribution Function](https://en.wikipedia.org/wiki/Radial_distribution_function) $g(r)$ measures the probability of finding a particle at a distance $r$ from a reference particle.
 
 $$
 g(r) = \frac{V}{N^2} \left\langle \sum_{i=1}^{N} \sum_{j \neq i}^{N} \delta(r - r_{ij}) \right\rangle \cdot \frac{1}{4 \pi r^2 \Delta r}
@@ -60,9 +59,9 @@ $$
 
 Where:
 
-- $V$  is the volume of the system.
-- $N$  is the number of particles.
-- $r_{ij}$  is the distance between particles $i$ and $j$ .
+- $V$ is the volume of the system.
+- $N$ is the number of particles.
+- $r_{ij}$ is the distance between particles $i$ and $j$.
 - $\delta(r - r_{ij})$ is the Dirac delta function ensuring that only pairs with separation $r_{ij}$ equal to $r$ contribute.
 - $4\pi r^2 \Delta r$ is the volume of a spherical shell at distance $r$ with thickness $\Delta r$.
 
@@ -139,8 +138,8 @@ $$
 C(\tau) = \frac{1}{N} \sum_{i=1}^{N} \left\langle \mathbf{v}_i(0) \cdot \mathbf{v}_i(\tau) \right\rangle
 $$
 
-- $N$ is the total number of time steps in the simulation.
-- $\mathbf{v}_i(t)$ is the velocity of particle $i$ at time step $t$.
+- $N$ is the total number of particles in the system.
+- $\mathbf{v}_i(t)$ is the velocity of particle $i$ at time $t$.
 
 In practice, because simulations are finite and VACF data is computed over a limited time interval, we typically use the discrete Fourier transform (DFT) or fast Fourier transform (FFT) to compute the VDOS numerically:
 
@@ -173,12 +172,12 @@ plt.title('Vibration Spectrum')
 plt.show()
 ```
 
-## 5.5 Why is VACF related to VDOS? 
+## 5.5 Why is VACF related to VDOS?
 
-### 5.5.1 Normal modes
-In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is $3N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. And each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion. And each normal mode in a system is orthogonal to the others. 
+### 5.5.1 Normal Modes
+In a system of $N$ atoms, each atom has 3 degrees of freedom (one for each Cartesian coordinate: $x$, $y$, and $z$). Therefore, the total number of degrees of freedom is $3N$. To understand the pattern of the collective vibrations, we can decompose it into a sum of normal modes, each vibrating at a distinct frequency. Each **normal mode** corresponds to one of these degrees of freedom in terms of collective motion, and each normal mode in a system is orthogonal to the others.
 
-In experiment, you can measure the vibration using IR, Raman or Neutron scattering. How can we measure the vibration from MD trajectory? The key is to extract the viration frequencies from each normal mode.
+In experiments, you can measure vibrations using IR, Raman, or Neutron scattering. How can we measure the vibrations from an MD trajectory? The key is to extract the vibration frequencies from each normal mode.
 
 ### 5.5.2 Vibration Frequency of a single harmonic oscillator
 Let's imagine a simplest case of a single harmonic oscillator, the velocity of an atom is related to its position by:
@@ -201,9 +200,9 @@ $$
 S(\omega) = \int_{-\infty}^{\infty} C_v(t) e^{-i \omega t} dt
 $$
 
-$S(\omega)$ reveals the frequencies at which the velocities oscillate. For a system of harmonic oscillators, these frequencies correspond directly to the vibrational frequencies of the system because atomic vibrations drive the velocity behavior. Hence $S(\omega)$ captures the strength of the velocity fluctuations at each frequency $\omega$. 
+$S(\omega)$ reveals the frequencies at which the velocities oscillate. For a system of harmonic oscillators, these frequencies correspond directly to the vibrational frequencies of the system because atomic vibrations drive the velocity behavior. Hence, $S(\omega)$ captures the strength of the velocity fluctuations at each frequency $\omega$. 
 
-Since these frequencies arise from the harmonic vibrations of atoms, the power spectrum $S(\omega)$ gives us direct insight into the vibrational modes of the system. Hence $S(\omega)$ should be proportional to the VDOS $D(\omega)$ because both describe the distribution of vibrational frequencies in the system. In the harmonic approximation:
+Since these frequencies arise from the harmonic vibrations of atoms, the power spectrum $S(\omega)$ gives us direct insight into the vibrational modes of the system. Hence, $S(\omega)$ should be proportional to the VDOS $D(\omega)$ because both describe the distribution of vibrational frequencies in the system. In the harmonic approximation:
 
 - $D(\omega)$ counts the number of vibrational modes at frequency $\omega$,
 - $S(\omega)$ measures the velocity oscillations caused by these vibrational modes.
@@ -230,16 +229,19 @@ $$
 
 This form shows that the VDOS is directly obtained by taking the cosine transform of the VACF, which captures the oscillatory nature of the velocity correlations and connects them to the vibrational frequencies in the system.
 
-### 5.5.3 Vibration Frequencies of many harmonic oscillators
-If the system has only one normal mode, we can trivially found the frequency by computing the $S(\omega)$. What if the system consists of two normal modes? The $S(\omega)$ would carry the information for both modes. Remember that each normal mode in a system is **orthogonal** to the others. Each mode will make its own contribution to $S(\omega)$. If these modes are identical, you will see a peak with the doubled magnitude. If these modes are different, you will a two distant peaks. Therefore, you just need to compute the total VACF once and then compute $S(\omega)$ from its Fourier Transform. 
+### 5.5.3 Vibration Frequencies of Many Harmonic Oscillators
+If the system has only one normal mode, we can trivially find the frequency by computing the $S(\omega)$. What if the system consists of two normal modes? The $S(\omega)$ would carry the information for both modes. Remember that each normal mode in a system is **orthogonal** to the others. Each mode will make its own contribution to $S(\omega)$. If these modes are identical, you will see a peak with doubled magnitude. If these modes are different, you will see two distinct peaks. Therefore, you just need to compute the total VACF once and then compute $S(\omega)$ from its Fourier Transform.
 
-### 5.5.4 Computational Experiment 
-To understand the concept of VACF, we can perform a simple numerical experiment to simulate two model systems based on an O$_2$ diatomic molecule. In a O$_2$, the equilibrium distance is we consider the atoms are connected by a spring with $k$=1180 N/m. 
-In the first model, we seek to simulate a simple vibration harmonic, by creating the initial velocities along the spring. In the second model, we simulate the combination of vibration and rotation by creating the initial velocites not aligned on the spring. 
+### 5.5.4 Computational Experiment
+
+To understand the concept of VACF, we can perform a simple numerical experiment to simulate two model systems based on an O<sub>2</sub> diatomic molecule. In O<sub>2</sub>, the equilibrium distance is considered to be 1.16 Å, and the atoms are connected by a spring with $k$ = 1180 N/m.
+
+In the first model, we seek to simulate a simple harmonic vibration by creating the initial velocities along the spring. In the second model, we simulate the combination of vibration and rotation by creating the initial velocities not aligned with the spring.
 
    ![Lec_05_models](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_05_diatomic.png)
 
 Running the following MD code, you expect to simulate the motions and then compute the corresponding VACF and VDOS.
+
 ```python
 import numpy as np
 import matplotlib.pyplot as plt
@@ -321,15 +323,14 @@ if __name__ == "__main__":
 ```
    ![Lec_05_models](https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_05_VACF.png)
 
-For the ideal harmonic oscillators, you should expect that the VACF remain the same behavior overtime. Thanks to Fourier analysis, we can conveniently extract the vibrational frequencies for a single and mutiple harmonic oscillators. However, some numerical aspects must be noted. For instance, the low-frequency modes cannot be sampled efficiently within a short VACF run time. The magnitude needs to be properly rescaled if needed.
+For ideal harmonic oscillators, you should expect the VACF to maintain consistent behavior over time. Thanks to Fourier analysis, we can conveniently extract the vibrational frequencies for single and multiple harmonic oscillators. However, some numerical aspects must be noted. For instance, low-frequency modes cannot be sampled efficiently within a short VACF run time. The magnitude needs to be properly rescaled if needed.
 
-Here is a report regarding the simulation of most realistic system [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf).
+Here is a report regarding the simulation of a more realistic system: [VDOS study of LJ liquid and solids](https://aiichironakano.github.io/phys516/VAC.pdf).
 
+## 5.6 Further Discussions
 
-## 5.6 Further discussions
+For realistic systems, LAMMPS allows the computation of both RDF and VACF. Therefore, one just needs to directly get them from the LAMMPS output and then plot them on your own.
 
-For the realistic system, LAMMPS allows the computation of both RDF and VACF. Therefore, one just needs to directly get them from the lammps output and then plot them on your own.
-
-- **Interpretation of RDF**: Peaks in RDF tells the atomic neighbor counts. Liquid and solid have very different behaviors in their RDF.  
-- **Interpretation of VDOS**: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the Low-frequency and high-frequency modes and link them to atomic motions from MD trajectory.
-- **Practical issues in computing VDOS**. Assuming there exist a very small frequency, how can you ensure that such a vibraion mode can be relected in your VACF?
+- **Interpretation of RDF**: Peaks in RDF indicate atomic neighbor counts. Liquids and solids exhibit very different behaviors in their RDF.
+- **Interpretation of VDOS**: Peaks in the VDOS correspond to characteristic vibrational modes of the system. Try to identify the low-frequency and high-frequency modes and link them to atomic motions from the MD trajectory.
+- **Practical issues in computing VDOS**: Assuming there exists a very small frequency, how can you ensure that such a vibration mode can be reflected in your VACF?
