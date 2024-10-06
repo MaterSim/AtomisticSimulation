@@ -207,7 +207,7 @@ The efficiency of metadynamics heavily depends on the proper choice of CVs. Poor
 
 In traditional metadynamics, the constant addition of Gaussian potentials can lead to excessive bias accumulation, which may result in poor sampling or an inaccurate free energy landscape. Well-tempered metadynamics addresses this by gradually reducing the height of the Gaussians added over time, which helps prevent oversampling and ensures that the system does not accumulate too much bias in any particular region. As such, it is expected to improve convergence and enhance the accuracy of the free energy surface estimation.
 
-The key idea behind well-tempered metadynamics is to scale the bias deposition rate according to the amount of bias already present. This scaling is achieved by introducing a parameter called the bias factor  \gamma , which controls how much the bias potential decreases as the simulation progresses. The bias factor is related to a fictitious temperature that effectively dictates how smoothly the bias is added.
+The key idea behind well-tempered metadynamics is to scale the bias deposition rate according to the amount of bias already present. This scaling is achieved by introducing a parameter called the bias factor $\gamma$, which controls how much the bias potential decreases as the simulation progresses. The bias factor is related to a fictitious temperature that effectively dictates how smoothly the bias is added.
 
 The bias potential in well-tempered metadynamics evolves as:
 
@@ -218,8 +218,7 @@ $$
 Compared to the previous equation, an additional exponential form was applied to scale the Gaussian potential, where 
 
 - $k_B$ is the Boltzmann constant.
-- $\gamma$ is the bias factor that determines the rate of decrease in bias deposition.
-- $\Delta T$ is the fictitious temperature, defined as  $\Delta T = T_{\text{system}} (\gamma - 1)$, where  $T_{\text{system}}$ is the real temperature of the system 
+- $\Delta T$ is the fictitious temperature, defined as  $\Delta T = T_{\text{system}} (\gamma - 1)$, where $T_{\text{system}}$ is the real temperature of the system.
 
 The bias factor $\gamma$ effectively controls the level of exploration versus exploitation in the simulation. 
 A larger bias factor results in slower reduction of the bias potential, allowing the system to continue exploring new regions of the free energy surface. Conversely, a smaller bias factor leads to faster convergence, which is beneficial for accurately reconstructing the free energy surface without excessive biasing.
