@@ -105,6 +105,8 @@ When analyzing the $p_l$ series for different structures, Steinhardt found that 
 
 Despite these limitations, the idea of using spherical harmonics and power spectra to describe the local atomic environment has inspired many subsequent works and is still widely used in computational materials science today.
 
+The [colab link](https://colab.research.google.com/drive/10CZ1xm5SZQXb-NqDHOwGTMkbO3yp1Fbu?usp=sharing) allows you to test the concepts of spherical harmonics, bond order parameters and rotation invariancy. 
+
 ## 7.3 Manybody descriptors
 
 In modern computational materials science and atomistic simulations, understanding the local atomic environment goes beyond simple pairwise interactions. Describing how groups of atoms are collectively arranged, including both radial and angular components, is critical for capturing the structural complexity of systems such as liquids, glasses, and complex crystals. Manybody descriptors provide a mathematical framework to represent these arrangements, offering a more detailed picture of the atomic environment than traditional pair distribution functions or angular descriptors alone.
