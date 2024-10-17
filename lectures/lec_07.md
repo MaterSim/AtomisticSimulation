@@ -34,7 +34,12 @@ Where:
 - $\theta_j$ is the angle formed between the bond connecting a particle to its neighbor $j$ and some reference axis.
 - $m$ is the symmetry index. For example, $m$ = 6 is used for systems with hexagonal symmetry.
 
-The value of $\psi_m$ will depend on the degree of angular ordering in the system. If the neighbors of a particle are arranged in a regular, symmetrical pattern, such as a hexagonal lattice, $\psi_m$ will take values close to 1, indicating strong orientational order. In disordered systems, where the angular arrangement of neighbors is more random, $\psi_m$ will approach 0, signifying little to no angular correlation between the particles. Thus, by examining how  $\psi_m$ evolves with temperature, pressure, or density, researchers can gain insights into the structural transformations occurring in the system.
+The value of $\psi_m$ is a **complex number**, and it will depend on the degree of angular ordering in the system. 
+
+- **Magnitude**: The magnitude $|\psi_m(i)|$ measures how well the local arrangement of neighbors conforms to a m-fold symmetric structure. If the neighbors are perfectly arranged in a hexagonal pattern, $|\psi_6(i)|$ will be close to 1. In disordered regions, the value of $|\psi_6(i)|$ will be closer to 0.
+- **Phase**: The phase (angle of $\psi_m(i)$ ) indicates the orientation of the bond order relative to the reference direction.
+
+Thus, by examining how  $\psi_m$ evolves with temperature, pressure, or density, researchers can gain insights into the structural transformations occurring in the system.
 
 ### 7.2.2 Extension to 3D: Neighbor density function
 
