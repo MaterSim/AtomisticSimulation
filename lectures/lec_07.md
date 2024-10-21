@@ -47,13 +47,13 @@ In real-world scenarios, we are primarily dealing with 3D systems. How can we ex
 
 When discussing the 2D Bond Orientational Order Parameter, we derived a formula that aimed to capture the angular relationships between particles. Essentially, we were measuring how the particles around a reference atom were arranged, particularly focusing on their angular orientations. In 3D, this concept becomes more involved. Specifically, we want to describe how atoms are arranged around a central reference atom, taking into account both their radial and angular distributions.
 
-To begin with, we define the **Atomic Neighbor Density Function** to describe the spatial distribution of atoms around a reference atom within a cutoff radius  r_c . The atomic neighbor density function is expressed as:
+To begin with, we define the **Atomic Neighbor Density Function** to describe the spatial distribution of atoms around a reference atom within a cutoff radius $rc$. The atomic neighbor density function is expressed as:
 
 $$
     \rho(\mathbf{r}) = \sum_i^{r_i \leq rc} \delta(\mathbf{r}-\mathbf{r_i})
 $$
 
-Here, $\delta(\mathbf{r} - \mathbf{r_i})$ is the Dirac delta function, which ensures that the function only contributes when a neighboring atom is located at  $\mathbf{r_i}$, and the summation runs over all neighboring atoms within the cutoff radius $rc$.
+Here, $\delta(\mathbf{r} - \mathbf{r_i})$ is the Dirac delta function, which ensures that the function only contributes when a neighboring atom is located at $\mathbf{r_i}$, and the summation runs over all neighboring atoms within the cutoff radius $rc$.
 
 To capture the angular distribution of neighboring atoms, we can transform the spatial neighbor density function into another domain, similar to how the Fourier transform converts a time-domain signal into its frequency components. In this case, we are interested in projecting the atomic density distribution onto the unit sphere to study the angular arrangement of atoms.
 
@@ -65,9 +65,9 @@ $$
 
 In this expression:
 
-- $Y_{lm}(\mathbf{\hat{r}})$  are the spherical harmonics, which form a complete orthonormal basis on the sphere.
+- $Y_{lm}(\mathbf{\hat{r}})$ are the spherical harmonics, which form a complete orthonormal basis on the sphere.
 - $\mathbf{\hat{r}}$  is the normalized radial vector, with a unit length of 1.
-- $c_{lm}$  are the expansion coefficients, which describe the contribution of each spherical harmonic mode to the overall distribution.
+- $c_{lm}$ are the expansion coefficients, which describe the contribution of each spherical harmonic mode to the overall distribution.
 
 Similar to the Fourier transform, the expansion coefficients $c_{lm}$ are complex numbers that capture the angular characteristics of the neighbor density. These coefficients can be computed by projecting the neighbor density function onto the spherical harmonics:
 
@@ -75,12 +75,11 @@ $$
     c_{lm} = \left< Y_{lm}(\mathbf{\hat{r}})|\rho(\mathbf{r}) \right> = \sum_i^{r_i \leq r_c}Y_{lm}(\mathbf{\hat{r}_i}).
 $$
 
-Here, the indices $l$ and $m$ correspond to the angular frequency components, with $l$ denoting the total angular momentum and $m$ representing its projection along a chosen axis. Unlike the 1D Fourier transform, where a single frequency index suffices, spherical harmonics require two indices $l$ and $m$  to describe the angular frequencies in 3D.
+Here, the indices $l$ and $m$ correspond to the angular frequency components, with $l$ denoting the total angular momentum and $m$ representing its projection along a chosen axis. Unlike the 1D Fourier transform, where a single frequency index suffices, spherical harmonics require two indices $l$ and $m$ to describe the angular frequencies in 3D.
 
 These expansion coefficients, $c_{lm}$, contain detailed information about the neighbor density around the reference atom. However, a key issue is that these coefficients are sensitive to rotations of the system. If the system is rotated, the values of $c_{lm}$ will change, which is undesirable when trying to describe the local atomic environment in a way that is independent of orientation.
 
 In practical applications, we aim to find a representation of the local atomic environment that is both real-valued and invariant under translations and rotations of the system.
-
 
 ### 7.2.3 3D Bond Order Parameters
 
@@ -134,7 +133,7 @@ $$
 \rho'(\mathbf{r}) = \sum_i^{r_i \leq rc} \sum_{lm}  4\pi e^{-\alpha(r^2+r_i^2)} I_l(2\alpha r r_i) Y_{lm}^*(\mathbf{\hat{r_i}}) Y_{lm}(\mathbf{\hat{r_i}}),
 $$
 
-where $I_l$  is the modified spherical Bessel function of the first kind, which provides the radial dependence.
+where $I_l$ is the modified spherical Bessel function of the first kind, which provides the radial dependence.
 
 Bartók also introduced a set of polynomials, $g_n(r)$, which help describe the radial component in a more refined way:
 
@@ -145,7 +144,7 @@ $$
 where $N_\alpha$  is a normalization factor given by:
 
 $$
-        N_\alpha = \sqrt{\int_0^{rc} r^2(rc-r)^{2(\alpha+2)}dr}
+    N_\alpha = \sqrt{\int_0^{rc} r^2(rc-r)^{2(\alpha+2)}dr}
 $$
 
 
@@ -217,7 +216,7 @@ $$
 
 Where:
 
-- $r_0$  is a characteristic radius (related to the cutoff radius $rc$).
+- $r_0$ is a characteristic radius (related to the cutoff radius $rc$).
 - $\omega$, $\theta$, and $\phi$ are the spherical coordinates.
 
 The atomic neighbor density function is expressed as:
