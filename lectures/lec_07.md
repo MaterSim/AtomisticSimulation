@@ -50,10 +50,10 @@ When discussing the 2D Bond Orientational Order Parameter, we derived a formula 
 To begin with, we define the **Atomic Neighbor Density Function** to describe the spatial distribution of atoms around a reference atom within a cutoff radius $rc$. The atomic neighbor density function is expressed as:
 
 $$
-    \rho(\mathbf{r}) = \sum_i^{r_i \leq rc} \delta(\mathbf{r}-\mathbf{r_i})
+    \rho(\mathbf{r}) = \sum_i^{r_i \leq r_c} \delta(\mathbf{r}-\mathbf{r_i})
 $$
 
-Here, $\delta(\mathbf{r} - \mathbf{r_i})$ is the Dirac delta function, which ensures that the function only contributes when a neighboring atom is located at $\mathbf{r_i}$, and the summation runs over all neighboring atoms within the cutoff radius $rc$.
+Here, $\delta(\mathbf{r} - \mathbf{r_i})$ is the Dirac delta function, which ensures that the function only contributes when a neighboring atom is located at $\mathbf{r_i}$, and the summation runs over all neighboring atoms within the cutoff radius $r_c$.
 
 To capture the angular distribution of neighboring atoms, we can transform the spatial neighbor density function into another domain, similar to how the Fourier transform converts a time-domain signal into its frequency components. In this case, we are interested in projecting the atomic density distribution onto the unit sphere to study the angular arrangement of atoms.
 
@@ -123,29 +123,43 @@ The modified neighbor density function is given by:
 
 $$
 \begin{equation*}
-    \rho'(\mathbf{r}) = \sum_i^{r_i \leq rc} e^{(-\alpha|\mathbf{r}-\mathbf{r_i}|^2)}
-                      = \sum_i^{r_i \leq rc} e^{-\alpha(r^2+r_i^2)} e^{2\alpha \mathbf{r} \cdot \mathbf{r_i}} 
+    \rho'(\mathbf{r}) = \sum_i^{r_i \leq r_c} e^{(-\alpha|\mathbf{r}-\mathbf{r_i}|^2)}
+                      = \sum_i^{r_i \leq r_c} e^{-\alpha(r^2+r_i^2)} e^{2\alpha \mathbf{r} \cdot \mathbf{r_i}} 
 \end{equation*}
+$$
+
+Expanding the exponential of a dot product in spherical coordinates:
+
+$$
+e^{2\alpha \mathbf{r} \cdot \mathbf{r_i}} = e^{2\alpha r r_i \mathrm{cos(\gamma)}} = 4\pi \sum_{l=0}^{\infty} \sum_{m=-l}^{l} I_l(2\alpha r r_i) Y_{lm}^{*}(\hat{\mathbf{r_i}}) Y_{lm}(\hat{\mathbf{r}}).
+$$
+
+In which, we used the general formula addition theorem for spherical harmonics,
+
+$$
+e^{z \mathrm{cos(\gamma)}} = 4\pi \sum_{l=0}^{\infty} \sum_{m=-l}^{l} I_l(z) Y_{lm}^{*}(\hat{\mathbf{r_i}}) Y_{lm}(\hat{\mathbf{r}}).
 $$
 
 This expression can be further expanded as:
 
 $$
-\rho'(\mathbf{r}) = \sum_i^{r_i \leq rc} \sum_{lm}  4\pi e^{-\alpha(r^2+r_i^2)} I_l(2\alpha r r_i) Y_{lm}^*(\mathbf{\hat{r_i}}) Y_{lm}(\mathbf{\hat{r_i}}),
+\rho'(\mathbf{r}) = \sum_i^{r_i \leq r_c} \sum_{lm}  4\pi e^{-\alpha(r^2+r_i^2)} I_l(2\alpha r r_i) Y_{lm}^*(\mathbf{\hat{r_i}}) Y_{lm}(\mathbf{\hat{r_i}}),
 $$
 
-where $I_l$ is the modified spherical Bessel function of the first kind, which provides the radial dependence.
+where 
+- the first part $I_l(2\alpha r r_i)$ is the modified spherical Bessel function of the first kind (governed by $2\alpha r r_i$), providing the radial dependence
+- the second part captures the angular dependence of the vectors $\mathbf{r}$ and $\mathbf{r}_i$.
 
 Bartók also introduced a set of polynomials, $g_n(r)$, which help describe the radial component in a more refined way:
 
 $$
-    \phi_\alpha(r) = (rc - r)^{\alpha +2}/N_\alpha
+    \phi_\alpha(r) = (r_c - r)^{\alpha +2}/N_\alpha
 $$
 
 where $N_\alpha$  is a normalization factor given by:
 
 $$
-    N_\alpha = \sqrt{\int_0^{rc} r^2(rc-r)^{2(\alpha+2)}dr}
+    N_\alpha = \sqrt{\int_0^{r_c} r^2(r_c-r)^{2(\alpha+2)}dr}
 $$
 
 
@@ -160,20 +174,27 @@ Where $\mathbf{W}$ is constructed from the inverse square root of the overlap ma
 $$
 \begin{equation*}
     \begin{split}
-       S_{\alpha\beta} &= \int_0^{rc}r^2\phi_\alpha(r)\phi_\beta(r)dr \\ 
+       S_{\alpha\beta} &= \int_0^{r_c}r^2\phi_\alpha(r)\phi_\beta(r)dr \\ 
        &= \frac{\sqrt{(2\alpha+5)(2\alpha+6)(2\alpha+7)(2\beta+5)(2\beta+6)(2\beta+7)}}{(5+\alpha+\beta)(6+\alpha+\beta)(7+\alpha+\beta)}
     \end{split}
 \end{equation*}
 $$
 
-The overlap matrix describes how different radial functions overlap with each other and ensures that the final radial basis functions $g_n(r)$ are orthonormal.
+The overlap matrix describes how different radial functions overlap with each other and ensures that the final radial basis functions $g_n(r)$ are **orthonormal**.
 
 The neighbor density function $\rho{\prime}(\mathbf{r})$ can then be expanded in terms of both the radial basis $g_n(r)$ and the spherical harmonics:
 
 $$
-            c_{nlm} = \left< g_n(r)Y_{lm}(\mathbf{\hat{r}})|\rho'(\mathbf{r}) \right> 
-                    = 4\pi\sum_i^{r_i \leq rc} e^{-\alpha r_i^2} Y_{lm}^*(\mathbf{\hat{r}_i}) 
-                     \int_0^{rc} r^2 g_n(r) e^{-\alpha r^2} I_l(2\alpha r r_i) dr
+c_{nlm} = \left< g_n(r)Y_{lm}(\mathbf{\hat{r}})|\rho'(\mathbf{r}) \right> 
+= \int d^3r g_n(r) Y_{lm}(\hat{\mathbf{r}}) \sum_{r_i \leq r_c} \sum_{l{\prime}m{\prime}} 4\pi e^{-\alpha(r^2 + r_i^2)} I_{l{\prime}}(2\alpha r r_i) Y_{l{\prime}m{\prime}}^{*}(\hat{\mathbf{r_i}}) Y_{l{\prime}m{\prime}}(\hat{\mathbf{r}})
+$$
+
+When integrating over the angular variables $\hat{\mathbf{r}}$, only the terms with $l{\prime} = l$ and $m{\prime} = m$  will survive, due to orthogonality. 
+
+$$
+    c_{nlm} = 4\pi \sum_i^{r_i \leq r_c} Y_{lm}^* (\hat{\mathbf{r_i}})  \int_0^{r_c} r^2 g_n(r) e^{-\alpha(r^2 + r_i^2)} I_l(2\alpha r r_i) dr
+            = 4\pi \sum_i^{r_i \leq r_c} e^{-\alpha r_i^2} Y_{lm}^*(\mathbf{\hat{r}_i}) 
+                     \int_0^{r_c} r^2 g_n(r) e^{-\alpha r^2} I_l(2\alpha r r_i) dr
 $$
 
 
@@ -206,7 +227,7 @@ $$
 $$
 \begin{equation*}
     \begin{split}
-        r_0 & \geq rc\\
+        r_0 & \geq r_c\\
         \theta &= \arccos\left(z/r\right)\\
         \phi &= \arctan\left(y/x\right)\\
         \omega &= \pi r/r_0
@@ -217,7 +238,7 @@ $$
 
 Where:
 
-- $r_0$ is a characteristic radius (related to the cutoff radius $rc$).
+- $r_0$ is a characteristic radius (related to the cutoff radius $r_c$).
 - $\omega$, $\theta$, and $\phi$ are the spherical coordinates.
 
 The atomic neighbor density function is expressed as:
@@ -227,7 +248,7 @@ $$
 $$
 
 
-The first term ensures that the density function remains well-behaved with respect to variations in $\omega$, and $f_c$ is a smooth function to ensure that the it gradually decays to 0 when $r \ge rc$.
+The first term ensures that the density function remains well-behaved with respect to variations in $\omega$, and $f_c$ is a smooth function to ensure that the it gradually decays to 0 when $r \ge r_c$.
 
 By expanding the atomic neighbor density function in terms of the [**Wigner-D matrix**](https://en.wikipedia.org/wiki/Wigner_D-matrix) elements, which represent rotations in the angular coordinates, we obtain:
 
