@@ -72,10 +72,11 @@ In this expression:
 Similar to the Fourier transform, the expansion coefficients $c_{lm}$ are complex numbers that capture the angular characteristics of the neighbor density. These coefficients can be computed by projecting the neighbor density function onto the spherical harmonics:
 
 $$
-    c_{lm} = \left< Y_{lm}(\mathbf{\hat{r}})|\rho(\mathbf{r}) \right> = \sum_i^{r_i \leq r_c}Y_{lm}(\mathbf{\hat{r}_i}).
+    c_{lm} = \left< Y_{lm}(\mathbf{\hat{r}})|\rho(\mathbf{r}) \right> = \int Y_{lm}^*(\hat{\mathbf{r}}) \rho(\mathbf{r}) d^3r
+= \sum_i^{r_i \leq r_c}Y_{lm}(\mathbf{\hat{r}_i}) = \sum_i^{r_i \leq r_c} N e^{i m \phi} P_l^m \mathrm{cos}(\theta).
 $$
 
-Here, the indices $l$ and $m$ correspond to the angular frequency components, with $l$ denoting the total angular momentum and $m$ representing its projection along a chosen axis. Unlike the 1D Fourier transform, where a single frequency index suffices, spherical harmonics require two indices $l$ and $m$ to describe the angular frequencies in 3D.
+Here, the indices $l$ and $m$ correspond to the angular frequency components, with $l$ denoting the total angular momentum and $m$ representing its projection along a chosen axis. And $Y_{lm}(\mathbf{\hat{r}})$ can be decomposed as the multiplication between a complex exponential and associated Legendre polynomials. Unlike the 1D Fourier transform, where a single frequency index suffices, spherical harmonics require two indices $l$ and $m$ to describe the angular frequencies in 3D.
 
 These expansion coefficients, $c_{lm}$, contain detailed information about the neighbor density around the reference atom. However, a key issue is that these coefficients are sensitive to rotations of the system. If the system is rotated, the values of $c_{lm}$ will change, which is undesirable when trying to describe the local atomic environment in a way that is independent of orientation.
 
