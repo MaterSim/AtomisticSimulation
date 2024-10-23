@@ -212,7 +212,7 @@ The key idea behind well-tempered metadynamics is to scale the bias deposition r
 The bias potential in well-tempered metadynamics evolves as:
 
 $$
-V_{\text{bias}}(s,t) = \sum_{t{\prime} \leq t} W \exp\left( -\frac{(s(t) - s(t{\prime}))^2}{2 \sigma^2} \right) \exp\left( -\frac{V_{\text{bias}}(s,t{\prime})}{k_B \Delta T} \right)
+V_{\text{bias}}(s,t) = \sum_{t{\prime} \leq t} W \exp\left( -\frac{V_{\text{bias}}(s,t{\prime})}{k_B \Delta T} \right) \exp\left( -\frac{(s(t) - s(t{\prime}))^2}{2 \sigma^2} \right) 
 $$
 
 Compared to the previous equation, an additional exponential form was applied to scale the Gaussian potential, where 
@@ -220,12 +220,18 @@ Compared to the previous equation, an additional exponential form was applied to
 - $k_B$ is the Boltzmann constant.
 - $\Delta T$ is the fictitious temperature, defined as  $\Delta T = T_{\text{system}} (\gamma - 1)$, where $T_{\text{system}}$ is the real temperature of the system.
 
-The bias factor $\gamma$ effectively controls the level of exploration versus exploitation in the simulation. 
-A larger bias factor results in slower reduction of the bias potential, allowing the system to continue exploring new regions of the free energy surface. Conversely, a smaller bias factor leads to faster convergence, which is beneficial for accurately reconstructing the free energy surface without excessive biasing.
+In the standard metadynamics, the height of Gaussian has a fixed value of $W$. In the Well-tempered metadynamics, the height becomes $W\exp\left[-{V_{\text{bias}}(s,t{\prime})}/{k_B \Delta T}\right].$ Recall that $V_{\text{bias}}$ is always positive and motonically increases with time. So $\exp \left[-V_{\text{bias}}(s,t{\prime})/{k_B \Delta T} \right]$ tends to gradually decay from 1 to a very small number as timestep increases. This would prevent a very large bias being deposited at one location. 
 
-Well-tempered metadynamics has several advantages over traditional metadynamics. 
+Thus, $\Delta T$ can be used to adjust how fast the decay should be. 
+- When $\Delta T \rightarrow 0$, $\exp\left[-V_{\text{bias}}(s,t{\prime})/{k_B \Delta T} \right] \rightarrow 0$, which means a zero Gaussian height. Thus, the whole simulation returns to a standard MD simulation with a zero bias. In this scenario, one cannot see the barrier crossing. 
+- When $\Delta T \rightarrow \infty$ , $\exp\left[-V_{\text{bias}}(s,t{\prime})/{k_B \Delta T} \right] \rightarrow 1$, which means a constant Gaussian height W is added at every update. This returns to a standard Metadynamics simulation. In this scenario, one can see the barrier crossing. But this leads to a even sampling of all $s$ values if one run the simulation for a very long time. 
+- By choosing a suitable $\Delta T$ between 0 and infinity, one still keeps despositing nonzero Gussians. But the $s$ region with low $V$ values won't be filled quickly. Therefore, it ensures that low $V$ regions would be visited more frequently than those high $V$ regions.
 
-1. By reducing the rate of bias deposition over time, it ensures that the system can focus more on the most relevant regions of the free energy surface, leading to a more accurate reconstruction, which is crucial for systems with multiple metastable states or complex free energy landscapes.
+In many applications, we are interested in knowing the free energy difference between different energy minima. One can infer the $F(s)$ by counting the histogram via $F(s) = -T \ln N(s, t)$, one eventually finds $F(s)$ is equal for any $s$ in a standard metadynamics simulation. However, you will find $F(s)$ values converge to some distinct values in a Well-tempered metadynamics.
+  
+In summary, the Well-tempered metadynamics has several advantages over traditional metadynamics. 
+
+1. By reducing the rate of bias deposition over time, it ensures that the system can **focus more on the most relevant regions of the free energy surface**, leading to a more accurate reconstruction, which is crucial for systems with multiple metastable states or complex free energy landscapes.
 
 2. It provides a natural mechanism for achieving convergence of the free energy surface. As the system becomes more thoroughly explored, the bias added to the system decreases, ultimately reaching a point where it no longer significantly alters the free energy landscape. This gradual reduction in bias allows the system to settle into the correct free energy minima, providing a reliable estimate of the underlying free energy differences between states.
 
@@ -242,7 +248,6 @@ Its ability to reconstruct free energy surfaces makes it an invaluable tool for 
 
 <!----References
 
-Laio, A., & Parrinello, M. (2002). Escaping free-energy minima. Proceedings of the National Academy of Sciences, 99(20), 12562-12566.
-
-Barducci, A., Bussi, G., & Parrinello, M. (2008). Well-Tempered Metadynamics: A Smoothly Converging and Tunable Free-Energy Method. Physical Review Letters, 100(2), 020603.
+1. Laio, A., & Parrinello, M. (2002). Escaping free-energy minima. Proceedings of the National Academy of Sciences, 99(20), 12562-12566.
+2. Barducci, A., Bussi, G., & Parrinello, M. (2008). Well-Tempered Metadynamics: A Smoothly Converging and Tunable Free-Energy Method. Physical Review Letters, 100(2), 020603.
 ---!>
