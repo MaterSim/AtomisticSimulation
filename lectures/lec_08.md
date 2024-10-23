@@ -103,7 +103,7 @@ Where:
 - $\sigma$ is the width of the Gaussian, determining how localized the bias is in the CV space.
 - $s(t)$ represents the value of the CVs at time $t$.
 
-The bias potential  V_{\text{bias}}(s,t)  accumulates Gaussians placed at the positions the system has visited in the CV space, thus gradually filling the wells in the free energy landscape and pushing the system to explore other areas.
+The bias potential $V_{\text{bias}}(s,t)$ accumulates Gaussians placed at the positions the system has visited in the CV space, thus gradually filling the wells in the free energy landscape and pushing the system to explore other areas.
 
 Below shows how to implement the bias potential in the context of metadynamics.
 
