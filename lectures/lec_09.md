@@ -52,18 +52,7 @@ From these two theorems, we can find that
 - One can reduce the problem from dealing with a many-body wavefunction to a function of three spatial variables.
 - The ground-state density $\rho_0(\mathbf{r})$ minimizes the energy functional $E[\rho]$.
 
-## 9.4 Solution of Non-interacting electrons (to Add)
-
-Although solving the many-electron system is hard, 
-
-$$
-\hat{H} \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N) = E \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N)
-$$
-it is quite straight to solve the system consisting of non-interacting electrons.
-
-
-
-## 9.5 The Kohn-Sham Equations
+## 9.4 The Kohn-Sham Equations
 
 In 1965, Walter Kohn and Lu Jeu Sham applied Variational Principle to develope a method to make DFT practical by introducing a system of non-interacting electrons that produce the same ground-state density as the interacting system.
 
@@ -89,7 +78,7 @@ where
 - $\epsilon_i$: Orbital energies.
 - $V_{\text{eff}}(\mathbf{r})$: Effective potential, including $V_{\text{external}}(\mathbf{r}) + E_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})$
 
-## 9.6 Effective potential in the KS Equations
+## 9.5 Effective potential in the KS Equations
 
 First, for a system with nuclei located at positions $\mathbf{R}_j$ and with nuclear charges $Z_j$, the external potential at a point $\mathbf{r}$ in space is given by:
 
@@ -121,7 +110,7 @@ E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{
 $$
 
 
-## Iteraive Solution
+## 9.6 Iteraive Solution
 After choosing the form of $E_{\text{XC}}$, the total energy can be expressed as electron density. 
 Since the electron density becomes the only concern of interest, one can start with an initial guess of the wavefunction and then solve the KS equations. 
 From each individual Kohn-Sham Equation, we get $\phi_i(\mathbf{r})$ and $\epsilon_i$.
