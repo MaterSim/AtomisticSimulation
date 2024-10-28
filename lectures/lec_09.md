@@ -20,12 +20,12 @@ $$
 The Hamiltonian for such a system is:
 
 $$
-\hat{H} = \sum_{i=1}^{N} \left( -\frac{\hbar^2}{2m} \nabla_i^2 + V_{\text{ext}}(\mathbf{r}_i) \right) + \sum^{i \lt j} \frac{e^2}{4\pi\epsilon_0 |\mathbf{r}_i - \mathbf{r}_j|}
+\hat{H} = \sum_{i=1}^{N} \left( -\frac{\hbar^2}{2m} \nabla_i^2 + V_{\text{external}}(\mathbf{r}_i) \right) + \sum^{i \lt j} \frac{e^2}{4\pi\epsilon_0 |\mathbf{r}_i - \mathbf{r}_j|}
 $$
 
 where 
 
-- The first term represents the kinetic energy of each electron and $V_{\text{ext}}$ (due to external potential).
+- The first term represents the kinetic energy of each electron and $V_{\text{external}}$ (due to external potential).
 - The second summation accounts for electron-electron Coulomb interactions.
 
 It is not easy to solve this equation due to the following issues,
@@ -37,12 +37,12 @@ It is not easy to solve this equation due to the following issues,
 ## 9.3 The Hohenberg-Kohn Theorems
 
 Kohn and Hohenberg proofed two Theorems
-1. The ground-state electron density $\rho_0(\mathbf{r})$ uniquely determines the external potential $V_{\text{ext}}(\mathbf{r})$, up to a constant, and hence all properties of the system. 
+1. The ground-state electron density $\rho_0(\mathbf{r})$ uniquely determines the external potential $V_{\text{external}}(\mathbf{r})$, up to a constant, and hence all properties of the system. 
 
 2. There exists a universal functional $E[\rho]$ such that the ground-state energy $E_0$ can be obtained variationally:
 
 $$
-E_0 = \min_{\rho} \left[ E[\rho] = F[\rho] + \int V_{\text{ext}}(\mathbf{r}) \rho(\mathbf{r}) d\mathbf{r} \right]
+E_0 = \min_{\rho} \left[ E[\rho] = F[\rho] + \int V_{\text{external}}(\mathbf{r}) \rho(\mathbf{r}) d\mathbf{r} \right]
 $$
 
 where $F[\rho]$ is a universal functional comprising the kinetic energy and electron-electron interactions.
@@ -52,46 +52,60 @@ From these two theorems, we can find that
 - One can reduce the problem from dealing with a many-body wavefunction to a function of three spatial variables.
 - The ground-state density $\rho_0(\mathbf{r})$ minimizes the energy functional $E[\rho]$.
 
-## 9.4 The Kohn-Sham Formalism
+## 9.4 Solution of Non-interacting electrons (to Add)
+
+Although solving the many-electron system is hard, 
+
+$$
+\hat{H} \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N) = E \Psi(\mathbf{r}_1, \mathbf{r}_2, \cdots, \mathbf{r}_N)
+$$
+it is quite straight to solve the system consisting of non-interacting electrons.
+
+
+
+## 9.5 The Kohn-Sham Equations
+
 In 1965, Walter Kohn and Lu Jeu Sham applied Variational Principle to develope a method to make DFT practical by introducing a system of non-interacting electrons that produce the same ground-state density as the interacting system.
 
 Following Kohn-Sham Formalism, the total Energy Functional is expressed as:
 
 $$
-E[\rho] = T_s[\rho] + E_{\text{ext}}[\rho] + E_H[\rho] + E_{\text{XC}}[\rho]
+E[\rho] = T_s[\rho] + E_{\text{external}}[\rho] + E_{\text{Hartree}}[\rho] + E_{\text{XC}}[\rho]
 $$
 
 - $T_s[\rho]$: Kinetic energy of non-interacting electrons.
-- $E_{\text{ext}}[\rho]$: Interaction with external potential.
-- $E_H[\rho]$: Hartree energy (classical electron-electron repulsion).
+- $E_{\text{external}}[\rho]$: Interaction with external potential.
+- $E_{\text{Hartree}}[\rho]$: Hartree energy (classical electron-electron repulsion).
 - $E_{\text{XC}}[\rho]$: Exchange-correlation energy, encompassing all many-body effects.
 
-Thus, the Schrödinger equation (now called **Kohn-Sham Equations**) becomes:
+Thus, the Schrödinger equation can be decomposed into a series of **Kohn-Sham Equations**:
 
 $$
 \left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
 $$
 
+where
 - $\phi_i(\mathbf{r})$: Kohn-Sham orbitals.
 - $\epsilon_i$: Orbital energies.
-- $V_{\text{eff}}(\mathbf{r})$: Effective potential.
+- $V_{\text{eff}}(\mathbf{r})$: Effective potential, including $V_{\text{external}}(\mathbf{r}) + E_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})$
 
-**Effective Potential** is
+## 9.6 Effective potential in the KS Equations
 
-$$
-V_{\text{eff}}(\mathbf{r}) = V_{\text{ext}}(\mathbf{r}) + V_H(\mathbf{r}) + V_{\text{XC}}(\mathbf{r})
-$$
-
-- $V_H(\mathbf{r})$ : Hartree potential.
-- $V_{\text{XC}}(\mathbf{r}) = \frac{\delta E_{\text{XC}}[\rho]}{\delta \rho(\mathbf{r})}$ .
-
-The **Electron Density** derived from the solution of KS equation:
+First, for a system with nuclei located at positions $\mathbf{R}_j$ and with nuclear charges $Z_j$, the external potential at a point $\mathbf{r}$ in space is given by:
 
 $$
-\rho(\mathbf{r}) = \sum_{i}^{\text{occ}} |\phi_i(\mathbf{r})|^2
+V_{\text{external}}(\mathbf{r}) = - \sum_{j} \frac{Z_j}{|\mathbf{r} - \mathbf{R}_j|}
 $$
 
-To solve the KS equation, **Exchange-Correlation Functional** is a tricky term that represents the difference between the true kinetic and electron-electron interaction energies and those of the non-interacting reference system. The exact form is unknown. Hence approximations are necessary. Some commond choices are
+Second, the **Hartree potential** $V_{\text{Hartree}}(\mathbf{r})$ is the electrostatic potential felt by an electron at position  $\mathbf{r}$  due to the total electron density:
+
+$$
+V_{\text{Hartree}}(\mathbf{r}) = \int \frac{\rho(\mathbf{r{\prime}})}{|\mathbf{r} - \mathbf{r{\prime}}|} d\mathbf{r{\prime}}
+$$
+
+In practice, the integral is a long-range term and it needs to be computed using techniques such as Fourier transforms or Poisson solvers to handle the long-range nature of the Coulomb interaction.
+
+Finally, the **Exchange-Correlation Functional** is a tricky term that represents the difference between the true kinetic and electron-electron interaction energies and those of the non-interacting reference system. The exact form is unknown. Hence approximations are necessary. Some commond choices are
 
 - ``Local Density Approximation (LDA)`` assumes the exchange-correlation energy at a point depends only on the local density.
 
@@ -106,9 +120,40 @@ $$
 E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) d\mathbf{r}
 $$
 
-Since the electron density becomes the only concern of interest, one can start with a initial guess of the wavefunction and then solve the KS equations iteratively. 
 
-## 9.5 Practical solutions of KS equations explained 
+## Iteraive Solution
+After choosing the form of $E_{\text{XC}}$, the total energy can be expressed as electron density. 
+Since the electron density becomes the only concern of interest, one can start with an initial guess of the wavefunction and then solve the KS equations. 
+From each individual Kohn-Sham Equation, we get $\phi_i(\mathbf{r})$ and $\epsilon_i$.
+After knowing each $\phi_i(\mathbf{r})$, the **Total Electron Density** can be re-estimated as follows:
+
+$$
+\rho(\mathbf{r}) = \sum_{i}^{\text{occ}} |\phi_i(\mathbf{r})|^2
+$$
+
+One can then use the updated $\rho(\mathbf{r})$ to run another iteration. 
+Repeating the iterations several times, one expect to the convergence of $\rho(\mathbf{r})$ and total energy.
+
+```mermaid
+flowchart TD
+    InitDensity["Initial Guess of ρ(r)"]
+    ComputeVeff["Compute V_eff(r)"]
+    SolveKS["Solve KS Equations"]
+    RecomputeDensity["Recompute ρ(r)"]
+    CheckConvergence{"Is ρ(r) Converged?"}
+    Terminate["Terminate"]
+
+    InitDensity --> ComputeVeff
+    ComputeVeff --> SolveKS
+    SolveKS --> RecomputeDensity
+    RecomputeDensity --> CheckConvergence
+    CheckConvergence -- Yes --> Terminate
+    CheckConvergence -- No --> ComputeVeff
+```
+
+
+
+## 9.7 Practical solutions of KS equations explained 
 
 Now, we proceed to apply DFT to solve an One-Dimensional Harmonic Oscillator. Here we start by define the grid.
 We aim to find the wavefunction of an One-Dimensional Harmonic Oscillator. 
@@ -126,7 +171,7 @@ x = np.linspace(x_min, x_max, N)
 dx = x[1] - x[0]
 ```
 
-2. **Express the Kinetic energy** ($T$) and **External Potential** $V_{\text{ext}}(x)$ is simply a Harmonic potential:
+2. **Express the Kinetic energy** ($T$) and **External Potential** $V_{\text{ext}}(x)$:
 ```python
 T = (-2 * np.eye(N) + np.eye(N, k=1) + np.eye(N, k=-1)) / dx**2
 V_ext = 0.5 * x**2
