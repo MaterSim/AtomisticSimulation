@@ -14,7 +14,7 @@ In a H<sub>2</sub>  molecule, we need to consider the following variables in the
 We first write down its Hamiltonian,
 
 $$
-\text{Hamiltonian} \quad \hat{H} = \hat{T}_e + \hat{V} _{\text{ext}} + \hat{V} _{\text{ee}} + \hat{V} _{\text{nn}}
+\hat{H} = \hat{T}_e + \hat{V} _{\text{ext}} + \hat{V} _{\text{ee}} + \hat{V} _{\text{nn}}
 $$
 
 Where
@@ -157,13 +157,13 @@ plt.show()
 In the previous example, we used Local Density Approximation (LDA) for the exchange-correlation energy $E_{\text{XC}}$.
 
 $$
-E_{\text{XC}}^{\text{LDA}}[\rho] = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) \, d\mathbf{r}
+E_{\text{XC}}^{\text{LDA}}[\rho] = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r})  d\mathbf{r}
 $$
 
 The Generalized Gradient Approximation (GGA) improves upon the LDA by including not only the electron density  $\rho(\mathbf{r})$  but also the gradient of the electron density $\nabla \rho(\mathbf{r})$. This allows for a more accurate representation of the exchange-correlation effects, especially in systems where the electron density varies significantly, such as in molecular systems like H<sub>2</sub>.
 
 $$
-E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) \, d\mathbf{r}
+E_{\text{XC}}^{\text{GGA}}[\rho] = \int f(\rho(\mathbf{r}), \nabla \rho(\mathbf{r})) d\mathbf{r}
 $$
 
 where $f(\rho, \nabla \rho)$ is a function that depends on both the local density $\rho$ and its gradient $\nabla \rho$.
