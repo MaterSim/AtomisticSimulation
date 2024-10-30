@@ -41,8 +41,9 @@ $$
 
 To avoid the singularity in the Coulomb interaction for each electron with the protons, the external potential  V_{\text{ext}}(\mathbf{r})  can be softened as follows:
 
+$$
 V_{\text{ext}}(\mathbf{r}) = -\frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_1|^2 + \alpha^2}} - \frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_2|^2 + \alpha^2}}
-
+$$
 
 where $\alpha$  is a small positive softening parameter. This parameter helps to avoid the singularity at points $\mathbf{r} = \mathbf{R}_1$  and  $\mathbf{r} = \mathbf{R}_2$, where the distance between the electron and the nuclei would otherwise be zero, causing a divergence in the potential.
 
@@ -52,7 +53,7 @@ The Hartree potential represents the classical electrostatic potential at a poin
 
 
 $$
-V_{\text{Hatree}}(\mathbf{r}) = \int \frac{\rho(\mathbf{r}{\prime})}{|\mathbf{r} - \mathbf{r}{\prime}|} \, d\mathbf{r}{\prime}
+V_{\text{Hatree}}(\mathbf{r}) = \int \frac{\rho(\mathbf{r}{\prime})}{|\mathbf{r} - \mathbf{r}{\prime}|}  d\mathbf{r}{\prime}
 $$
 
 Direct evaluation of $V_{\text{Hartree}}(\mathbf{r})$  in real space can be computationally expensive, scaling up to $O(N^6)$ for large systems. To address this, the Fourier Space Method is often preferred, especially in periodic systems, as it efficiently computes the potential by solving the Poisson equation in reciprocal space. The Hartree potential can be derived from the Fourier-transformed electron density $\rho(\mathbf{k})$  as:
@@ -62,6 +63,28 @@ V_{\text{Hatree}}(\mathbf{k}) = \frac{4 \pi \rho(\mathbf{k})}{|\mathbf{k}|^2}
 $$
 
 where $V_{\text{Hatree}}(\mathbf{k})$ is the Fourier-transformed Hartree potential.
+
+This invovles three steps:
+
+1.	Fourier Transform of Electron Density:
+
+$$
+\rho(\mathbf{k}) = \text{FFT}(\rho(\mathbf{r}))
+$$
+
+2.	Calculate Hartree Potential in Fourier Space (avoid division by zero at  $\mathbf{k}$ = 0):
+
+$$
+V_{\text{Hartree}}(\mathbf{k}) = \frac{4 \pi \rho(\mathbf{k})}{|\mathbf{k}|^2}
+$$
+
+
+3.	Inverse Fourier Transform to Real Space**:
+
+$$
+V_{\text{Hartree}}(\mathbf{r}) = \text{IFFT}(V_{\text{Hartree}}(\mathbf{k}))
+$$
+
 
 Correspondingly, the Hartree Energy is 
 
@@ -107,7 +130,7 @@ $$
 The total energy is the sum of potential and kinetic energies. The kinetic energy $T_s$ can be numerical evaluated as
 
 $$
-T_s = -\frac{1}{2} \sum_i^{\text{occupied}} \int \phi_i^*(\mathbf{r}) \nabla^2 \phi_i(\mathbf{r}) \, d\mathbf{r}
+T_s = -\frac{1}{2} \sum_i^{\text{occupied}} \int \phi_i^*(\mathbf{r}) \nabla^2 \phi_i(\mathbf{r})  d\mathbf{r}
 $$
 
 where $\phi_i(\mathbf{r})$  are the Kohn-Sham orbitals, and the sum runs over all occupied orbitals.
