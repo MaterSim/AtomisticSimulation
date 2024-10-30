@@ -229,7 +229,7 @@ T = -\frac{1}{2} \int \psi^*(\mathbf{r}) \nabla^2 \psi(\mathbf{r})  d^3\mathbf{r
 $$
 
 $$
-E_{\text{external}} = \int \rho(\mathbf{r}) V_{\text{ext}}(\mathbf{r}) \, d^3\mathbf{r}
+E_{\text{external}} = \int \rho(\mathbf{r}) V_{\text{ext}}(\mathbf{r})  d^3\mathbf{r}
 $$
 
 The numerical expressions are
@@ -239,7 +239,7 @@ T \approx -\frac{1}{2} \sum_i \psi_i^* \left( \nabla^2 \psi \right)_i  dx^3
 $$
 
 $$
-E_{\text{external}} \approx \sum_i \rho_i V_{\text{external}, i} \, dx^3
+E_{\text{external}} \approx \sum_i \rho_i V_{\text{external}, i}  dx^3
 $$
 
 To check if your implmentation is correct, one should compare the results with the analytical solutions for a single H atom. The energy levels for a hydrogen atom in Hartree units (where 1 Hartree = 27.2 eV) are given by the formula:
@@ -269,6 +269,7 @@ It is not easy to solve this equation due to the following issues,
 Thanks to Walter Kohn and many other pioneers, Density Functional Theory (DFT) has become an indispensable tool in physics, chemistry, and materials science for studying the electronic structure of matter. We will examine some basics in this section.
 
 ### 9.3.1 Kohn and Hohenberg Theorems
+
 In 1964, Pierre Hohenberg and Walter Kohn established Density Functional Theory (DFT) that the ground-state properties of a many-electron system are uniquely determined by its electron density $\rho(\mathbf{r})$.
 
 1. The ground-state electron density $\rho_0(\mathbf{r})$ uniquely determines the external potential $V_{\text{external}}(\mathbf{r})$, up to a constant, and hence all properties of the system. 
@@ -337,13 +338,13 @@ $$
 This integral computes the repulsion between all pairs of infinitesimal density elements at positions  $\mathbf{r}$  and  $\mathbf{r{\prime}}$. In a discrete grid, we can approximate this as:
 
 $$
-E_{\text{Hartree}} \approx \frac{1}{2} \sum_{i,j} \frac{\rho_i \rho_j}{|\mathbf{r}_i - \mathbf{r}_j|} \, dx^3 \, dx^3
+E_{\text{Hartree}} \approx \frac{1}{2} \sum_{i,j} \frac{\rho_i \rho_j}{|\mathbf{r}_i - \mathbf{r}_j|} dx^3  dx^3
 $$
 
 Finally, the **Exchange-Correlation Functional** is a tricky term that represents the difference between the true kinetic and electron-electron interaction energies and those of the non-interacting reference system. The exact form is unknown. Hence approximations are necessary. 
 
 $$
-E_{\text{XC}} = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) d^3\mathbf{r}
+E_{\text{XC}} = \int \epsilon_{\text{XC}}(\rho(\mathbf{r})) \rho(\mathbf{r}) d^3 \mathbf{r}
 $$
 
 $$
@@ -407,7 +408,6 @@ In short, DFT proposed two important concepts to solve the many electron problem
 1. The simplification from many electron equations to a set of single electron KS equations. To enable this transition, one needs to seek an optimal effective potential for the single KS equations. This requires the introduction of **Hartree potential** ($V_{\text{Hartree}}$) and **Exchange-Correlation potential** ($V_{\text{XC}}$) on top of the traditional single electron problems based on ($T + V_{\text{external}}$) only.
 2. When solving the KS equations, we use the electron density ($\rho$) to construct the $\hat{H}$. Thus all potential terms needs to be expressed as the function of $\rho$.
 
-   
 After knowing $\rho$, the tentative solution of KS energy and orbital can be obtained. From the orbital, we can get the updated $\rho$ and $V_{\text{eff}}$ and then repeat the process iteratively. When the system reaches a steay state, i.e., the $\rho$ and $V_{\text{eff}}$ no longer change, we can terminate this calculation.
 The entire proceedure can be summaried as follows.
 
