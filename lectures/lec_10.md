@@ -326,9 +326,18 @@ plt.savefig('H2-antibond.png')
 plt.close()
 ```
 <p align="center">
-  <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_bonding.png" alt="Alt text" width="300"/>
-  <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_antibonding.png" alt="Alt text" width="300"/>
+  <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_bonding.png" alt="Alt text" width="480"/>
+  <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_antibonding.png" alt="Alt text" width="480"/>
 </p>
+
+## 10.4 Further discussions
+
+- Interpret the Ground State Energy
+- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
+- Discuss how the electron density represents the covalent bonding between the two protons.
+- Compare the results obtained from LDA and GGA
+- Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
+- Discuss the numerical aspects when extending DFT to more complicated systems (molecules or crystals)
 
 <!----
 ## 10.3 GGA implementation 
@@ -388,13 +397,4 @@ def compute_total_energy_gga(rho, V_ext, T, orbitals, dx):
     return T_s + E_ext + E_H + E_XC
 ```
 ----!>
-
-## 10.4 Further discussions
-
-- Interpret the Ground State Energy
-- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
-- Discuss how the electron density represents the covalent bonding between the two protons.
-- Compare the results obtained from LDA and GGA
-- Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
-- Discuss the numerical aspects when extending DFT to more complicated systems (molecules or crystals)
 
