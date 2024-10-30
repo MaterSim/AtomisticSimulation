@@ -252,6 +252,8 @@ At the ground state, the system has $T$=0.5 Hartree, and $E_{\text{external}}$ =
 
 Additionally, one should plot the first few hydrogen's [atomic orbitals](https://en.wikipedia.org/wiki/Atomic_orbital) (e.g., $1s$, $2s$, $2p_x$, $2p_y$, $2p_z$) to verify the code implementation.
 
+One can find more analysis and instruction in the [notebook](https://colab.research.google.com/drive/1GDDLF0ai8dQK9KA8kNpeBqJi75H-kjkF).
+
 
 ## 9.3 Density Function Theory Solution to Many Electron Systems
 
