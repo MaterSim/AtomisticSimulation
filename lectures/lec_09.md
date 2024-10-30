@@ -229,7 +229,7 @@ T = -\frac{1}{2} \int \psi^*(\mathbf{r}) \nabla^2 \psi(\mathbf{r})  d^3\mathbf{r
 $$
 
 $$
-E_{\text{external}} = \int \rho(\mathbf{r}) V_{\text{ext}}(\mathbf{r})  d^3\mathbf{r}
+E_{\text{external}} = \int \rho(\mathbf{r}) V_{\text{external}}(\mathbf{r})  d^3\mathbf{r}
 $$
 
 The numerical expressions are
@@ -250,10 +250,10 @@ $$
 
 At the ground state, the system has $T$=0.5 Hartree, and $E_{\text{external}}$ = 1.0 Hartree. 
 
-Additionally, one should plot the first few atomic orbitals (e.g., 1s, 2s, 2px, 2py, 2pz) to verify the code implementation.
+Additionally, one should plot the first few hydrogen's [atomic orbitals](https://en.wikipedia.org/wiki/Atomic_orbital) (e.g., $1s$, $2s$, $2p_x$, $2p_y$, $2p_z$) to verify the code implementation.
 
 
-## 9.3 The Challenge of Many-Electrons Equation
+## 9.3 Density Function Theory Solution to Many Electron Systems
 
 While it is straightforward to deal with single electron equation, solving the Schrödinger equation for systems with more than one electron becomes intractable due to the electron-electron interactions. Hartree and Hartree-Fock Methods were developed to apply the mean-field approximations to simplify the many-body problem but still faced limitations, particularly in accounting for electron correlation. 
 
@@ -262,9 +262,6 @@ It is not easy to solve this equation due to the following issues,
 - Computational resources required grow exponentially with the number of electrons.
 - Properly accounting for interactions and correlations between electrons is challenging.
 - Methods like Hartree-Fock simplify the problem but neglect electron correlation, leading to inaccuracies.
-  
-
-## 9.4 Density Function Theory
 
 Thanks to Walter Kohn and many other pioneers, Density Functional Theory (DFT) has become an indispensable tool in physics, chemistry, and materials science for studying the electronic structure of matter. We will examine some basics in this section.
 
@@ -311,9 +308,11 @@ $$
 where
 - $\phi_i(\mathbf{r})$: Kohn-Sham orbitals.
 - $\epsilon_i$: Orbital energies.
-- $V_{\text{eff}}(\mathbf{r})$: Effective potential, including $V_{\text{external}}(\mathbf{r}) + E_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})$
+- $V_{\text{eff}}(\mathbf{r})$: Effective potential, including $V_{\text{external}}(\mathbf{r}) + V_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})$.
 
 ### 9.3.3 Effective potential in the KS Equations
+
+Technically, we can solve the single electron equation as long as the Effective potential $V_{\text{eff}}(\mathbf{r})$ is known. Following the spirit of DFT, we seek to express all potential terms ($V_{\text{external}}$, $E_{\text{Hartree}}$, $V_{\text{XC}}$), base on electron density. 
 
 First, for a system with nuclei located at positions $\mathbf{R}_j$ and with nuclear charges $Z_j$, the external potential at a point $\mathbf{r}$ in space is given by:
 
@@ -374,7 +373,7 @@ For spin-unpolarized systems, the correlation energy per electron can be express
 $$
 \epsilon_{\text{C}}(r_s) =
 \begin{cases}
-A + B \, r_s \ln(r_s) + C \, r_s & \text{for } r_s \leq 1 \\
+A + B r_s \ln(r_s) + C r_s & \text{for } r_s \leq 1 \\
 \frac{\gamma}{1 + \beta_1 \sqrt{r_s} + \beta_2 r_s} & \text{for } r_s > 1
 \end{cases}
 $$
