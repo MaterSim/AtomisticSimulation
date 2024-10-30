@@ -1,8 +1,7 @@
 # 10 DFT Simulation of a Hydrogen Molecule
 
 Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
-By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H$_2$ and the
-electron distribution.
+By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H<sub>2</sub> and the electron distribution.
 
 ## 10.1 Basic Setup
 
