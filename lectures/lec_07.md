@@ -1,10 +1,10 @@
 # 7 Representation of Local Atomic Environment
 
-In atomic and molecular systems, the local environment around a particle plays a crucial role in determining its physical properties. Understanding how atoms or molecules are arranged in space provides insights into the material’s structural characteristics, phase transitions, and dynamic behaviors. The local atomic environment can be described through various mathematical tools. In this lecture, we will birefly start with the previously mentioned radial distribution function. While RDF is effective at describing radial distributions, it falls short when it comes to capturing angular information, which is critical in systems with orientational order. Hence, we attempt to explore the descriptors that can deal with both radial and angular information with mathematical rigor.
+In atomic and molecular systems, the local environment around a particle plays a crucial role in determining its physical properties. Understanding how atoms or molecules are arranged in space provides insights into the material’s structural characteristics, phase transitions, and dynamic behaviors. The local atomic environment can be described through various mathematical tools. In this lecture, we will briefly start with the previously mentioned radial distribution function. While RDF is effective at describing radial distributions, it falls short when it comes to capturing angular information, which is critical in systems with orientational order. Hence, we attempt to explore the descriptors that can deal with both radial and angular information with mathematical rigor.
 
 ## 7.1 Radial Distribution Function and its Limiation
 
-Radial distribution function $g(r)$, is a fundamental tool for describing the local structure in a system of particles. It gives the probability of finding a particle at a distance $r$ from a reference particle, normalized by the average particle density,
+Radial distribution function $g(r)$ is a fundamental tool for describing the local structure in a system of particles. It gives the probability of finding a particle at a distance $r$ from a reference particle, normalized by the average particle density,
 
 $$
 g(r) = \frac{1}{\rho N} \left\langle \sum_{i} \sum_{j \neq i} \delta(r - r_{ij}) \right\rangle
@@ -20,7 +20,7 @@ While the RDF is a powerful tool for capturing the radial distribution of partic
 
 ## 7.2 Orientational Order Parameter
 
-To capture the missing angular information in systems with orientational order, we need to introduce additional descriptors, such as the orientational order parameter. This parameter quantifies the degree of angular ordering among neighboring particles. Unlike RDF which focuses solely on the radial distances, orientational order parameters provide insights into how the bonds between particles are aligned in space. These parameters are particularly useful in distinguishing between phases with different degrees of symmetry, such as solid, liquid, or nematic phases.
+To capture the missing angular information in systems with orientational order, we need to introduce additional descriptors, such as the orientational order parameter. This parameter quantifies the degree of angular ordering among neighboring particles. Unlike RDF, which focuses solely on the radial distances, orientational order parameters provide insights into how the bonds between particles are aligned in space. These parameters are particularly useful in distinguishing between phases with different degrees of symmetry, such as solid, liquid, or nematic phases.
 
 ### 7.2.1 Bond Orientational Order Parameter in a 2D system
 Let’s first consider a two-dimensional system, where the angular relationships between a particle and its nearest neighbors can provide critical information about the system’s structure. To quantify these angular relationships, we define the bond orientational order parameter $\psi_m$, which measures how the bonds between a particle and its neighbors are aligned with respect to a reference axis. The order parameter $\psi_m$ is given by the following equation:
@@ -39,13 +39,14 @@ The value of $\psi_m$ is a **complex number**, and it will depend on the degree 
 - **Magnitude**: The magnitude $|\psi_m(i)|$ measures how well the local arrangement of neighbors conforms to a m-fold symmetric structure. If the neighbors are perfectly arranged in a hexagonal pattern, $|\psi_6(i)|$ will be close to 1. In disordered regions, the value of $|\psi_6(i)|$ will be closer to 0.
 - **Phase**: The phase (angle of $\psi_m(i)$ ) indicates the orientation of the bond order relative to the reference direction.
 
-Thus, by examining how  $\psi_m$ evolves with temperature, pressure, or density, researchers can gain insights into the structural transformations occurring in the system.
+Thus, by examining how $\psi_m$ evolves with temperature, pressure, or density, researchers can gain insights into the structural transformations occurring in the system.
 
-### 7.2.2 Extension to 3D: Neighbor density function
+### 7.2.2 Extension to 3D: Neighbor Density Function
 
 In real-world scenarios, we are primarily dealing with 3D systems. How can we extend the approach we discussed for 2D to 3D? This extension involves additional complexity because, with the introduction of an extra dimension, the alignment of atoms can no longer be described by a single variable, as in 2D. To capture this alignment in 3D, we need to be more rigorous with our mathematical description.
 
 When discussing the 2D Bond Orientational Order Parameter, we derived a formula that aimed to capture the angular relationships between particles. Essentially, we were measuring how the particles around a reference atom were arranged, particularly focusing on their angular orientations. In 3D, this concept becomes more involved. Specifically, we want to describe how atoms are arranged around a central reference atom, taking into account both their radial and angular distributions.
+
 
 To begin with, we define the **Atomic Neighbor Density Function** to describe the spatial distribution of atoms around a reference atom within a cutoff radius $rc$. The atomic neighbor density function is expressed as:
 
@@ -91,6 +92,7 @@ The bond order parameter $p_l$ is defined as:
 $$   
 p_l = \sum_{m=-l}^{+l}c_{lm}c^*_{lm}
 $$
+
 
 Note that this was called $Q_l$ in the original paper. However, it was later found that bond order parameter is closely related to the power spectrum. Hence, we will call it $p_l$ from now on. In signal processing, the power spectrum describes how the power of a signal is distributed across different frequency components. Similarly, in this context, $p_l$ measures the **power** of the neighbor density when projected onto the angular frequency components represented by $l$.
 
@@ -285,11 +287,9 @@ Here, $$C_{m_1 m_2 m}^{j_1 j_2 j}$$  are the **Clebsch-Gordan coefficients**, wh
 
 Manybody descriptors, such as the power spectrum and bispectrum, have found widespread applications in various fields of materials science, condensed matter physics, and machine learning, particularly in the analysis of atomic-scale structures. Their ability to describe both angular and radial components of atomic environments has made them essential tools for understanding complex materials and phenomena.
 
-**Interatomic Potentials and Machine Learning.** One of the most prominent applications of manybody descriptors is in the development of machine-learning-based interatomic potentials. Methods such as the Gaussian Approximation Potential (GAP) and Moment Tensor Potentials (MTP) use manybody descriptors to model the potential energy surface (PES) of atomic systems. These models require descriptors that are invariant to translations, rotations, and permutations of atoms. By providing a compact and invariant representation of the local atomic environment, manybody descriptors allow machine learning models to predict atomic forces and energies with high accuracy, without the need for empirical fitting. This has revolutionized the simulation of large-scale systems, such as materials under extreme conditions or complex chemical reactions.
+**Interatomic Potentials and Machine Learning.** One of the most prominent applications of manybody descriptors is in the development of machine-learning-based interatomic potentials. These models require descriptors that are invariant to translations, rotations, and permutations of atoms. By providing a compact and invariant representation of the local atomic environment, manybody descriptors allow machine learning models to predict atomic forces and energies with high accuracy, without the need for empirical fitting. This has revolutionized the simulation of large-scale systems, such as materials under extreme conditions or complex chemical reactions.
 
-**Materials Characterization.** Bond order parameters are widely used in molecular dynamics (MD) simulations to distinguish between different crystal structures (e.g., fcc, bcc, hcp) and to identify phase transitions between solid, liquid, and amorphous states. These descriptors allow researchers to quantify the degree of local order or disorder in a material and monitor how this order evolves over time. This is particularly useful in the study of glasses, liquids, and amorphous materials, where traditional descriptors like the pair distribution function fail to capture the full complexity of the atomic arrangement. 
-
-**Phase Transitions.** These descriptors are also widely used to investigate phase transitions in materials. For example, during the melting of a crystalline solid, descriptors like the power spectrum $p_l$ can be employed to monitor changes in the local atomic environment, allowing researchers to pinpoint the onset of disorder as a solid transitions to a liquid. In addition, these descriptors can serve as collective variables in enhanced sampling technqiues to study phase transitions. 
+**Materials Characterization and Phase Transition.** Bond order parameters are widely used in molecular dynamics (MD) simulations to distinguish between different crystal structures (e.g., fcc, bcc, hcp) and to identify phase transitions between solid, liquid, and amorphous states. These descriptors allow researchers to quantify the degree of local order or disorder in a material and monitor how this order evolves over time. This is particularly useful in the study of glasses, liquids, and amorphous materials, where traditional descriptors like the pair distribution function fail to capture the full complexity of the atomic arrangement. 
 
 **Physical Property Prediction.** By representing atomic structures in a form that is both compact and invariant, these descriptors enable the construction of high-throughput screening models to predict material properties such as hardness, conductivity, and thermal stability. The use of descriptors like the bispectrum in machine learning pipelines has enabled researchers to explore vast chemical and structural spaces and identify novel materials with desired properties.
 

@@ -241,8 +241,7 @@ Well-tempered metadynamics can be applied to a wide range of systems, from simpl
 
 ## 8.6 Further Discussions
 
-Metadynamics is a powerful enhanced sampling technique to overcome the limitations of traditional MD simulation. 
-Its ability to reconstruct free energy surfaces makes it an invaluable tool for studying complex molecular systems, phase transitions, and reaction mechanisms. However, its success depends on careful selection of collective variables and parameters. By systematically adding bias potentials, metadynamics allows for the study of rare events and provides detailed insights into the thermodynamics and kinetics of molecular systems. 
+Metadynamics is a powerful enhanced sampling technique to overcome the limitations of traditional MD simulation. Its ability to reconstruct free energy surfaces makes it an invaluable tool for studying complex molecular systems, phase transitions, and reaction mechanisms. However, its success depends on careful selection of collective variables and parameters. By systematically adding bias potentials, metadynamics allows for the study of rare events and provides detailed insights into the thermodynamics and kinetics of molecular systems. 
 
 - Discuss how the choice of Gaussian parameters can impact the ordinary metadynamics simulation.
 - Discuss the impact of $\gamma$ on the well tempered metadynamics simulation

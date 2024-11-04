@@ -1,14 +1,14 @@
 # 10 DFT Simulation of a Hydrogen Molecule
+Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single electron system, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
 
-Having learned the basic concept of DFT, we will continue to apply the DFT approach to simulate a more complicated system than a single harmonic oscillator, i.e., the H<sub>2</sub> molecule. H<sub>2</sub> is the simplest molecule, consisting of two protons and two electrons. This small size is ideal for demonstrating the DFT method in a manageable way.
 By solving for the ground state energy and electron density of H<sub>2</sub>, we hope to better understand the numerical aspects of the DFT method. In addition, we will analyze the results to understand the bonding in H<sub>2</sub> and the electron distribution.
 
 ## 10.1 Basic Setup
 
-In a H<sub>2</sub>  molecule, we need to consider the following variables in the KS equation.
+In an H<sub>2</sub> molecule, we need to consider the following variables in the KS equation.
 
-- Nuclei: Two protons, located at positions $R_1$ and $R_2$ .
-- Electrons: Two electrons interacting with the protons and each other.
+- Nuclei: two protons, located at positions $R_1$ and $R_2$.
+- Electrons: two electrons interacting with the protons and each other.
 
 We first write down its Hamiltonian,
 
@@ -22,7 +22,7 @@ Where
 - $\hat{V}_{\text{ee}}$ : Electron-electron interaction.
 - $\hat{V}_{\text{nn}}$ : Nucleus-nucleus interaction.
 
-Hence, Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H<sub>2</sub>, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as $\rho(x) = 2 |\phi_0(x)|^2$. **If you want to solve a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.**
+Hence, the Kohn-Sham formalism reduces the many-body problem to a series of single-particle equations. For the case of H<sub>2</sub>, there is only one Kohn-Sham equation solved because both electrons occupy the same Kohn-Sham orbital. We assume that both electrons have opposite spins and fill the same orbital, so the total electron density is computed as $\rho(\mathbf{r}) = 2 |\phi_0(\mathbf{r})|^2$. **If you want to solve a spin-polarized (or unrestricted) system, you would need to solve two distinct Kohn-Sham equations, one for each electron.**
 
 $$
 \left[ -\frac{\hbar^2}{2m} \nabla^2 + V_{\text{eff}}(\mathbf{r}) \right] \phi_i(\mathbf{r}) = \epsilon_i \phi_i(\mathbf{r})
@@ -30,7 +30,7 @@ $$
 
 ## 10.2 Effective Potentials
 
-### 10.2.1 The external potential $V_{\text{ext}}(\mathbf{r})$ 
+### 10.2.1 The external potential $V_{\text{ext}}(\mathbf{r})$
 
 In a hydrogen molecule, the external potential is given by the Coulomb interaction with the two protons:
 
@@ -38,47 +38,46 @@ $$
 V_{\text{external}}(\mathbf{r}) = -\frac{1}{|\mathbf{r} - \mathbf{R}_1|} - \frac{1}{|\mathbf{r} - \mathbf{R}_2|}
 $$
 
-To avoid the singularity in the Coulomb interaction for each electron with the protons, the external potential  V_{\text{ext}}(\mathbf{r})  can be softened as follows:
+To avoid the singularity in the Coulomb interaction for each electron with the protons, the external potential  $V_{\text{external}}(\mathbf{r})$ can be softened as follows:
 
 $$
-V_{\text{ext}}(\mathbf{r}) = -\frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_1|^2 + \alpha^2}} - \frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_2|^2 + \alpha^2}}
+V_{\text{external}}(\mathbf{r}) = -\frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_1|^2 + \alpha^2}} - \frac{1}{\sqrt{|\mathbf{r} - \mathbf{R}_2|^2 + \alpha^2}}
 $$
 
-where $\alpha$  is a small positive softening parameter. This parameter helps to avoid the singularity at points $\mathbf{r} = \mathbf{R}_1$  and  $\mathbf{r} = \mathbf{R}_2$, where the distance between the electron and the nuclei would otherwise be zero, causing a divergence in the potential.
+where $\alpha$ is a small positive softening parameter. This parameter helps to avoid the singularity at points $\mathbf{r} = \mathbf{R}_1$  and  $\mathbf{r} = \mathbf{R}_2$, where the distance between the electron and the nuclei would otherwise be zero, causing a divergence in the potential.
 
 ### 10.2.2 Hartree potential and Energy
 
-The Hartree potential represents the classical electrostatic potential at a point  $\mathbf{r}$  due to the electron density distribution  $\rho(\mathbf{r})$. It can be calculated as:
-
-
-$$
-V_{\text{Hatree}}(\mathbf{r}) = \int \frac{\rho(\mathbf{r}{\prime})}{|\mathbf{r} - \mathbf{r}{\prime}|}  d\mathbf{r}{\prime}
-$$
-
-Direct evaluation of $V_{\text{Hartree}}(\mathbf{r})$  in real space can be computationally expensive, scaling up to $O(N^6)$ for large systems. To address this, the Fourier Space Method is often preferred, especially in periodic systems, as it efficiently computes the potential by solving the Poisson equation in reciprocal space. The Hartree potential can be derived from the Fourier-transformed electron density $\rho(\mathbf{k})$  as:
+The Hartree potential represents the classical electrostatic potential at a point $\mathbf{r}$ due to the electron density distribution  $\rho(\mathbf{r})$. It can be calculated as:
 
 $$
-V_{\text{Hatree}}(\mathbf{k}) = \frac{4 \pi \rho(\mathbf{k})}{|\mathbf{k}|^2}
+V_{\text{Hartree}}(\mathbf{r}) = \int \frac{\rho(\mathbf{r}{\prime})}{|\mathbf{r} - \mathbf{r}{\prime}|}  d\mathbf{r}{\prime}
+$$
+
+Direct evaluation of $V_{\text{Hartree}}(\mathbf{r})$  in real space can be computationally expensive, scaling up to $O(N^6)$ for large systems. To address this, the Fourier Space method is often preferred, especially in the periodic systems, as it efficiently computes the potential by solving the Poisson equation in reciprocal space. The Hartree potential can be derived from the Fourier-transformed electron density $\rho(\mathbf{k})$ as:
+
+$$
+V_{\text{Hartree}}(\mathbf{k}) = \frac{4 \pi \rho(\mathbf{k})}{|\mathbf{k}|^2}
 $$
 
 where $V_{\text{Hatree}}(\mathbf{k})$ is the Fourier-transformed Hartree potential.
 
-This invovles three steps:
+This involves three steps:
 
-1.	Fourier Transform of Electron Density:
+1.	Fourier transform of electron density:
 
 $$
 \rho(\mathbf{k}) = \text{FFT}(\rho(\mathbf{r}))
 $$
 
-2.	Calculate Hartree Potential in Fourier Space (avoid division by zero at  $\mathbf{k}$ = 0):
+2.	Calculate the Hartree Potential in Fourier Space (avoid division by zero at  $\mathbf{k}$ = 0):
 
 $$
 V_{\text{Hartree}}(\mathbf{k}) = \frac{4 \pi \rho(\mathbf{k})}{|\mathbf{k}|^2}
 $$
 
 
-3.	Inverse Fourier Transform to Real Space**:
+3.	Inverse Fourier Transform to Real Space:
 
 $$
 V_{\text{Hartree}}(\mathbf{r}) = \text{IFFT}(V_{\text{Hartree}}(\mathbf{k}))
@@ -96,7 +95,7 @@ $$
 
 In a hydrogen molecule, the exchange and correlation effects account for the complex quantum interactions between electrons, beyond the simple electrostatic repulsion captured by the Hartree term. These effects are crucial in accurately describing the binding energy, molecular structure, and overall electronic distribution within the molecule.
 
-The exchange-correlation (XC) energy, $E_{\text{XC}}$, combines both exchange effects, which arise from the antisymmetry requirement of the electron wavefunction, and correlation effects, which account for electron-electron repulsion. The exchange-correlation potential,  $V_{\text{XC}}(\mathbf{r})$, is defined as the functional derivative of $E_{\text{XC}}$ with respect to the electron density  $\rho(\mathbf{r})$:
+The exchange-correlation (XC) energy, $E_{\text{XC}}$, combines both exchange effects, which arise from the antisymmetry requirement of the electron wavefunction, and correlation effects, which account for electron-electron repulsion. The exchange-correlation potential, $V_{\text{XC}}(\mathbf{r})$, is defined as the functional derivative of $E_{\text{XC}}$ with respect to the electron density $\rho(\mathbf{r})$:
 
 $$
 V_{\text{XC}}(\mathbf{r}) = \frac{\delta E_{\text{XC}}[\rho]}{\delta \rho(\mathbf{r})}
@@ -119,14 +118,13 @@ For the case of simplicity, we ignore the correlation term here.
 
 ### 10.2.4 The Expression of Effective Potential and Total Energy
 
-
-The Effective Potential is
+Adding all potential terms together, the effective potential is
 
 $$
-V_{\text{eff}}(\mathbf{r}) = V_{\text{external}}(\mathbf{r}) + E_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})
+V_{\text{eff}}(\mathbf{r}) = V_{\text{external}}(\mathbf{r}) + V_{\text{Hartree}}[\rho] + V_{\text{XC}}(\mathbf{r})
 $$
 
-The total energy is the sum of potential and kinetic energies. The kinetic energy $T_s$ can be numerical evaluated as
+The total energy is the sum of potential and kinetic energies. The kinetic energy $T_s$ can be numerically evaluated as
 
 $$
 T_s = -\frac{1}{2} \sum_i^{\text{occupied}} \int \phi_i^*(\mathbf{r}) \nabla^2 \phi_i(\mathbf{r})  d\mathbf{r}
@@ -144,6 +142,8 @@ where $E_{\text{NN}}$ is the nuclear-nuclear repulsion energy, given by $\frac{e
 
 
 ## 10.3 Python Implementation
+
+Below gives an example Python code to compute the ground state of hydrogen molecule.
 
 ### 10.3.1 DFT-SCF calculation
 ```python
@@ -169,11 +169,10 @@ R2 = np.array([0.7, 0, 0])
 num_electrons = 2.0
 E_nuc = 1.0 / (R2[0]-R1[0])
 
-# Softened Coulomb external potential for two protons
-softening = 0.1  # To prevent singularity at nuclei
-scaling_factor = 1.0  # Scale down the external potential
-V_ext = scaling_factor * (-1 / np.sqrt((X - R1[0])**2 + (Y - R1[1])**2 + (Z - R1[2])**2 + softening**2))
-V_ext += scaling_factor * (-1 / np.sqrt((X - R2[0])**2 + (Y - R2[1])**2 + (Z - R2[2])**2 + softening**2))
+# Softened Coulomb potential for two protons
+softening = 0.1  # To prevent singularity 
+V_ext = -1 / np.sqrt((X - R1[0])**2 + (Y - R1[1])**2 + (Z - R1[2])**2 + softening**2)
+V_ext += -1 / np.sqrt((X - R2[0])**2 + (Y - R2[1])**2 + (Z - R2[2])**2 + softening**2)
 
 # Initial guess for electron density
 rho = np.exp(-1 * ((X - R1[0])**2 + (Y - R1[1])**2 + (Z - R1[2])**2))
@@ -212,7 +211,7 @@ def kinetic_energy_operator(N, dx):
     I = eye(N, format='csr')  # Identity matrix for each dimension
     T = kron(kron(T_1D, I), I) + kron(kron(I, T_1D), I) + kron(kron(I, I), T_1D)
 
-    return -0.5 * T  # Scale by -0.5 for the kinetic energy operator
+    return -0.5 * T  # Scale by -0.5 
 
 # SCF loop parameters
 tolerance = 1e-6
@@ -272,7 +271,7 @@ else:
 
 The code iteratively solves the KS equations. In each iteration, the electron density is updated from the orbitals, and the effective potential is recalculated using the new density. This process continues until the electron density converges (i.e., when the difference between the new and old density is smaller than a set tolerance).
 
-Here the function ``eigsh`` solves the eigenvalue problem for the Hamiltonian, returning the Kohn-Sham energies and orbitals. Once the Hamiltonian is constructed and solved, the Kohn-Sham orbitals  $\phi_i(x)$  are used to update the electron density  $\rho(x)$ . The SCF loop continues until the electron density converges.
+Here the function `eigsh` solves the eigenvalue problem for the Hamiltonian, returning the Kohn-Sham energies and orbitals. Once the Hamiltonian is constructed and solved, the Kohn-Sham orbitals $\phi_i(\mathbf{r})$ are used to update the electron density $\rho(\mathbf{r})$. The SCF loop continues until the electron density converges.
 
 An example output looks like the following
 
@@ -305,9 +304,9 @@ Solver HOMO Energy          = -1.047270 Hartree
 To provide a comparison for convergence values in the Kohn-Sham DFT iterations, here are the typical reference values for the energy components of the hydrogen molecule:
 
 - Kinetic Energy ($T$): Approximately 1.2–1.3 Hartree
-- External Energy ($E_\text{external}$): between -3.4 and -3.8 Hartree
-- Hartree Energy ($E_\text{Hartree}$): Usually around 1.2 Hartree
-- Exchange-Correlation Energy ($E_\text{XC}$): Typically between -0.8 and -0.9 Hartree
+- External Energy ($E_{\text{ext}}$): between -3.4 and -3.8 Hartree
+- Hartree Energy ($E_{\text{H}}$): Usually around 1.2 Hartree
+- Exchange-Correlation Energy ($E_{\text{XC}}$): Typically between -0.8 and -0.9 Hartree
 - Total Energy: around -1.19 Hartree
 - The HOMO energy (highest occupied molecular orbital) is generally around -0.6 Hartree.
 
@@ -324,7 +323,6 @@ psi /= np.sqrt(np.sum(np.abs(psi)**2) * dx**3)
 rho = np.abs(psi)**2  # Two electrons in ground state
 
 # Plot a cross-section of the electron density along the z=0 plane
-#plt.imshow(rho[:, :, N//2], extent=(-L/2, L/2, -L/2, L/2), origin='lower')
 plt.contourf(rho[:, :, N//2], extent=(-L/2, L/2, -L/2, L/2), origin='lower')
 plt.colorbar(label='Electron Density')
 plt.xlabel('x (Bohr)')
@@ -338,7 +336,6 @@ psi /= np.sqrt(np.sum(np.abs(psi)**2) * dx**3)
 rho = np.abs(psi)**2  # Two electrons in ground state
 rho *= num_electrons / (np.sum(rho) * dx**3)
 
-#plt.imshow(rho[:, :, N//2], extent=(-L/2, L/2, -L/2, L/2), origin='lower')
 plt.contourf(rho[:, :, N//2], extent=(-L/2, L/2, -L/2, L/2), origin='lower')
 plt.colorbar(label='Electron Density')
 plt.xlabel('x (Bohr)')
@@ -347,6 +344,7 @@ plt.title('Electron Density for H2 Molecule in 3D')
 plt.savefig('H2-antibond.png')
 plt.close()
 ```
+
 <p align="center">
   <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_bonding.png" alt="Alt text" width="480"/>
   <img src="https://github.com/qzhu2017/AtomisticSimulation/blob/main/Codes/lec_10_antibonding.png" alt="Alt text" width="480"/>
@@ -354,12 +352,16 @@ plt.close()
 
 ## 10.4 Further discussions
 
-- Interpret the Ground State Energy
-- Compare the computed total energy of the H<sub>2</sub> molecule with known reference values.
-- Discuss how the electron density represents the covalent bonding between the two protons.
-- Compare the results obtained from LDA and GGA
-- Analyze how DFT with GGA provides a more accurate description of the electron density and energy.
-- Discuss the numerical aspects when extending DFT to more complicated systems (molecules or crystals)
+- **Interpret the Ground State Energy**. The ground state energy of the H<sub>2</sub> molecule is a critical value that represents the lowest energy configuration of the system. It includes contributions from the kinetic energy of the electrons, the external potential energy due to the nuclei, the Hartree energy representing electron-electron repulsion, and the exchange-correlation energy. 
+
+- **Compare the Computed Energy Values**. The computed total energy of the H<sub>2</sub> molecule should be compared with known reference values from literature or high-precision quantum chemistry calculations. Typically, the total energy for the H<sub>2</sub> molecule is around -1.17 Hartree. Any significant deviation from this value could indicate issues with the numerical setup or the approximations used.
+
+- **Discuss the covalent bonding**. The electron density distribution in the H<sub>2</sub> molecule shows how electrons are shared between the two protons, forming a covalent bond. In the ground state, the electron density is highest between the two nuclei, indicating a strong bonding interaction. This distribution can be visualized through contour plots or 3D density plots.
+
+- **Compare the Results Obtained from LDA and GGA**. The Local Density Approximation (LDA) and the Generalized Gradient Approximation (GGA) are two different approaches to approximating the exchange-correlation energy in DFT. LDA considers only the local electron density, while GGA includes the gradient of the electron density. GGA typically provides more accurate results for systems with varying electron densities, such as molecules and surfaces.
+
+- **Extending DFT to More Complicated Systems (Molecules or Crystals)**. Extending DFT to more complicated systems, such as larger molecules or crystals, involves several numerical challenges. These include the increased computational cost due to the larger number of electrons and nuclei, the need for more sophisticated algorithms to solve the Kohn-Sham equations efficiently, and the handling of periodic boundary conditions in crystals. Advanced techniques such as plane-wave basis sets, pseudopotentials, and parallel computing are often employed to address these challenges.
+
 
 <!----
 ## 10.3 GGA implementation 
