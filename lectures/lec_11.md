@@ -26,7 +26,7 @@ Where $\mathbf{k}$ is the wavevector and $u_{\mathbf{k}}(\mathbf{r})$ is a perio
 
 The Kohn-Sham equations for periodic solids are solved in reciprocal space (k-space). The Hamiltonian in k-space is periodic and can be solved using plane-wave basis sets.
 
-In periodic solids, it is convenient to expand the wavefunction  \psi_{\mathbf{k}}(\mathbf{r})  as a sum of plane waves:
+In periodic solids, it is convenient to expand the wavefunction $\psi_{\mathbf{k}}(\mathbf{r})$ as a sum of plane waves:
 
 $$
 \psi_{\mathbf{k}}(\mathbf{r}) = \sum_{\mathbf{G}} C_{\mathbf{k}, \mathbf{G}} e^{i (\mathbf{k} + \mathbf{G}) \cdot \mathbf{r}}
